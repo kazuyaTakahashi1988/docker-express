@@ -29,13 +29,13 @@ services:
  dockerexpress:
    image: dockerexpress
    build:
-    context: dockerExpress
+    context: app
     dockerfile: ./Dockerfile
    ports:
     - 3000:3000
    init: true
    volumes:
-    - ./dockerExpress:/usr/src/app
+    - ./app:/usr/src/app
     - express-node-modules:/usr/src/app/node_modules
    networks:
     - docker-networks-express
