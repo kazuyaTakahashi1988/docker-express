@@ -5,10 +5,11 @@ var cookieParser = require('cookie-parser');
 var crypto = require('crypto');
 var logger = require('morgan');
 
-const passport = require('./auth');
-const session = require('express-session');
-const flash = require('connect-flash');
+var passport = require('./auth');
+var session = require('express-session');
+var flash = require('connect-flash');
 
+// Router
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
 
@@ -19,8 +20,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
+
+// formでPOSTデータを取得する場合、以下のコード必要
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(flash());
 app.use(session({
   secret: 'YOUR-SECRET-STRING',
