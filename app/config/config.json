@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "root",
+    "database": "express_db",
+    "host": "express-mysql",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "root",
+    "database": "express_db",
+    "host": "express-mysql",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "root",
+    "database": "express_db",
+    "host": "express-mysql",
+    "dialect": "mysql"
+  }
+}
