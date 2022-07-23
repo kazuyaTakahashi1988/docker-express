@@ -38,6 +38,11 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', indexRouter);
+app.use('/user', userRouter);
+
+
 
 const authMiddleware = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -72,11 +77,9 @@ app.use(cookieParser());
 // 暗号化につかうキー
 const APP_KEY = 'YOUR-SECRET-KEY';
 
-
 /* ------------------------------------------------
   アカウント作成 ログイン　Router
 ------------------------------------------------ */
-
 
 // バリデーション・ルール
 const registrationValidationRules = [
@@ -126,11 +129,6 @@ app.post('/register', registrationValidationRules, (req, res) => {
     res.redirect(307, '/login');
   });
 });
-
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', indexRouter);
-app.use('/user', userRouter);
 
 /* ------------------------------------------------
   ログイン　Router
