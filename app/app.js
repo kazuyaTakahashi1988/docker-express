@@ -42,7 +42,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/user', userRouter);
 
-
+/* ------------------------------------------------
+  ログイン ＆ アカウント登録関連
+------------------------------------------------ */
 
 const authMiddleware = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -77,9 +79,9 @@ app.use(cookieParser());
 // 暗号化につかうキー
 const APP_KEY = 'YOUR-SECRET-KEY';
 
-/* ------------------------------------------------
-  アカウント作成 ログイン　Router
------------------------------------------------- */
+/* --------------------------------
+  アカウント作成 Router
+-------------------------------- */
 
 // バリデーション・ルール
 const registrationValidationRules = [
@@ -130,9 +132,9 @@ app.post('/register', registrationValidationRules, (req, res) => {
   });
 });
 
-/* ------------------------------------------------
+/* --------------------------------
   ログイン　Router
------------------------------------------------- */
+-------------------------------- */
 
 const adminAuthMiddleware01 = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -141,7 +143,6 @@ const adminAuthMiddleware01 = (req, res, next) => {
     res.redirect(302, '/');
   }
 };
-
 
 // ログインページ
 app.get('/login', adminAuthMiddleware01, (req, res) => {
