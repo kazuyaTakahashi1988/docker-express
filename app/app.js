@@ -1,18 +1,22 @@
 var createError = require('http-errors');
 var express = require('express');
+var logger = require('morgan');
 var path = require('path');
+
 var cookieParser = require('cookie-parser');
 var crypto = require('crypto');
-var logger = require('morgan');
-
 var passport = require('./auth');
 var session = require('express-session');
 var flash = require('connect-flash');
 
+var { check, validationResult } = require('express-validator');
+var nodemailer = require('nodemailer');
+var bcrypt = require('bcryptjs');
+var User = require('./models').User;
+
 // Router
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
-
 var app = express();
 
 // view engine setup
@@ -67,12 +71,82 @@ const authMiddleware = (req, res, next) => {
 app.use(cookieParser());
 // 暗号化につかうキー
 const APP_KEY = 'YOUR-SECRET-KEY';
+
+
+/* ------------------------------------------------
+  アカウント作成 ログイン　Router
+------------------------------------------------ */
+
+
+// バリデーション・ルール
+const registrationValidationRules = [
+  check('name')
+    .not().isEmpty().withMessage('名前は項目は必須入力です。'),
+  check('email')
+    .not().isEmpty().withMessage('メールアドレスは項目は必須入力です。')
+    .isEmail().withMessage('有効なメールアドレス形式で指定してください。'),
+  check('password')
+    .not().isEmpty().withMessage('パスワードはこの項目は必須入力です。')
+    .isLength({ min: 8, max: 25 }).withMessage('パスワードは8文字から25文字にしてください。')
+    .custom((value, { req }) => {
+      if (req.body.password !== req.body.passwordConfirmation) {
+        throw new Error('パスワード（確認）と一致しません。');
+      }
+      return true;
+    })
+];
+
+// アカウント作成ページ
+app.get('/register', (req, res) => {
+  return res.render('auth/register', {
+    errors: undefined
+  });
+});
+app.post('/register', registrationValidationRules, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) { // バリデーション失敗
+    // return res.status(422).json({ errors: errors.array() });
+    return res.render('auth/register', {
+      errors: errors.array()
+    })
+  }
+  // 送信されたデータ
+  const name = req.body.name;
+  const email = req.body.email;
+  const password = req.body.password;
+  // ユーザーデータを登録（仮登録）
+  User.findOrCreate({
+    where: { email: email },
+    defaults: {
+      name: name,
+      email: email,
+      password: bcrypt.hashSync(password, bcrypt.genSaltSync(8))
+    }
+  }).then(([user]) => {
+    res.redirect(307, '/login');
+  });
+});
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/user', userRouter);
 
-// ログインフォーム
-app.get('/login', (req, res) => {
+/* ------------------------------------------------
+  ログイン　Router
+------------------------------------------------ */
+
+const adminAuthMiddleware01 = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect(302, '/');
+  }
+};
+
+
+// ログインページ
+app.get('/login', adminAuthMiddleware01, (req, res) => {
   const errorMessage = req.flash('error').join('<br>');
   res.render('login/form', {
     errorMessage: errorMessage
@@ -109,23 +183,22 @@ app.post('/login',
   }
 );
 
-// ログアウトのページ
+// ログアウトページ
 app.get('/logout', (req, res) => {
   req.session.passport.user = undefined;
   res.redirect('/')
-})
+});
 
-// catch 404 and forward to error handler
+
+/* ------------------------------------------------
+  catch 404 and forward to error handler
+------------------------------------------------ */
 app.use(function (req, res, next) {
   next(createError(404));
 });
-
-// error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
