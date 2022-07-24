@@ -1,6 +1,6 @@
 <%
 let args = {
-    // pageTtl: title,
+    pageTtl: title,
     // pageDes: 'トップディスクリプション',
     // pageKey: 'トップキー',
     // pageUrl: '/index.html',
@@ -17,15 +17,15 @@ let args = {
 <html lang="ja">
 
 <head>
-  <%- include('../public/assets/inc/_load-head-ga') %>
-  <%- include('../public/assets/inc/_load-head-meta',{ args, user }) %>
-  <%- include('../public/assets/inc/_load-head-css',{ args, user }) %>
-  <%- include('../public/assets/inc/_load-head-js',{ args, user }) %>
+  <%- include('../../public/assets/inc/_load-head-ga') %>
+  <%- include('../../public/assets/inc/_load-head-meta',{ args, user }) %>
+  <%- include('../../public/assets/inc/_load-head-css',{ args, user }) %>
+  <%- include('../../public/assets/inc/_load-head-js',{ args, user }) %>
 </head>
 
 <body class="pagetype-home">
-  <%- // include('../public/assets/inc/_load-body-svg') %>
-  <%- include('../public/assets/inc/_load-body-header',{ args, user }) %>
+  <%- // include('../../public/assets/inc/_load-body-svg') %>
+  <%- include('../../public/assets/inc/_load-body-header',{ args, user }) %>
 
   <% if(!user){ %>
   <div class="container">
@@ -33,18 +33,18 @@ let args = {
     <p>質問者の投稿に気軽にコメントとリプライを送ることができ、名前とメールアドレスの登録だけで簡単に始められます。<br>下記のボタンから会員登録して本サイトをご活用ください。</p>
     <p class="text-center mt-5">
       <a href="/login/" class="btn btn-primary text-white mr-3 px-5 py-2">▷&nbsp;&nbsp;ログインはこちら</a>
-      <a href="/register/"  class="btn btn-secondary text-white px-5 py-2">▷&nbsp;&nbsp;会員登録はこちら</a>
+      <a href="/register/" class="btn btn-secondary text-white px-5 py-2">▷&nbsp;&nbsp;会員登録はこちら</a>
     </p>
   </div>
   <% } %>
 
   <div class="container">
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p><br>
+    <p class="text-right"><a href="/logout/" class="btn btn-secondary text-white px-5 py-2">ログアウトはこちら</a></p>
+    <p><h1>開発中...</h1>（ User：<%= title %>のダッシュボード )</p><br>
   </div>
 
-  <%- include('../public/assets/inc/_load-body-footer',{ args, user }) %>
-  <%- include('../public/assets/inc/_load-body-js',{ args, user }) %>
+  <%- include('../../public/assets/inc/_load-body-footer',{ args, user }) %>
+  <%- include('../../public/assets/inc/_load-body-js',{ args, user }) %>
 </body>
 
 </html>

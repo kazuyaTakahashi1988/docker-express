@@ -1,0 +1,34 @@
+<% let define = {
+    SITE_NAME: 'Q & A site - ナゼナゼ Express -',
+    SITE_HOST: 'https://Default-Host.com',
+    SITE_DES: ' Q & A site - ナゼナゼ Express - は質問を投稿、及び回答することができるC to C サービスです。',
+    SITE_KEY: 'デフォルトキー',
+}; %>
+
+<!-- ▽ head meta ▽ -->
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="<%= args.pageDes ? args.pageDes : define.SITE_DES %>" />
+<meta name="keywords" content="<%= args.pageKey ? args.pageKey : define.SITE_KEY %>" />
+<title><%= args.pageTtl ? `${args.pageTtl} | ${define.SITE_NAME}` : define.SITE_NAME %></title>
+
+<!-- ▽ OGP meta ▽ -->
+<meta property="og:site_name" content="<%= define.SITE_NAME %>" />
+<meta property="og:url" content="<%= args.pageUrl ? `${define.SITE_HOST}${args.pageUrl}` : define.SITE_HOST %>" />
+<meta property="og:title" content="<%= args.pageTtl ? `${args.pageTtl} | ${define.SITE_NAME}` : define.SITE_NAME %>" />
+<meta property="og:description" content="<%= args.pageDes ? args.pageDes : define.SITE_DES %>" />
+<meta property="og:image" content="<%= args.pageImg ? `${define.SITE_HOST}/assets/images${args.pageImg}` : `${define.SITE_HOST}/assets/images/common/ogp.png` %>" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="fb:admins" content="xxxxxxxxx">
+<meta name="twitter:card" content="summary_large_image" />
+
+<% if (args.is_home == true){ %>
+<meta property="og:type" content="website" />
+<% } else { %>
+<meta property="og:type" content="article" />
+<% } %>
+
+<!-- ▽ favicon ▽ -->
+<link rel="icon" href="/assets/images/common/favicon.ico" type="image/vnd.microsoft.icon" />
+<link rel="apple-touch-icon" href="/assets/images/common/apple-touch-icon.png" />

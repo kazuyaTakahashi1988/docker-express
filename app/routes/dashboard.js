@@ -14,7 +14,7 @@ router.get('/', adminAuthMiddleware, async (req, res, next) => {
   // User.findOne({ where: { rememberToken: req.session.passport.user.rememberToken } }).then(users => {
   // });
   // res.send(users);
-  res.render('user', { title: req.session.passport.user.id + req.session.passport.user.name });
+  res.render('dashboard', { title: req.session.passport.user.name, user : req.user });
 });
 
 module.exports = router;

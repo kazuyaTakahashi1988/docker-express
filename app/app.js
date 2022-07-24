@@ -16,7 +16,7 @@ var User = require('./models').User;
 
 // Router
 var indexRouter = require('./routes/index');
-var userRouter = require('./routes/user');
+var dashboardRouter = require('./routes/dashboard');
 var app = express();
 
 // view engine setup
@@ -40,7 +40,7 @@ app.use(passport.session());
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
-app.use('/user', userRouter);
+app.use('/dashboard', dashboardRouter);
 
 /* ------------------------------------------------
   ログイン ＆ アカウント登録関連
@@ -178,7 +178,7 @@ app.post('/login',
     return next();
   },
   (req, res) => {
-    res.redirect('/user');
+    res.redirect('/dashboard');
   }
 );
 
