@@ -25,10 +25,9 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 
-// formでPOSTデータを取得する場合、以下のコード必要
+// 認証関連
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(flash());
 app.use(session({
   secret: 'YOUR-SECRET-STRING',
@@ -38,21 +37,22 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Router 指定
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/dashboard', dashboardRouter);
 
 /* ------------------------------------------------
-  ログイン ＆ アカウント登録関連
+  認証関連
 ------------------------------------------------ */
 
 app.use(cookieParser());
 // 暗号化につかうキー
 const APP_KEY = 'YOUR-SECRET-KEY';
 
-/* --------------------------------
-  アカウント作成 Router
--------------------------------- */
+/* ---------------------------
+  アカウント作成 
+--------------------------- */
 
 // 認証判定
 const authJudge = (req, res, next) => {
@@ -112,9 +112,9 @@ app.post('/register', registrationValidationRules, (req, res) => {
   });
 });
 
-/* --------------------------------
-  ログイン　Router
--------------------------------- */
+/* ---------------------------
+  ログイン
+--------------------------- */
 
 // ログインページ
 app.get('/login', authJudge, (req, res) => {
