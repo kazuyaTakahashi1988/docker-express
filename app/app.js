@@ -3,12 +3,12 @@ var express = require('express');
 var logger = require('morgan');
 var path = require('path');
 
+// 認証関連
 var cookieParser = require('cookie-parser');
 var crypto = require('crypto');
 var passport = require('./auth');
 var session = require('express-session');
 var flash = require('connect-flash');
-
 var { check, validationResult } = require('express-validator');
 var nodemailer = require('nodemailer');
 var bcrypt = require('bcryptjs');
@@ -22,7 +22,6 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
 app.use(logger('dev'));
 
 // 認証関連
@@ -37,13 +36,13 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Router 指定
+// Router
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/dashboard', dashboardRouter);
 
 /* ------------------------------------------------
-  認証関連
+  ▽ 認証関連 ▽
 ------------------------------------------------ */
 
 app.use(cookieParser());
@@ -162,7 +161,7 @@ app.get('/logout', (req, res) => {
 
 
 /* ------------------------------------------------
-  catch 404 and forward to error handler
+  ▽ catch 404 and forward to error handler ▽
 ------------------------------------------------ */
 app.use(function (req, res, next) {
   next(createError(404));
