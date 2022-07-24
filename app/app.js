@@ -147,7 +147,7 @@ const adminAuthMiddleware01 = (req, res, next) => {
 // ログインページ
 app.get('/login', adminAuthMiddleware01, (req, res) => {
   const errorMessage = req.flash('error').join('<br>');
-  res.render('login/form', {
+  res.render('auth/form', {
     errorMessage: errorMessage
   });
 });
