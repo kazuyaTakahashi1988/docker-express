@@ -17,15 +17,15 @@ let args = {
 <html lang="ja">
 
 <head>
-  <%- include('../../public/assets/inc/_load-head-ga') %>
-  <%- include('../../public/assets/inc/_load-head-meta',{ args, user }) %>
-  <%- include('../../public/assets/inc/_load-head-css',{ args, user }) %>
-  <%- include('../../public/assets/inc/_load-head-js',{ args, user }) %>
+  <%- include('./../_inc/load-head-ga') %>
+  <%- include('./../_inc/load-head-meta',{ args, user }) %>
+  <%- include('./../_inc/load-head-css',{ args, user }) %>
+  <%- include('./../_inc/load-head-js',{ args, user }) %>
 </head>
 
 <body class="pagetype-home">
-  <%- // include('../../public/assets/inc/_load-body-svg') %>
-  <%- include('../../public/assets/inc/_load-body-header',{ args, user }) %>
+  <%- // include('./../_inc/load-body-svg') %>
+  <%- include('./../_inc/load-body-header',{ args, user }) %>
 
   <% if(!user){ %>
   <div class="container">
@@ -43,8 +43,8 @@ let args = {
     <p><h1>開発中...</h1>（ User：<%= title %>のダッシュボード )</p><br>
   </div>
 
-  <%- include('../../public/assets/inc/_load-body-footer',{ args, user }) %>
-  <%- include('../../public/assets/inc/_load-body-js',{ args, user }) %>
+  <%- include('./../_inc/load-body-footer',{ args, user }) %>
+  <%- include('./../_inc/load-body-js',{ args, user }) %>
 </body>
 
 </html>
