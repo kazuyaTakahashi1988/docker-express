@@ -46,35 +46,6 @@ app.use('/dashboard', dashboardRouter);
   ログイン ＆ アカウント登録関連
 ------------------------------------------------ */
 
-const authMiddleware = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    next();
-  } else if (req.cookies.remember_me) {
-    const [rememberToken, hash] = req.cookies.remember_me.split('|');
-    User.findAll({
-      where: {
-        rememberToken: rememberToken
-      }
-    }).then(users => {
-      for (let i in users) {
-        const user = users[i];
-        const verifyingHash = crypto.createHmac('sha256', APP_KEY)
-          .update(user.id + '-' + rememberToken)
-          .digest('hex');
-        if (hash === verifyingHash) {
-          return req.login(user, () => {
-            // セキュリティ的はここで remember_me を再度更新すべき
-            next();
-          });
-        }
-      }
-      res.redirect(302, '/login');
-    });
-  } else {
-    res.redirect(302, '/login');
-  }
-};
-
 app.use(cookieParser());
 // 暗号化につかうキー
 const APP_KEY = 'YOUR-SECRET-KEY';
@@ -82,7 +53,6 @@ const APP_KEY = 'YOUR-SECRET-KEY';
 /* --------------------------------
   アカウント作成 Router
 -------------------------------- */
-
 
 // 認証判定
 const authJudge = (req, res, next) => {
