@@ -19,11 +19,6 @@ var indexRouter = require('./routes/index');
 var dashboardRouter = require('./routes/dashboard');
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(logger('dev'));
-
 // 認証関連
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -35,23 +30,24 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cookieParser());
 
 // Router
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/dashboard', dashboardRouter);
 
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(logger('dev'));
+
 /* ------------------------------------------------
   ▽ 認証関連 ▽
 ------------------------------------------------ */
 
-app.use(cookieParser());
 // 暗号化につかうキー
 const APP_KEY = 'YOUR-SECRET-KEY';
-
-/* ---------------------------
-  アカウント作成 
---------------------------- */
 
 // 認証判定
 const authJudge = (req, res, next) => {
@@ -61,6 +57,17 @@ const authJudge = (req, res, next) => {
     res.redirect(302, '/');
   }
 };
+
+/* ---------------------------
+  アカウント作成 
+--------------------------- */
+
+// アカウント作成ページ
+app.get('/register', authJudge, (req, res) => {
+  return res.render('auth/register', {
+    errors: undefined
+  });
+});
 
 // バリデーション・ルール
 const registrationValidationRules = [
@@ -80,12 +87,6 @@ const registrationValidationRules = [
     })
 ];
 
-// アカウント作成ページ
-app.get('/register', authJudge, (req, res) => {
-  return res.render('auth/register', {
-    errors: undefined
-  });
-});
 app.post('/register', registrationValidationRules, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) { // バリデーション失敗
@@ -158,7 +159,6 @@ app.get('/logout', (req, res) => {
   req.session.passport.user = undefined;
   res.redirect('/')
 });
-
 
 /* ------------------------------------------------
   ▽ catch 404 and forward to error handler ▽
