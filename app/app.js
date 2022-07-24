@@ -83,6 +83,16 @@ const APP_KEY = 'YOUR-SECRET-KEY';
   アカウント作成 Router
 -------------------------------- */
 
+
+// 認証判定
+const authJudge = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect(302, '/');
+  }
+};
+
 // バリデーション・ルール
 const registrationValidationRules = [
   check('name')
@@ -102,7 +112,7 @@ const registrationValidationRules = [
 ];
 
 // アカウント作成ページ
-app.get('/register', (req, res) => {
+app.get('/register', authJudge, (req, res) => {
   return res.render('auth/register', {
     errors: undefined
   });
@@ -136,18 +146,10 @@ app.post('/register', registrationValidationRules, (req, res) => {
   ログイン　Router
 -------------------------------- */
 
-const adminAuthMiddleware01 = (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    next();
-  } else {
-    res.redirect(302, '/');
-  }
-};
-
 // ログインページ
-app.get('/login', adminAuthMiddleware01, (req, res) => {
+app.get('/login', authJudge, (req, res) => {
   const errorMessage = req.flash('error').join('<br>');
-  res.render('auth/form', {
+  res.render('auth/login', {
     errorMessage: errorMessage
   });
 });
