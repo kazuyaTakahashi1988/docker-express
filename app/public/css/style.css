@@ -6,3 +6,23 @@ body {
 a {
   color: #00B7FF;
 }
+.pList .pTitle{
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pList .pContent{
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 75px;
+}
+a:hover{
+  text-decoration: none!important;
+}
+.pList a:hover .btn-primary{
+  background-color: #444;
+  border-color: #444;
+}

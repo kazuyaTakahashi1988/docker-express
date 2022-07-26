@@ -19,7 +19,7 @@ var indexRouter = require('./routes/index');
 var dashboardRouter = require('./routes/dashboard');
 var app = express();
 
-// 認証関連
+// use 認証関連
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(flash());
@@ -32,12 +32,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
 
-// Router
+// use Router
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/dashboard', dashboardRouter);
 
-// view engine setup
+// use view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(logger('dev'));
