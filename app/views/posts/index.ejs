@@ -1,0 +1,64 @@
+<%
+let args = {
+    // pageTtl: title,
+    // pageDes: 'トップディスクリプション',
+    // pageKey: 'トップキー',
+    // pageUrl: '/index.html',
+    // pageImg: '/top/ogp.png',
+    // pageCss: '/top.css',
+    // pageJs: '/top.min.js',
+    // pageCss02: '',
+    // pageJs02: '',
+    // is_jquery: true,
+    // is_home: true,
+};
+%>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <%- include('./../_inc/load-head-ga') %>
+  <%- include('./../_inc/load-head-meta',{ args, user }) %>
+  <%- include('./../_inc/load-head-css',{ args, user }) %>
+  <%- include('./../_inc/load-head-js',{ args, user }) %>
+</head>
+
+<body class="pagetype-home">
+  <%- // include('./../_inc/load-body-svg') %>
+  <%- include('./../_inc/load-body-header',{ args, user }) %>
+
+  <div class="container bg-light p-5 rounded">
+    <h4 class="mb-5 text-center">-&nbsp;&nbsp;Q & A 一覧 &nbsp;&nbsp;-</h4>
+    <div class="row text-center pList">
+      <% posts.forEach( post => { %>
+      <div class="col-lg-4 mb-5">
+        <a href="<%= `/posts/${post.id}` %>" class="d-block text-dark">
+          <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <title>Placeholder</title>
+            <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text>
+          </svg>
+          <h5 class="pTitle my-3 text-left"><b>Q.&nbsp;&nbsp;</b><b><%= post.title %></b></h5>
+          <p class="pContent text-left"><%= post.content.replace(/(<([^>]+)>)/gi, "").slice(0, 150) %></p>
+          <p><span class="btn btn-primary" href="<%= `/posts/${post.id}` %>">View details »</span></p>
+        </a>
+      </div>
+      <% }) %>
+    </div>
+
+    <div aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        <% if(page > 1){ %><li class="page-item"><a class="page-link" href="<%= `/posts?page=${page - 1}` %>">&laquo;</a></li><% } %>
+        <% for(let index = 1; index <= count; index++){ %>
+        <li class="page-item <%- page == index && `active` %>"><a class="page-link" href="<%= `/posts?page=${index}` %>"><%= index %></a></li>
+        <% } %>
+        <% if(page < count){ %><li class="page-item"><a class="page-link" href="<%= `/posts?page=${++page}` %>">&raquo;</a></li><% } %>
+      </ul>
+    </div>
+
+  </div>
+
+  <%- include('./../_inc/load-body-footer',{ args, user }) %>
+  <%- include('./../_inc/load-body-js',{ args, user }) %>
+</body>
+
+</html>

@@ -1,21 +1,11 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-
-const adminAuthMiddleware = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    next();
-  } else {
-    res.redirect(302, '/login');
-  }
-};
-
-/* GET user page. */
-router.get('/', adminAuthMiddleware, async (req, res, next) => {
-  // Category.findOne({ where: { rememberToken: req.session.passport.user.rememberToken } }).then(users => {
-  // });
-  // res.send(posts);
-  res.render('dashboard', { user: req.user });
+/* GET /dashboard/ page. */
+router.get('/', async (req, res, next) => {
+  const user = req.user;
+  // res.send(user);
+  res.render('dashboard', { user });
 });
 
 module.exports = router;

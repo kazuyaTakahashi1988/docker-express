@@ -1,23 +1,24 @@
-var createError = require('http-errors');
-var express = require('express');
-var logger = require('morgan');
-var path = require('path');
+const createError = require('http-errors');
+const express = require('express');
+const logger = require('morgan');
+const path = require('path');
 
 // 認証関連
-var cookieParser = require('cookie-parser');
-var crypto = require('crypto');
-var passport = require('./auth');
-var session = require('express-session');
-var flash = require('connect-flash');
-var { check, validationResult } = require('express-validator');
-var nodemailer = require('nodemailer');
-var bcrypt = require('bcryptjs');
-var User = require('./models').User;
+const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
+const passport = require('./auth');
+const session = require('express-session');
+const flash = require('connect-flash');
+const { check, validationResult } = require('express-validator');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
+const User = require('./models').User;
 
 // Router
-var indexRouter = require('./routes/index');
-var dashboardRouter = require('./routes/dashboard');
-var app = express();
+const indexRouter = require('./routes/index');
+const postsRouter = require('./routes/posts');
+const dashboardRouter = require('./routes/dashboard');
+const app = express();
 
 // use 認証関連
 app.use(express.json());
@@ -31,11 +32,19 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // use Router
-app.use(express.static(path.join(__dirname, 'public')));
+const adminAuthMiddleware = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect(302, '/login');
+  }
+};
 app.use('/', indexRouter);
-app.use('/dashboard', dashboardRouter);
+app.use('/posts', adminAuthMiddleware, postsRouter);
+app.use('/dashboard', adminAuthMiddleware, dashboardRouter);
 
 // use view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -70,7 +79,7 @@ app.get('/register', authJudge, (req, res) => {
 });
 
 // バリデーション・ルール
-const registrationValidationRules = [
+const regiValidRules = [
   check('name')
     .not().isEmpty().withMessage('名前は項目は必須入力です。'),
   check('email')
@@ -87,7 +96,7 @@ const registrationValidationRules = [
     })
 ];
 
-app.post('/register', registrationValidationRules, (req, res) => {
+app.post('/register', regiValidRules, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) { // バリデーション失敗
     // return res.status(422).json({ errors: errors.array() });
@@ -150,7 +159,7 @@ app.post('/login',
     return next();
   },
   (req, res) => {
-    res.redirect('/dashboard');
+      res.redirect('/dashboard');
   }
 );
 
@@ -163,10 +172,10 @@ app.get('/logout', (req, res) => {
 /* ------------------------------------------------
   ▽ catch 404 and forward to error handler ▽
 ------------------------------------------------ */
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   next(createError(404));
 });
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   res.status(err.status || 500);
