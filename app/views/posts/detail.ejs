@@ -1,0 +1,50 @@
+<%
+let args = {
+    pageTtl: post.title,
+    pageDes: post.content.replace(/(<([^>]+)>)/gi, "").slice(0, 130),
+    // pageKey: ' QA詳細キー',
+    pageUrl: `/posts/detail/${post.id}`,
+    // pageImg: '/top/ogp.png',
+    // pageCss: '/top.css',
+    // pageJs: '/top.min.js',
+    // pageCss02: '',
+    // pageJs02: '',
+    // is_jquery: true,
+    // is_home: true,
+};
+%>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <%- include('./../_inc/load-head-ga') %>
+  <%- include('./../_inc/load-head-meta',{ args, user }) %>
+  <%- include('./../_inc/load-head-css',{ args, user }) %>
+  <%- include('./../_inc/load-head-js',{ args, user }) %>
+</head>
+
+<body class="pagetype-home">
+  <%- // include('./../_inc/load-body-svg') %>
+  <%- include('./../_inc/load-body-header',{ args, user }) %>
+
+  <div class="container bg-light p-5 rounded">
+    <h4 class="text-center mb-5"><%= post.title %></h4>
+    <div class="text-center pList">
+        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text>
+        </svg>
+        <p class="text-left">
+          <a href="<%= `/posts/user/${post.User.id}` %>"><small><span class="text-dark">ユーザー：</span><%= post.User.name %></small></a><br>
+          <a href="<%= `/posts/category/${post.Category.id}` %>"><small><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></small></a>
+        </p>
+        <p class="text-left"><b>Q.&nbsp;&nbsp;</b><%= post.content %></p>
+        <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
+    </div>
+  </div>
+
+    <%- include('./../_inc/load-body-footer',{ args, user }) %>
+    <%- include('./../_inc/load-body-js',{ args, user }) %>
+</body>
+
+</html>

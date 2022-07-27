@@ -3,9 +3,8 @@ const router = express.Router();
 
 /* GET /dashboard/ page. */
 router.get('/', async (req, res, next) => {
-  const user = req.user;
   // res.send(user);
-  res.render('dashboard', { user });
+  res.render('dashboard', { user: req.user });
 });
 
 module.exports = router;

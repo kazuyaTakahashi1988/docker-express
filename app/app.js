@@ -38,12 +38,32 @@ app.use(express.static(path.join(__dirname, 'public')));
 const adminAuthMiddleware = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
+  } else if (req.cookies.remember_me) {
+    const [rememberToken, hash] = req.cookies.remember_me.split('|');
+    User.findAll({
+      where: {
+        rememberToken: rememberToken
+      }
+    }).then(users => {
+      for (let i in users) {
+        const user = users[i];
+        const verifyingHash = crypto.createHmac('sha256', APP_KEY)
+          .update(user.id + '-' + rememberToken)
+          .digest('hex');
+        if (hash === verifyingHash) {
+          return req.login(user, () => {
+            next();
+          });
+        }
+      }
+      res.redirect(302, '/login');
+    });
   } else {
     res.redirect(302, '/login');
   }
 };
 app.use('/', indexRouter);
-app.use('/posts', adminAuthMiddleware, postsRouter);
+app.use('/posts', postsRouter);
 app.use('/dashboard', adminAuthMiddleware, dashboardRouter);
 
 // use view engine setup
@@ -166,6 +186,7 @@ app.post('/login',
 // ログアウトページ
 app.get('/logout', (req, res) => {
   req.session.passport.user = undefined;
+  res.clearCookie('remember_me');
   res.redirect('/')
 });
 
