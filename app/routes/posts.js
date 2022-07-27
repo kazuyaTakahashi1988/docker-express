@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
             count,
             page,
             pegePath: '',
-            pageType: ''
+            pageName: ''
         });
     });
 });
@@ -35,10 +35,10 @@ router.get('/', async (req, res, next) => {
 router.get('/user/:id', async (req, res, next) => {
     const page = req.query.page || 1;
     const perPage = 6;
-    let pageType;
+    let pageName;
     User.findOne({ where: { id: req.params["id"] } }
     ).then(userOne => {
-        pageType = userOne.name
+        pageName = userOne.name
     });
     Post.findAndCountAll({
         order: [['id', 'DESC']],
@@ -54,7 +54,7 @@ router.get('/user/:id', async (req, res, next) => {
             count,
             page,
             pegePath: `/user/${req.params["id"]}`,
-            pageType
+            pageName
         });
     });
 });
@@ -63,10 +63,10 @@ router.get('/user/:id', async (req, res, next) => {
 router.get('/category/:id', async (req, res, next) => {
     const page = req.query.page || 1;
     const perPage = 6;
-    let pageType;
+    let pageName;
     Category.findOne({ where: { id: req.params["id"] } }
     ).then(categoryOne => {
-        pageType = categoryOne.category_name
+        pageName = categoryOne.category_name
     });
     Post.findAndCountAll({
         order: [['id', 'DESC']],
@@ -82,7 +82,7 @@ router.get('/category/:id', async (req, res, next) => {
             count,
             page,
             pegePath: `/category/${req.params["id"]}`,
-            pageType
+            pageName
         });
     });
 });

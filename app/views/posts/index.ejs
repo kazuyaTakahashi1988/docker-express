@@ -28,7 +28,7 @@ let args = {
   <%- include('./../_inc/load-body-header',{ args, user }) %>
 
   <div class="container bg-light p-5 rounded">
-    <h4 class="mb-5 text-center">-&nbsp;&nbsp; <%= pageType ? `${pageType} 一覧` : `Q & A 一覧` %> &nbsp;&nbsp;-</h4>
+    <h4 class="mb-5 text-center">-&nbsp;&nbsp; <%= pageName ? `${pageName} 一覧` : `Q & A 一覧` %> &nbsp;&nbsp;-</h4>
     <div class="row text-center pList">
       <% posts.forEach( post => { %>
       <div class="col-lg-4 mb-5">
