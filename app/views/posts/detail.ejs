@@ -28,7 +28,7 @@ let args = {
   <%- include('./../_inc/load-body-header',{ args, user }) %>
 
   <div class="container bg-light p-5 rounded">
-    <h4 class="text-center mb-5"><%= post.title %></h4>
+    <h4 class="text-center mb-5"><b class="h2">Q.&nbsp;&nbsp;</b><%= post.title %></h4>
     <div class="text-center pList">
         <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
           <title>Placeholder</title>
@@ -38,7 +38,7 @@ let args = {
           <a href="<%= `/posts/user/${post.User.id}` %>"><small><span class="text-dark">ユーザー：</span><%= post.User.name %></small></a><br>
           <a href="<%= `/posts/category/${post.Category.id}` %>"><small><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></small></a>
         </p>
-        <p class="text-left"><b>Q.&nbsp;&nbsp;</b><%= post.content %></p>
+        <p class="text-left"><%= post.content %></p>
         <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
     </div>
   </div>
