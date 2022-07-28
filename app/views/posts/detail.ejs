@@ -30,21 +30,24 @@ let args = {
   <div class="container bg-light p-5 rounded">
     <h4 class="text-center mb-5"><b class="h2">Q.&nbsp;&nbsp;</b><%= post.title %></h4>
     <div class="text-center pList">
+      <div class="thum">
         <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
           <title>Placeholder</title>
           <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text>
         </svg>
-        <p class="text-left">
-          <a href="<%= `/posts/user/${post.User.id}` %>"><small><span class="text-dark">ユーザー：</span><%= post.User.name %></small></a><br>
-          <a href="<%= `/posts/category/${post.Category.id}` %>"><small><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></small></a>
-        </p>
-        <p class="text-left"><%- post.content %></p>
-        <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
+        <img src="<%= `/uploads/${post.image}` %>">
+      </div>
+      <p class="text-left">
+        <a href="<%= `/posts/user/${post.User.id}` %>"><small><span class="text-dark">ユーザー：</span><%= post.User.name %></small></a><br>
+        <a href="<%= `/posts/category/${post.Category.id}` %>"><small><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></small></a>
+      </p>
+      <p class="text-left"><%- post.content %></p>
+      <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
     </div>
   </div>
 
-    <%- include('./../_inc/load-body-footer',{ args, user }) %>
-    <%- include('./../_inc/load-body-js',{ args, user }) %>
+  <%- include('./../_inc/load-body-footer',{ args, user }) %>
+  <%- include('./../_inc/load-body-js',{ args, user }) %>
 </body>
 
 </html>

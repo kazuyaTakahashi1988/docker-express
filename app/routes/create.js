@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
+
 const multer = require('multer');
 const sharp = require('sharp');
+const fs = require('fs');
 
 const Post = require('./../models').Post;
-const User = require('./../models').User;
 const Category = require('./../models').Category;
 
 const destDir = 'public/uploads/';
@@ -18,6 +19,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage
 });
+
 /* --------------------------------------
     ▽ Q & A 記事作成 ▽
 -------------------------------------- */
@@ -35,29 +37,31 @@ router.get('/post', async (req, res, next) => {
 });
 /* POST 作成処理 */
 router.post('/post', upload.single('image'), async (req, res, next) => {
+    var nowDate = new Date(); // 日付情報の取得
+    var Now = String(nowDate.getFullYear()) + String(nowDate.getMonth() + 1) + String(nowDate.getDate()) + String(nowDate.getHours()) + String(nowDate.getMinutes()) + String(nowDate.getSeconds()); // 日付情報文字列
+    let image;
     if (req.file) {
-        res.json(req.file);
-        sharp(req.file.originalname)
-            .resize(64)
-            .toFile(destDir + 'resized' + req.file.originalname, (err, info) => {
-                if (err) {
-                    throw err;
-                }
-                console.log(info);
+        // res.json(req.file);
+        sharp(destDir + req.file.originalname)
+            .resize(340)
+            .toFormat("jpg")
+            .jpeg({ quality: 30 })
+            .toFile(destDir + Now + req.file.originalname, () => {
+                fs.unlinkSync(destDir + req.file.originalname); // 元の画像を削除
             });
-        console.log("file: ", req.file);
-        res.send(req.body);
-    } else throw 'error';
-    res.send(req.body);
-    // Post.create({
-    //     title: req.body.title,
-    //     content: req.body.content,
-    //     user_id: req.user.id,
-    //     category_id: req.body.category_id,
-    // }
-    // ).then(result => {
-    //     res.redirect(302, `/posts/detail/${result.id}`);
-    // });
+        image = Now + req.file.originalname;
+    } else { image = ''; }
+
+    Post.create({
+        image: image,
+        title: req.body.title,
+        content: req.body.content,
+        user_id: req.user.id,
+        category_id: req.body.category_id,
+    }
+    ).then(result => {
+        res.redirect(302, '/posts/');
+    });
 });
 
 module.exports = router;

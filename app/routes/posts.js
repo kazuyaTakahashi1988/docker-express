@@ -21,7 +21,7 @@ router.get('/', async (req, res, next) => {
         limit: perPage
     }).then(result => {
         const posts = result.rows; // 取得記事
-        const count = Math.floor(result.count / perPage) + 1; // ページ総数
+        const count = Math.ceil(result.count / perPage); // ページ総数
         res.render('posts', {
             user: req.user, // 認証ユーザー情報
             posts, // 取得記事情報
@@ -50,7 +50,7 @@ router.get('/user/:id', async (req, res, next) => {
         limit: perPage
     }).then(result => {
         const posts = result.rows;
-        const count = Math.floor(result.count / perPage) + 1;
+        const count = Math.ceil(result.count / perPage);
         res.render('posts', {
             user: req.user,
             posts,
@@ -79,7 +79,7 @@ router.get('/category/:id', async (req, res, next) => {
         limit: perPage
     }).then(result => {
         const posts = result.rows;
-        const count = Math.floor(result.count / perPage) + 1;
+        const count = Math.ceil(result.count / perPage);
         res.render('posts', {
             user: req.user,
             posts,

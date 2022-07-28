@@ -50,5 +50,20 @@ a:hover{
   height: 100%;
   background: #e3f2fd;
   opacity: 0.4;
-
+}
+.thum{
+  border-radius: 100%;
+  width: 140px;
+  height: 140px;
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+}
+.thum img{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 100%;
+  height: 100%;
 }
