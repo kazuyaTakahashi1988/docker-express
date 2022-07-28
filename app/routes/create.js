@@ -45,7 +45,7 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
 
     /* ▽ 画像圧縮 処理 ▽  */
     if (req.file) {
-        sharp(destDir + req.file.originalname)
+        await sharp(destDir + req.file.originalname)
             .resize(340)
             .toFormat("jpg")
             .jpeg({ quality: 20 }) // 圧縮率 0〜100

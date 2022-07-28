@@ -11,7 +11,7 @@ const perPage = 6; // 表示ページ数
     ▽ 記事一覧 ▽
 -------------------------------------- */
 
-/* Q & A 一覧 */
+/* GET 一覧（Q & A） */
 router.get('/', async (req, res, next) => {
     const page = req.query.page || 1; // ?page= のクエリ情報
 
@@ -33,7 +33,7 @@ router.get('/', async (req, res, next) => {
     });
 });
 
-/* ユーザー記事 一覧 */
+/* GET 一覧（ユーザー） */
 router.get('/user/:id', async (req, res, next) => {
     const page = req.query.page || 1;
 
@@ -62,7 +62,7 @@ router.get('/user/:id', async (req, res, next) => {
     });
 });
 
-/* カテゴリー記事 一覧 */
+/* GET 一覧（カテゴリー） */
 router.get('/category/:id', async (req, res, next) => {
     const page = req.query.page || 1;
 
@@ -95,7 +95,7 @@ router.get('/category/:id', async (req, res, next) => {
     ▽ 記事詳細 ▽
 -------------------------------------- */
 
-/* 記事 詳細 */
+/* GET 詳細 */
 router.get('/detail/:id', async (req, res, next) => {
     Post.findOne({
         where: { id: req.params["id"] },
