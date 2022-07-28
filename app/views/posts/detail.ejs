@@ -4,7 +4,7 @@ let args = {
     pageDes: post.content.replace(/(<([^>]+)>)/gi, "").slice(0, 130),
     // pageKey: ' QA詳細キー',
     pageUrl: `/posts/detail/${post.id}`,
-    // pageImg: '/top/ogp.png',
+    pageImg: post.image ? `/uploads/${post.image}` : '',
     // pageCss: '/top.css',
     // pageJs: '/top.min.js',
     // pageCss02: '',
