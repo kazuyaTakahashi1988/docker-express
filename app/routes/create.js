@@ -35,13 +35,17 @@ router.get('/post', async (req, res, next) => {
         });
     });
 });
+
 /* POST 作成処理 */
 router.post('/post', upload.single('image'), async (req, res, next) => {
-    var nowDate = new Date(); // 日付情報の取得
-    var Now = String(nowDate.getFullYear()) + String(nowDate.getMonth() + 1) + String(nowDate.getDate()) + String(nowDate.getHours()) + String(nowDate.getMinutes()) + String(nowDate.getSeconds()); // 日付情報文字列
+
+    /* ▽ 画像ネーミング用　日付取得処理 ▽  */
+    var nowDate = new Date();
+    var Now = String(nowDate.getFullYear()) + String(nowDate.getMonth() + 1) + String(nowDate.getDate()) + String(nowDate.getHours()) + String(nowDate.getMinutes()) + String(nowDate.getSeconds());
+
+    /* ▽ 画像圧縮 処理 ▽  */
     let image;
     if (req.file) {
-        // res.json(req.file);
         sharp(destDir + req.file.originalname)
             .resize(340)
             .toFormat("jpg")
@@ -52,6 +56,7 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
         image = Now + req.file.originalname;
     } else { image = ''; }
 
+    /* ▽ 記事クリエイト 処理 ▽  */
     Post.create({
         image: image,
         title: req.body.title,

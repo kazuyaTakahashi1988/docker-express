@@ -29,8 +29,8 @@ let args = {
 
   <div class="container bg-light p-5 rounded">
     <form method="POST" action="/create/post/" enctype="multipart/form-data">
-      <div class="form-group">
-        <label for="title" class="form-label">サムネイル画像</label>
+      <div class="form-group mb-4">
+        <label for="title" class="form-label">・サムネイル画像</label>
         <div id="drag-drop-area" class="w-full bg-gray-50 text-gray-800 border focus:ring ring-indigo-300 rounded outline-none transition duration-100 px-3 py-2">
           <div class="drag-drop-inside">
             <p class="drag-drop-info">ここにファイルをドロップ</p>
@@ -40,13 +40,13 @@ let args = {
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">タイトル</label>
+      <div class="form-group mb-4">
+        <label class="form-label">・タイトル</label>
         <input type="text" class="form-control" name="title" id="title">
       </div>
 
-      <div class="form-group">
-        <label class="form-label">カテゴリー</label>
+      <div class="form-group mb-4">
+        <label class="form-label">・カテゴリー</label>
         <select class="form-control" name="category_id" id="category_id">
           <option selected value="">---</option>
           <% categories.forEach( category => { %>
@@ -57,8 +57,8 @@ let args = {
         </select>
       </div>
 
-      <div class="form-group">
-        <label for="form-label">内容</label>
+      <div class="form-group mb-4">
+        <label for="form-label">・内容</label>
         <textarea class="form-control" name="content" id="content"></textarea>
       </div>
 
