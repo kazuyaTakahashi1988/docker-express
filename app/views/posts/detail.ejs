@@ -38,7 +38,7 @@ let args = {
           <a href="<%= `/posts/user/${post.User.id}` %>"><small><span class="text-dark">ユーザー：</span><%= post.User.name %></small></a><br>
           <a href="<%= `/posts/category/${post.Category.id}` %>"><small><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></small></a>
         </p>
-        <p class="text-left"><%= post.content %></p>
+        <p class="text-left"><%- post.content %></p>
         <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
     </div>
   </div>

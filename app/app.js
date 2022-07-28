@@ -17,6 +17,7 @@ const User = require('./models').User;
 // Router
 const indexRouter = require('./routes/index');
 const postsRouter = require('./routes/posts');
+const createRouter = require('./routes/create');
 const dashboardRouter = require('./routes/dashboard');
 const app = express();
 
@@ -64,6 +65,7 @@ const adminAuthMiddleware = (req, res, next) => {
 };
 app.use('/', indexRouter);
 app.use('/posts', postsRouter);
+app.use('/create', adminAuthMiddleware, createRouter);
 app.use('/dashboard', adminAuthMiddleware, dashboardRouter);
 
 // use view engine setup

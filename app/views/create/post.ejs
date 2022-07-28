@@ -1,0 +1,89 @@
+<%
+let args = {
+    pageTtl: '投稿',
+    // pageDes: '',
+    // pageKey: '',
+    // pageUrl: `/posts/create/`,
+    // pageImg: '/top/ogp.png',
+    // pageCss: '/top.css',
+    // pageJs: '/top.min.js',
+    // pageCss02: '',
+    // pageJs02: '',
+    // is_jquery: true,
+    // is_home: true,
+};
+%>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <%- include('./../_inc/load-head-ga') %>
+  <%- include('./../_inc/load-head-meta',{ args, user }) %>
+  <%- include('./../_inc/load-head-css',{ args, user }) %>
+  <%- include('./../_inc/load-head-js',{ args, user }) %>
+</head>
+
+<body class="pagetype-home">
+  <%- // include('./../_inc/load-body-svg') %>
+  <%- include('./../_inc/load-body-header',{ args, user }) %>
+
+  <div class="container bg-light p-5 rounded">
+    <form method="POST" action="/create/post/">
+      <div class="form-group">
+        <label class="form-label">タイトル</label>
+        <input type="text" class="form-control" name="title" id="title">
+      </div>
+      <div class="form-group">
+        <label class="form-label">カテゴリー</label>
+        <select class="form-control" name="category_id" id="category_id">
+          <option selected value="">---</option>
+          <% categories.forEach( category => { %>
+          <option value="<%= category.id %>">
+            <%= category.category_name %>
+          </option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="form-label">内容</label>
+        <textarea class="form-control" name="content" id="content" rows=" 5"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">C r e a t e</button>
+    </form>
+  </div>
+
+  <%- include('./../_inc/load-body-footer',{ args, user }) %>
+  <%- include('./../_inc/load-body-js',{ args, user }) %>
+  <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
+  <script>
+    CKEDITOR.replace('content', {
+      filebrowserUploadUrl: "/create/post/imgUpload",
+      filebrowserUploadMethod: 'form',
+      // スペルチェック機能OFF
+      scayt_autoStartup: false,
+      // Enterを押した際に改行タグを挿入
+      enterMode: CKEDITOR.ENTER_BR,
+      // Shift+Enterを押した際に段落タグを挿入
+      shiftEnterMode: CKEDITOR.ENTER_P,
+      // idやclassを指定可能にする
+      allowedContent: true,
+      // preコード挿入時
+      format_pre: {
+        element: "pre",
+        attributes: {
+          class: "code",
+        },
+      },
+      // webからコピペした際でもプレーンテキストを貼り付けるようにする
+      forcePasteAsPlainText: true,
+      // 自動で空白を挿入しないようにする
+      fillEmptyBlocks: false,
+      // タブの入力を無効にする
+      tabSpaces: 0,
+    });
+    
+  </script>
+</body>
+
+</html>

@@ -14,7 +14,7 @@ const perPage = 6; // 表示ページ数
 /* Q & A 一覧 */
 router.get('/', async (req, res, next) => {
     const page = req.query.page || 1; // ?page= のクエリ情報
-    
+
     Post.findAndCountAll({
         order: [['id', 'DESC']],
         offset: (page - 1) * perPage,
@@ -36,7 +36,7 @@ router.get('/', async (req, res, next) => {
 /* ユーザー記事 一覧 */
 router.get('/user/:id', async (req, res, next) => {
     const page = req.query.page || 1;
-    
+
     let pageTitle;
     User.findOne({ where: { id: req.params["id"] } }
     ).then(userOne => {
