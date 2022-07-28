@@ -48,7 +48,7 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
         sharp(destDir + req.file.originalname)
             .resize(340)
             .toFormat("jpg")
-            .jpeg({ quality: 75 }) // 圧縮率 0〜100
+            .jpeg({ quality: 20 }) // 圧縮率 0〜100
             .toFile(destDir + saveImageName, () => {
                 fs.unlinkSync(destDir + req.file.originalname); // 元の画像を削除
             });
