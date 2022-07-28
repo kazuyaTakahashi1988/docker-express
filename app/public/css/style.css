@@ -4,6 +4,7 @@ html{
 body {
   padding: 40px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  word-break:break-all;
 }
 
 a {

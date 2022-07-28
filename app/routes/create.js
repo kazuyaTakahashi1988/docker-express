@@ -43,7 +43,7 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
     const nowDate = new Date();
     let saveImageName = "PostImage-".concat(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
 
-    /* ▽ 画像圧縮 処理 ▽  */
+    /* ▽ 画像圧縮処理 ▽  */
     if (req.file) {
         await sharp(destDir + req.file.originalname)
             .resize(340)
@@ -56,7 +56,7 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
         saveImageName = '';
     }
 
-    /* ▽ 記事クリエイト 処理 ▽  */
+    /* ▽ 記事クリエイト処理 ▽  */
     Post.create({
         image: saveImageName,
         title: req.body.title,
