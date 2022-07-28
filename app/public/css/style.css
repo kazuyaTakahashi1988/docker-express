@@ -29,3 +29,26 @@ a:hover{
   background-color: #444;
   border-color: #444;
 }
+#drag-drop-area{
+  position: relative;
+}
+#drag-drop-area.dragover::after{
+  content: "SET OK";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  z-index: 10;
+}
+#drag-drop-area.dragover::before{
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 100%;
+  height: 100%;
+  background: #e3f2fd;
+  opacity: 0.4;
+
+}

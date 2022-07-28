@@ -28,11 +28,23 @@ let args = {
   <%- include('./../_inc/load-body-header',{ args, user }) %>
 
   <div class="container bg-light p-5 rounded">
-    <form method="POST" action="/create/post/">
+    <form method="POST" action="/create/post/" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="title" class="form-label">サムネイル画像</label>
+        <div id="drag-drop-area" class="w-full bg-gray-50 text-gray-800 border focus:ring ring-indigo-300 rounded outline-none transition duration-100 px-3 py-2">
+          <div class="drag-drop-inside">
+            <p class="drag-drop-info">ここにファイルをドロップ</p>
+            <p>または</p>
+            <p class="drag-drop-buttons"><input id="fileInput" type="file" accept="image/*" value="ファイルを選択" name="image"></p>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label class="form-label">タイトル</label>
         <input type="text" class="form-control" name="title" id="title">
       </div>
+
       <div class="form-group">
         <label class="form-label">カテゴリー</label>
         <select class="form-control" name="category_id" id="category_id">
@@ -44,9 +56,10 @@ let args = {
           <% }) %>
         </select>
       </div>
+
       <div class="form-group">
         <label for="form-label">内容</label>
-        <textarea class="form-control" name="content" id="content" rows=" 5"></textarea>
+        <textarea class="form-control" name="content" id="content"></textarea>
       </div>
 
       <button type="submit" class="btn btn-primary">C r e a t e</button>
@@ -55,6 +68,33 @@ let args = {
 
   <%- include('./../_inc/load-body-footer',{ args, user }) %>
   <%- include('./../_inc/load-body-js',{ args, user }) %>
+
+  <% /* -------------------------
+    ▽ 画像のドラッグ＆ドロップ処理 ▽
+  ------------------------------- */%>
+  <script>
+    var fileArea = document.getElementById('drag-drop-area');
+    var fileInput = document.getElementById('fileInput');
+
+    fileArea.addEventListener('dragover', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.add('dragover');
+    });
+
+    fileArea.addEventListener('dragleave', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.remove('dragover');
+    });
+    fileArea.addEventListener('drop', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.remove('dragenter');
+      var files = evt.dataTransfer.files;
+      fileInput.files = files;
+    });
+  </script>
+  <% /* -------------------------
+    ▽ ckeditor ▽
+  ------------------------------- */%>
   <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
   <script>
     CKEDITOR.replace('content', {
@@ -82,7 +122,6 @@ let args = {
       // タブの入力を無効にする
       tabSpaces: 0,
     });
-    
   </script>
 </body>
 
