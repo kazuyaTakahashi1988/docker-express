@@ -28,6 +28,7 @@ services:
 
  dockerexpress:
    image: dockerexpress
+   container_name: express-app
    build:
     context: app
     dockerfile: ./Dockerfile
