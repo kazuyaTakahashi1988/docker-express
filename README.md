@@ -1,4 +1,4 @@
-[ docker-compose.yml ] ファイルがある場所でターミナルを開き、以下のコマンドを叩く　　
+docker-compose.yml ファイルがある場所でターミナルを開き、以下のコマンドを叩く　　
 
 ※　ポート番号　80　/　3000　をそれぞれ使用します
 ```
@@ -13,7 +13,7 @@ DB『 express_db 』を作成、照合順序は『 utf8_general_ci 』として�
 
 　　　　　↓↓↓↓　　
      
-再度[ docker-compose.yml ] ファイルがある場所でターミナルを開き、以下のコマンドを順に叩く
+再度 docker-compose.yml ファイルがある場所でターミナルを開き、以下のコマンドを順に叩く
 
 ```
 $ docker exec -it express-app /bin/sh
