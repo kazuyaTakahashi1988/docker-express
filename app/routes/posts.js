@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Post = require('./../models').Post;
+const Comment = require('./../models').Comment;
 const User = require('./../models').User;
 const Category = require('./../models').Category;
 
@@ -97,6 +98,16 @@ router.get('/category/:id', async (req, res, next) => {
 
 /* GET 詳細 */
 router.get('/detail/:id', async (req, res, next) => {
+    let comments;
+    await Comment.findAll({
+        order: [['id', 'DESC']],
+        where: { post_id: req.params["id"] },
+        include: [{ model: User }]
+    }
+    ).then(result => {
+        // res.send(post);
+        comments = result;
+    });
     Post.findOne({
         where: { id: req.params["id"] },
         include: [{ model: User }, { model: Category }]
@@ -105,6 +116,7 @@ router.get('/detail/:id', async (req, res, next) => {
         // res.send(post);
         res.render('posts/detail', {
             user: req.user,
+            comments,
             post
         });
     });

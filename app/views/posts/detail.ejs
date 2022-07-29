@@ -27,7 +27,7 @@ let args = {
   <%- // include('./../_inc/load-body-svg') %>
   <%- include('./../_inc/load-body-header',{ args, user }) %>
 
-  <div class="container bg-light p-5 rounded">
+  <div class="container bg-light p-5 mb-5 rounded">
     <h4 class="text-center mb-5"><b class="h2">Q.&nbsp;&nbsp;</b><%= post.title %></h4>
     <div class="text-center pList">
       <div class="thum">
@@ -41,10 +41,25 @@ let args = {
         <a href="<%= `/posts/user/${post.User.id}` %>"><small><span class="text-dark">ユーザー：</span><%= post.User.name %></small></a><br>
         <a href="<%= `/posts/category/${post.Category.id}` %>"><small><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></small></a>
       </p>
-      <p class="text-left"><%- post.content %></p>
+      <p class="text-left"><%- post.content %></p><br><br>
       <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
     </div>
+    <div class="d-block p-3 mt-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white">+ コメント</a></div>
   </div>
+
+  <% comments.forEach( comment => { %>
+  <div class="container bg-light justify-content-center px-5 py-3 mb-5 rounded">
+    <div class="py-2 mb-3">
+      <div class="second py-2 px-2"> <span class="text1"><%- comment.comment %></span>
+        <div class="d-flex justify-content-between py-1 pt-3">
+          <div><a href="/posts/user/<%= comment.User.id %>"><small>ユーザー：<span class="text2"><%= comment.User.name %></span></small></a></div>
+          <div><span class="text3"><small><%= comment.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span><span class="text4">3</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="d-block p-2 mb-4 border bg-white rounded"><a href="/create/reply/<%= comment.id %>" class="d-block"> <small>+ リプライ</small> </a></div>
+  </div>
+  <% }) %>
 
   <%- include('./../_inc/load-body-footer',{ args, user }) %>
   <%- include('./../_inc/load-body-js',{ args, user }) %>

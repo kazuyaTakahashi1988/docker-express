@@ -6,6 +6,7 @@ const sharp = require('sharp');
 const fs = require('fs');
 
 const Post = require('./../models').Post;
+const Comment = require('./../models').Comment;
 const Category = require('./../models').Category;
 
 const destDir = 'public/uploads/';
@@ -65,7 +66,42 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
         category_id: req.body.category_id,
     }
     ).then(result => {
-        res.redirect(302, '/posts/');
+        res.redirect(302, `/posts/detail/${result.id}`);
+    });
+});
+
+/* --------------------------------------
+    ▽ コメント作成 ▽
+-------------------------------------- */
+
+/* GET 作成ページ */
+router.get('/comment/:id', async (req, res, next) => {
+    Post.findOne({
+        where: { id: req.params["id"] }
+    }
+    ).then(post => {
+        if (post) {
+            res.render('create/comment', {
+                user: req.user,
+                post
+            });
+        } else {
+            res.redirect(302, '/posts/');
+        }
+    });
+});
+
+/* POST 作成処理 */
+router.post('/comment/', async (req, res, next) => {
+    // console.log('ID：' + req.body.comment + '　UseRID：' + req.user.id );
+    /* ▽ コメントクリエイト処理 ▽  */
+    Comment.create({
+        post_id: req.body.post_id,
+        comment: req.body.comment,
+        user_id: req.user.id,
+    }
+    ).then(result => {
+        res.redirect(302,  `/posts/detail/${req.body.post_id}`);
     });
 });
 
@@ -96,11 +132,11 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
     const CKEditorFuncNum = req.query.CKEditorFuncNum;
     const imgaePath = `/uploads/${saveImageName}`;
     // $msg = 'アップロードが完了しました';
-    const sendTxt = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imgaePath}', '')</script>`;
+    const sendTxt = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imgaePath}', 'アップロード成功')</script>`;
 
     /* ▽ HTMLを返す ▽ */
     res.header('Content-Type', 'text/html;charset=utf-8');
-	res.send(sendTxt);
+    res.send(sendTxt);
 });
 
 module.exports = router;

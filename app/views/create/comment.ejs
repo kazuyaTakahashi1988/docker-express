@@ -1,6 +1,6 @@
 <%
 let args = {
-    pageTtl: '投稿',
+    pageTtl: 'コメント投稿' + post.id,
     // pageDes: '',
     // pageKey: '',
     // pageUrl: `/posts/create/`,
@@ -21,6 +21,7 @@ let args = {
   <%- include('./../_inc/load-head-meta',{ args, user }) %>
   <%- include('./../_inc/load-head-css',{ args, user }) %>
   <%- include('./../_inc/load-head-js',{ args, user }) %>
+  <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
 </head>
 
 <body class="pagetype-home">
@@ -28,40 +29,16 @@ let args = {
   <%- include('./../_inc/load-body-header',{ args, user }) %>
 
   <div class="container bg-light p-5 rounded">
-    <form method="POST" action="/create/post/" enctype="multipart/form-data">
-      <div class="form-group mb-4">
-        <label for="title" class="form-label">・サムネイル画像</label>
-        <div id="drag-drop-area" class="w-full bg-gray-50 text-gray-800 border focus:ring ring-indigo-300 rounded outline-none transition duration-100 px-3 py-2">
-          <div class="drag-drop-inside">
-            <p class="drag-drop-info">ここにファイルをドロップ</p>
-            <p>または</p>
-            <p class="drag-drop-buttons"><input id="fileInput" type="file" accept="image/*" value="ファイルを選択" name="image"></p>
-          </div>
-        </div>
-      </div>
+    <form method="POST" action="/create/comment/">
 
       <div class="form-group mb-4">
-        <label class="form-label">・タイトル</label>
-        <input type="text" class="form-control" name="title" id="title">
+        <label for="form-label"><b class="h4">Q</b>『<b><%= post.title %></b>』へのコメントを作成</label>
       </div>
-
-      <div class="form-group mb-4">
-        <label class="form-label">・カテゴリー</label>
-        <select class="form-control" name="category_id" id="category_id">
-          <option selected value="">---</option>
-          <% categories.forEach( category => { %>
-          <option value="<%= category.id %>">
-            <%= category.category_name %>
-          </option>
-          <% }) %>
-        </select>
-      </div>
-
       <div class="form-group mb-4">
         <label for="form-label">・内容</label>
-        <textarea class="form-control" name="content" id="content"></textarea>
+        <textarea class="form-control" name="comment" id="comment"></textarea>
       </div>
-
+      <input type="hidden" value="<%= post.id %>" name="post_id">
       <button type="submit" class="btn btn-primary">C r e a t e</button>
     </form>
   </div>
@@ -95,9 +72,8 @@ let args = {
   <% /* -------------------------
     ▽ ckeditor ▽
   ------------------------------- */%>
-  <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
   <script>
-    CKEDITOR.replace('content', {
+    CKEDITOR.replace('comment', {
       filebrowserUploadUrl: "/create/CKEditorUpload",
       filebrowserUploadMethod: 'form',
       // スペルチェック機能OFF
