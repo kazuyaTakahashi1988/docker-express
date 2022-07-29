@@ -8,8 +8,7 @@
 # Open "localhost" in your browser　
 アイパス『 root 』でphpMyAdminにログインできます。
 
-DB『 express_db 』を作成。
-照合順序は『 utf8_general_ci 』　　
+DB『 express_db 』を作成、照合順序は『 utf8_general_ci 』としてください。
 
 　　　　　↓↓↓↓　　
      
