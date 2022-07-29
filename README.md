@@ -15,7 +15,7 @@ DB『 express_db 』を作成。
      
 再度[ docker-compose.yml ] ファイルがある場所でターミナルを開き、以下のコマンドを順に叩く
 
-# $ docker exec -it docker-express_dockerexpress_1 /bin/sh
+# $ docker exec -it express-app /bin/sh
 # $ npx sequelize-cli db:migrate
 # $ npx sequelize-cli db:seed:all
 
