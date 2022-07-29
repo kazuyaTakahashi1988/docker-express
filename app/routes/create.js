@@ -69,4 +69,38 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
     });
 });
 
+
+/* --------------------------------------
+    ▽ CKEditor 画像アップロード処理 ▽
+-------------------------------------- */
+
+/* POST */
+router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) => {
+
+    /* ▽ 保存画像ネーミング ▽  */
+    const nowDate = new Date();
+    let saveImageName = "CKEditorImage-".concat(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
+
+    /* ▽ 画像圧縮処理 ▽  */
+    if (req.file) {
+        await sharp(destDir + req.file.originalname)
+            .toFormat("jpg")
+            .jpeg({ quality: 20 }) // 圧縮率 0〜100
+            .toFile(destDir + saveImageName, () => {
+                fs.unlinkSync(destDir + req.file.originalname); // 元の画像を削除
+            });
+    } else {
+        saveImageName = '';
+    }
+    /* ▽ ckeditor.jsに返却するデータを生成する ▽ */
+    const CKEditorFuncNum = req.query.CKEditorFuncNum;
+    const imgaePath = `/uploads/${saveImageName}`;
+    // $msg = 'アップロードが完了しました';
+    const sendTxt = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imgaePath}', '')</script>`;
+
+    /* ▽ HTMLを返す ▽ */
+    res.header('Content-Type', 'text/html;charset=utf-8');
+	res.send(sendTxt);
+});
+
 module.exports = router;

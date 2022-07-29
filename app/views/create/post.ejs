@@ -21,6 +21,7 @@ let args = {
   <%- include('./../_inc/load-head-meta',{ args, user }) %>
   <%- include('./../_inc/load-head-css',{ args, user }) %>
   <%- include('./../_inc/load-head-js',{ args, user }) %>
+  <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
 </head>
 
 <body class="pagetype-home">
@@ -95,10 +96,9 @@ let args = {
   <% /* -------------------------
     ▽ ckeditor ▽
   ------------------------------- */%>
-  <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
   <script>
     CKEDITOR.replace('content', {
-      filebrowserUploadUrl: "/create/post/imgUpload",
+      filebrowserUploadUrl: "/create/CKEditorUpload",
       filebrowserUploadMethod: 'form',
       // スペルチェック機能OFF
       scayt_autoStartup: false,
