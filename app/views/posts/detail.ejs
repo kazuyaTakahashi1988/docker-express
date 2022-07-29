@@ -44,7 +44,7 @@ let args = {
       <p class="text-left"><%- post.content %></p><br><br>
       <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
     </div>
-    <div class="d-block p-3 mt-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white">+ コメント</a></div>
+    <div class="d-block mt-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white p-2">+ コメント</a></div>
   </div>
 
   <% comments.forEach( comment => { %>

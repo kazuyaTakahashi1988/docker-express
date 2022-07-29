@@ -93,7 +93,6 @@ router.get('/comment/:id', async (req, res, next) => {
 
 /* POST 作成処理 */
 router.post('/comment/', async (req, res, next) => {
-    // console.log('ID：' + req.body.comment + '　UseRID：' + req.user.id );
     /* ▽ コメントクリエイト処理 ▽  */
     Comment.create({
         post_id: req.body.post_id,
