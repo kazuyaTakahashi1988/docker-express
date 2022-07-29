@@ -6,7 +6,7 @@ $ docker-compose up -d　
 ```
 　　　　　↓↓↓↓
      
-# Open "localhost" in your browser　
+# Open "[http://localhost](http://localhost/)" in your browser　
 アイパス『 root 』でphpMyAdminにログインできます。
 
 DB『 express_db 』を作成、照合順序は『 utf8_general_ci 』としてください。
@@ -22,4 +22,4 @@ $ npx sequelize-cli db:seed:all
 ```
 
 　　　　　↓↓↓↓
-# Open "localhost:3000" in your browser　
+# Open "[http://localhost:3000](http://localhost:3000/)" in your browser　
