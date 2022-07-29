@@ -28,7 +28,7 @@ let args = {
   <%- include('./_inc/load-body-header',{ args, user }) %>
 
   <% if(!user){ %>
-  <div class="container">
+  <div class="container bg-white p-4">
     <h5 class="h5 d-inline" href="/"><img src="/images/common/favicon.ico" alt="" class="d-inline mb-2" width="64"> Q & A site <small>- ナゼナゼ Express -</small></h5> は質問を投稿、及び回答することができるC to C サービスです。</p>
     <p>質問者の投稿に気軽にコメントとリプライを送ることができ、名前とメールアドレスの登録だけで簡単に始められます。<br>下記のボタンからアカウント作成して本サイトをご活用ください。</p>
     <p class="text-center mt-5">
@@ -40,7 +40,7 @@ let args = {
   <h4 class="text-center mb-5"><a href="/create/post">▶︎&nbsp;&nbsp;質問を投稿しましょう！！</a></h4>
   <% }  %>
 
-  <div class="container bg-light p-5 rounded">
+  <div class="container bg-white p-5">
     <h4 class="mb-5 text-center">-&nbsp;&nbsp;新着 Q & A &nbsp;&nbsp;-</h4>
     <div class="row text-center pList">
       <% posts.forEach( post => { %>

@@ -32,6 +32,7 @@ router.get('/', async (req, res, next) => {
             pageTitle: 'Q & A 一覧' // ページのタイトル
         });
     });
+
 });
 
 /* GET 一覧（ユーザー） */
@@ -39,7 +40,7 @@ router.get('/user/:id', async (req, res, next) => {
     const page = req.query.page || 1;
 
     let pageTitle;
-    User.findOne({ where: { id: req.params["id"] } }
+    await User.findOne({ where: { id: req.params["id"] } }
     ).then(userOne => {
         pageTitle = userOne.name
     }); // ページのタイトル取得
@@ -61,6 +62,7 @@ router.get('/user/:id', async (req, res, next) => {
             pageTitle: `ユーザー：${pageTitle}`
         });
     });
+
 });
 
 /* GET 一覧（カテゴリー） */
@@ -68,7 +70,7 @@ router.get('/category/:id', async (req, res, next) => {
     const page = req.query.page || 1;
 
     let pageTitle;
-    Category.findOne({ where: { id: req.params["id"] } }
+    await Category.findOne({ where: { id: req.params["id"] } }
     ).then(categoryOne => {
         pageTitle = categoryOne.category_name
     }); // ページのタイトル取得
@@ -90,6 +92,7 @@ router.get('/category/:id', async (req, res, next) => {
             pageTitle: `カテゴリー：${pageTitle}`
         });
     });
+
 });
 
 /* --------------------------------------
@@ -108,6 +111,7 @@ router.get('/detail/:id', async (req, res, next) => {
         // res.send(post);
         comments = result;
     });
+
     Post.findOne({
         where: { id: req.params["id"] },
         include: [{ model: User }, { model: Category }]
@@ -120,6 +124,7 @@ router.get('/detail/:id', async (req, res, next) => {
             post
         });
     });
+    
 });
 
 module.exports = router;

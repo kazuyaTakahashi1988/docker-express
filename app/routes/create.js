@@ -27,6 +27,7 @@ const upload = multer({
 
 /* GET 作成ページ */
 router.get('/post', async (req, res, next) => {
+
     Category.findAll({
         order: [['id', 'DESC']]
     }).then(categories => {
@@ -35,6 +36,7 @@ router.get('/post', async (req, res, next) => {
             categories
         });
     });
+
 });
 
 /* POST 作成処理 */
@@ -68,6 +70,7 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
     ).then(result => {
         res.redirect(302, `/posts/detail/${result.id}`);
     });
+
 });
 
 /* --------------------------------------
@@ -76,6 +79,7 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
 
 /* GET 作成ページ */
 router.get('/comment/:id', async (req, res, next) => {
+
     Post.findOne({
         where: { id: req.params["id"] }
     }
@@ -89,10 +93,12 @@ router.get('/comment/:id', async (req, res, next) => {
             res.redirect(302, '/posts/');
         }
     });
+    
 });
 
 /* POST 作成処理 */
 router.post('/comment/', async (req, res, next) => {
+
     /* ▽ コメントクリエイト処理 ▽  */
     Comment.create({
         post_id: req.body.post_id,
@@ -102,6 +108,7 @@ router.post('/comment/', async (req, res, next) => {
     ).then(result => {
         res.redirect(302,  `/posts/detail/${req.body.post_id}`);
     });
+
 });
 
 
@@ -127,15 +134,16 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
     } else {
         saveImageName = '';
     }
+    
     /* ▽ ckeditor.jsに返却するデータを生成する ▽ */
     const CKEditorFuncNum = req.query.CKEditorFuncNum;
     const imgaePath = `/uploads/${saveImageName}`;
-    // $msg = 'アップロードが完了しました';
     const sendTxt = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imgaePath}', 'アップロード成功')</script>`;
 
     /* ▽ HTMLを返す ▽ */
     res.header('Content-Type', 'text/html;charset=utf-8');
     res.send(sendTxt);
+    
 });
 
 module.exports = router;
