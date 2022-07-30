@@ -29,6 +29,7 @@ let args = {
 
   <div class="container bg-white p-5 mb-5 rounded">
     <h4 class="text-center mb-5"><b class="h2">Q.&nbsp;&nbsp;</b><%= post.title %></h4>
+
     <div class="text-center pList">
       <div class="thum">
         <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
@@ -37,10 +38,20 @@ let args = {
         </svg>
         <%- post.image && `<img src="/uploads/${post.image}">` %>
       </div>
-      <p class="text-left">
+
+      <% if(!user){ %>
+      <p class="text-left text-primary"><b>Like：<%- post.Likes.length %></b></p>
+      <% } else { %>
+      <div id="likeBtnArea" class="<%- judge && 'likeOn' %>">
+        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn(<%= post.id %>, '/create/like/')" id="like"><small class="text-primary"><b>Like：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
+        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn(<%= post.id %>, '/create/unlike/')" id="unLike"><small class="text-info"><b>Like（済）：<span class="likeCount"><%= post.Likes.length %></span></b></small></button>
+      </div>
+      <% }  %><br>
+      <p class="text-left mb-2">
         <a href="<%= `/posts/user/${post.User.id}` %>"><small><span class="text-dark">ユーザー：</span><%= post.User.name %></small></a><br>
         <a href="<%= `/posts/category/${post.Category.id}` %>"><small><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></small></a>
       </p>
+
       <p class="text-left"><%- post.content %></p><br><br>
       <div class="d-flex justify-content-between py-1 pt-3 mb-3">
         <div></div>
@@ -69,14 +80,52 @@ let args = {
         <div><span class="text3"><small><%= Reply.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
       </div>
     </div>
-    <% }) %>
+    <% }); %>
     <div class="d-block p-2 mb-4 border bg-white rounded"><a href="/create/reply/<%= comment.id %>" class="d-block"> <small>+ リプライ</small> </a></div>
   </div>
-  <% }) %>
+  <% }); %>
 
   <%- include('./../_inc/load-body-footer',{ args, user }) %>
   <%- include('./../_inc/load-body-js',{ args, user }) %>
 
+  <style>
+    #likeBtnArea #like {
+      pointer-events: inherit;
+      display: block;
+    }
+
+    #likeBtnArea #unLike {
+      pointer-events: none;
+      display: none;
+    }
+
+    #likeBtnArea.likeOn #like {
+      pointer-events: none;
+      display: none;
+    }
+
+    #likeBtnArea.likeOn #unLike {
+      pointer-events: inherit;
+      display: block;
+    }
+  </style>
+  <script>
+    const likeBtnArea = document.getElementById('likeBtnArea');
+    const likeCount = document.getElementsByClassName('likeCount');
+
+    const likeBtn = async (id, path) => {
+      likeBtnArea.classList.toggle('likeOn');
+      const sURL = `${ path + id}`;
+      const response = await fetch(sURL, {
+        method: 'POST'
+      });
+      const jsondata = await response.json();
+      console.log(jsondata['likeCount']);
+      for (let index = 0; index < likeCount.length; index++) {
+        likeCount[index].innerHTML = jsondata['likeCount'];
+      }
+    }
+  </script>
 </body>
 
 </html>

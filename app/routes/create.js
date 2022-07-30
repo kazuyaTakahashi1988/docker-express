@@ -33,10 +33,10 @@ router.get('/post', async (req, res, next) => {
 
     Category.findAll({
         order: [['id', 'DESC']]
-    }).then(categories => {
+    }).then(result => {
         res.render('create/post', {
             user: req.user,
-            categories
+            categories: result
         });
     });
 
@@ -47,7 +47,8 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
 
     /* ▽ 保存画像ネーミング ▽  */
     const nowDate = new Date();
-    let saveImageName = "PostImage-".concat(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
+    let saveImageName =
+        "PostImage-".concat(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
 
     /* ▽ 画像圧縮処理 ▽  */
     if (req.file) {
@@ -84,11 +85,11 @@ router.get('/comment/:id', async (req, res, next) => {
 
     Post.findOne({
         where: { id: req.params["id"] }
-    }).then(post => {
-        if (post) {
+    }).then(result => {
+        if (result) {
             res.render('create/comment', {
                 user: req.user,
-                post
+                post: result
             });
         } else {
             res.redirect(302, '/posts/');
@@ -106,7 +107,7 @@ router.post('/comment/', async (req, res, next) => {
         comment: req.body.comment,
         user_id: req.user.id,
     }).then(result => {
-        res.redirect(302, `/posts/detail/${req.body.post_id}`);
+        res.redirect(302, `/posts/detail/${result.post_id}`);
     });
 
 });
@@ -118,15 +119,15 @@ router.post('/comment/', async (req, res, next) => {
 /* GET 作成ページ */
 router.get('/reply/:id', async (req, res, next) => {
 
-    await Comment.findOne({
+    Comment.findOne({
         where: { id: req.params["id"] },
         include: [{ model: User }]
-    }).then(comment => {
-        // res.send(comment);
-        if (comment) {
+    }).then(result => {
+        // res.send(result);
+        if (result) {
             res.render('create/reply', {
                 user: req.user,
-                comment
+                comment: result
             });
         } else {
             res.redirect(302, '/posts/');
@@ -153,21 +154,50 @@ router.post('/reply/', async (req, res, next) => {
     ▽ お気に入り作成 ▽
 -------------------------------------- */
 
-/* POST お気に入り登録 作成処理 */
+/* POST お気に入り登録 処理 */
 router.post('/like/:postId', async (req, res, next) => {
 
     /* ▽ お気に入り登録処理 ▽  */
-    await Like.create({
-        post_id: req.params["postId"],
-        user_id: req.user.id,
+    Like.findOrCreate({
+        where: { post_id: req.params["postId"], user_id: req.user.id },
+        defaults: {
+            post_id: req.params["postId"],
+            user_id: req.user.id
+        }
+    }).then(created => {
+        if (created) { // データが新規作成された場合
+            Like.findAndCountAll({
+                where: { post_id: req.params["postId"] }
+            }).then(result => {
+                return res.json({ likeCount: result.count })
+            });
+        } else {
+            return res.json({ likeCount: 'erroor01' })
+        }
     });
 
-    Like.findAll({
-        where: { post_id: req.body.post_id }
-    }).then(result => {
-        // res.send(result);
-        return res.json({ likeCount: result.length })
+});
+
+/* POST お気に入り解除 処理 */
+router.post('/unlike/:postId', async (req, res, next) => {
+
+    /* ▽ お気に入り解除処理 ▽  */
+    Like.findOne({
+        where: {
+            post_id: req.params["postId"],
+            user_id: req.user.id
+        },
+    }).then( async ( resolt ) => {
+        await resolt.destroy();
+        Like.findAndCountAll({
+            where: { post_id: req.params["postId"] }
+        }).then(result => {
+            return res.json({ likeCount: result.count })
+        });
+    }).catch((err) => {
+        res.status(404).json({ likeCount: 'erroor' });
     });
+
 
 });
 
@@ -180,7 +210,8 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
 
     /* ▽ 保存画像ネーミング ▽  */
     const nowDate = new Date();
-    let saveImageName = "CKEditorImage-".concat(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
+    let saveImageName =
+        "CKEditorImage-".concat(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
 
     /* ▽ 画像圧縮処理 ▽  */
     if (req.file) {
@@ -196,8 +227,8 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
 
     /* ▽ ckeditor.jsに返却するデータを生成する ▽ */
     const CKEditorFuncNum = req.query.CKEditorFuncNum;
-    const imgaePath = `/uploads/${saveImageName}`;
-    const sendTxt = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imgaePath}', 'アップロード成功')</script>`;
+    const imagePath = `/uploads/${saveImageName}`;
+    const sendTxt = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imagePath}', 'アップロード成功')</script>`;
 
     /* ▽ HTMLを返す ▽ */
     res.header('Content-Type', 'text/html;charset=utf-8');

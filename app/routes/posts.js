@@ -16,8 +16,8 @@ const perPage = 6; // 表示ページ数
 
 /* GET 一覧（Q & A） */
 router.get('/', async (req, res, next) => {
-    const page = req.query.page || 1; // ?page= のクエリ情報
 
+    const page = req.query.page || 1; // ?page= のクエリ情報
     Post.findAndCountAll({
         order: [['id', 'DESC']],
         offset: (page - 1) * perPage,
@@ -25,13 +25,15 @@ router.get('/', async (req, res, next) => {
     }).then(result => {
         const posts = result.rows; // 取得記事
         const count = Math.ceil(result.count / perPage); // ページ総数
+        const pegePath = '';
+        const pageTitle = 'Q & A 一覧'
         res.render('posts', {
             user: req.user, // 認証ユーザー情報
             posts, // 取得記事情報
             count, // ページ総数（ページャー生成用）
             page, // ページ総数から何件目（ページャー生成用）
-            pegePath: '', // ページのパス（ページャー生成用）
-            pageTitle: 'Q & A 一覧' // ページのタイトル
+            pegePath, // ページのパス（ページャー生成用）
+            pageTitle // ページのタイトル
         });
     });
 
@@ -39,14 +41,12 @@ router.get('/', async (req, res, next) => {
 
 /* GET 一覧（ユーザー） */
 router.get('/user/:id', async (req, res, next) => {
+
+    const userOne = await User.findOne({
+        where: { id: req.params["id"] }
+    });
+
     const page = req.query.page || 1;
-
-    let pageTitle;
-    await User.findOne({ where: { id: req.params["id"] }
-    }).then(userOne => {
-        pageTitle = userOne.name
-    }); // ページのタイトル取得
-
     Post.findAndCountAll({
         order: [['id', 'DESC']],
         where: { user_id: req.params["id"] },
@@ -55,13 +55,15 @@ router.get('/user/:id', async (req, res, next) => {
     }).then(result => {
         const posts = result.rows;
         const count = Math.ceil(result.count / perPage);
+        const pegePath = `/user/${req.params["id"]}`;
+        const pageTitle = `ユーザー：${userOne.name}`;
         res.render('posts', {
             user: req.user,
             posts,
             count,
             page,
-            pegePath: `/user/${req.params["id"]}`,
-            pageTitle: `ユーザー：${pageTitle}`
+            pegePath,
+            pageTitle
         });
     });
 
@@ -69,14 +71,12 @@ router.get('/user/:id', async (req, res, next) => {
 
 /* GET 一覧（カテゴリー） */
 router.get('/category/:id', async (req, res, next) => {
+
+    const categoryOne = await Category.findOne({
+        where: { id: req.params["id"] }
+    });
+
     const page = req.query.page || 1;
-
-    let pageTitle;
-    await Category.findOne({ where: { id: req.params["id"] }
-    }).then(categoryOne => {
-        pageTitle = categoryOne.category_name
-    }); // ページのタイトル取得
-
     Post.findAndCountAll({
         order: [['id', 'DESC']],
         where: { category_id: req.params["id"] },
@@ -85,13 +85,15 @@ router.get('/category/:id', async (req, res, next) => {
     }).then(result => {
         const posts = result.rows;
         const count = Math.ceil(result.count / perPage);
+        const pegePath = `/category/${req.params["id"]}`;
+        const pageTitle = `カテゴリー：${categoryOne.category_name}`;
         res.render('posts', {
             user: req.user,
             posts,
             count,
             page,
-            pegePath: `/category/${req.params["id"]}`,
-            pageTitle: `カテゴリー：${pageTitle}`
+            pegePath,
+            pageTitle
         });
     });
 
@@ -103,28 +105,35 @@ router.get('/category/:id', async (req, res, next) => {
 
 /* GET 詳細 */
 router.get('/detail/:id', async (req, res, next) => {
-    let comments;
-    await Comment.findAll({
+
+    const comments = await Comment.findAll({
         order: [['id', 'DESC']],
         where: { post_id: req.params["id"] },
-        include: [{ model: User },{ model: Reply,include:[{ model: User }] }]
-    }).then(result => {
-        // res.send(result);
-        comments = result;
+        include: [{ model: User }, { model: Reply, include: [{ model: User }] }]
     });
 
     Post.findOne({
         where: { id: req.params["id"] },
-        include: [{ model: User },{ model: Category },{ model: Like }]
-    }).then(post => {
+        include: [{ model: User }, { model: Category }, { model: Like }]
+    }).then( async ( post ) => {
         // res.send(post);
+        let judge = false; // Likeしたかの判定
+        if (req.user) {
+            judge = await Like.findOne({
+                where: {
+                    post_id: req.params["id"],
+                    user_id: req.user.id
+                }
+            });
+        }
         res.render('posts/detail', {
             user: req.user,
+            post,
             comments,
-            post
+            judge
         });
     });
-    
+
 });
 
 module.exports = router;
