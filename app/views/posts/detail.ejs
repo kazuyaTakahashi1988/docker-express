@@ -42,9 +42,13 @@ let args = {
         <a href="<%= `/posts/category/${post.Category.id}` %>"><small><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></small></a>
       </p>
       <p class="text-left"><%- post.content %></p><br><br>
+      <div class="d-flex justify-content-between py-1 pt-3 mb-3">
+        <div></div>
+        <div><span class="text3"><small><%= post.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+      </div>
+      <div class="d-block my-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white p-2">+ コメント</a></div>
       <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
     </div>
-    <div class="d-block mt-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white p-2">+ コメント</a></div>
   </div>
 
   <% comments.forEach( comment => { %>
@@ -53,16 +57,26 @@ let args = {
       <div class="second py-2 px-2"> <span class="text1"><%- comment.comment %></span>
         <div class="d-flex justify-content-between py-1 pt-3">
           <div><a href="/posts/user/<%= comment.User.id %>"><small><span class="text-dark">ユーザー：</span><span class="text2"><%= comment.User.name %></span></small></a></div>
-          <div><span class="text3"><small><%= comment.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span><span class="text4">3</span></div>
+          <div><span class="text3"><small><%= comment.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
         </div>
       </div>
     </div>
+    <% comment.Replies.forEach( Reply => { %>
+    <div class="balloon1 p-3">
+      <p class="text1"><%= Reply.reply %></p>
+      <div class="d-flex justify-content-between py-1 pt-3">
+        <div><a href="/posts/user/<%= Reply.User.id %>"><small><span class="text-dark">ユーザー：</span><span class="text2"><%= Reply.User.name %></span></small></a></div>
+        <div><span class="text3"><small><%= Reply.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+      </div>
+    </div>
+    <% }) %>
     <div class="d-block p-2 mb-4 border bg-white rounded"><a href="/create/reply/<%= comment.id %>" class="d-block"> <small>+ リプライ</small> </a></div>
   </div>
   <% }) %>
 
   <%- include('./../_inc/load-body-footer',{ args, user }) %>
   <%- include('./../_inc/load-body-js',{ args, user }) %>
+
 </body>
 
 </html>

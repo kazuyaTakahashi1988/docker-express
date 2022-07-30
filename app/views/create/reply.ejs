@@ -1,0 +1,52 @@
+<%
+let args = {
+    pageTtl: 'リプライ投稿' + comment.id,
+    // pageDes: '',
+    // pageKey: '',
+    // pageUrl: `/posts/create/`,
+    // pageImg: '/top/ogp.png',
+    // pageCss: '/top.css',
+    // pageJs: '/top.min.js',
+    // pageCss02: '',
+    // pageJs02: '',
+    // is_jquery: true,
+    // is_home: true,
+};
+%>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <%- include('./../_inc/load-head-ga') %>
+  <%- include('./../_inc/load-head-meta',{ args, user }) %>
+  <%- include('./../_inc/load-head-css',{ args, user }) %>
+  <%- include('./../_inc/load-head-js',{ args, user }) %>
+  <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
+</head>
+
+<body class="pagetype-home">
+  <%- // include('./../_inc/load-body-svg') %>
+  <%- include('./../_inc/load-body-header',{ args, user }) %>
+
+  <div class="container bg-white p-5 rounded">
+    <form method="POST" action="/create/reply/">
+
+      <div class="form-group mb-4">
+        <label for="form-label"><b class="h4"><%= comment.User.name %></b>さんへのコメントリプライを作成</label>
+      </div>
+      <div class="form-group mb-4">
+        <label for="form-label">・内容</label>
+        <textarea class="form-control" name="reply" id="reply" rows="8"></textarea>
+      </div>
+      <input type="hidden" value="<%= comment.id %>" name="comment_id">
+      <input type="hidden" value="<%= comment.post_id %>" name="post_id">
+      <button type="submit" class="btn btn-primary">C r e a t e</button>
+    </form>
+  </div>
+
+  <%- include('./../_inc/load-body-footer',{ args, user }) %>
+  <%- include('./../_inc/load-body-js',{ args, user }) %>
+
+</body>
+
+</html>

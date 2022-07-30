@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-const Post = require('./../models').Post;
-const Comment = require('./../models').Comment;
 const User = require('./../models').User;
+const Post = require('./../models').Post;
 const Category = require('./../models').Category;
+const Comment = require('./../models').Comment;
+const Reply = require('./../models').Reply;
+const Like = require('./../models').Like;
 
 const perPage = 6; // 表示ページ数
 
@@ -40,8 +42,8 @@ router.get('/user/:id', async (req, res, next) => {
     const page = req.query.page || 1;
 
     let pageTitle;
-    await User.findOne({ where: { id: req.params["id"] } }
-    ).then(userOne => {
+    await User.findOne({ where: { id: req.params["id"] }
+    }).then(userOne => {
         pageTitle = userOne.name
     }); // ページのタイトル取得
 
@@ -70,8 +72,8 @@ router.get('/category/:id', async (req, res, next) => {
     const page = req.query.page || 1;
 
     let pageTitle;
-    await Category.findOne({ where: { id: req.params["id"] } }
-    ).then(categoryOne => {
+    await Category.findOne({ where: { id: req.params["id"] }
+    }).then(categoryOne => {
         pageTitle = categoryOne.category_name
     }); // ページのタイトル取得
 
@@ -105,18 +107,16 @@ router.get('/detail/:id', async (req, res, next) => {
     await Comment.findAll({
         order: [['id', 'DESC']],
         where: { post_id: req.params["id"] },
-        include: [{ model: User }]
-    }
-    ).then(result => {
-        // res.send(post);
+        include: [{ model: User },{ model: Reply,include:[{ model: User }] }]
+    }).then(result => {
+        // res.send(result);
         comments = result;
     });
 
     Post.findOne({
         where: { id: req.params["id"] },
-        include: [{ model: User }, { model: Category }]
-    }
-    ).then(post => {
+        include: [{ model: User },{ model: Category },{ model: Like }]
+    }).then(post => {
         // res.send(post);
         res.render('posts/detail', {
             user: req.user,

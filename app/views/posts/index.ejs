@@ -51,11 +51,15 @@ let args = {
     <% if(count > 1){ %>
     <div aria-label="Page navigation example">
       <ul class="pagination justify-content-center">
-        <% if(page > 1){ %><li class="page-item"><a class="page-link" href="/posts<%- pegePath && pegePath %><%= `?page=${page - 1}` %>">&laquo;</a></li><% } %>
+        <% if(page > 1){ %>
+        <li class="page-item"><a class="page-link" href="/posts<%- pegePath && pegePath %><%= `?page=${page - 1}` %>">&laquo;</a></li>
+        <% } %>
         <% for(let index = 1; index <= count; index++){ %>
         <li class="page-item <%- page == index && `active` %>"><a class="page-link" href="/posts<%- pegePath && pegePath %><%= `?page=${index}` %>"><%= index %></a></li>
         <% } %>
-        <% if(page < count){ %><li class="page-item"><a class="page-link" href="/posts<%- pegePath && pegePath %><%= `?page=${++page}` %>">&raquo;</a></li><% } %>
+        <% if(page < count){ %>
+        <li class="page-item"><a class="page-link" href="/posts<%- pegePath && pegePath %><%= `?page=${++page}` %>">&raquo;</a></li>
+        <% } %>
       </ul>
     </div>
     <% } %>

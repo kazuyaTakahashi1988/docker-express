@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'category_id',
         targetKey: 'id'
       })
+      Post.hasMany(models.Like, {
+        foreignKey: 'post_id'
+      })
     }
 }
 

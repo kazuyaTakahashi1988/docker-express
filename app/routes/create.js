@@ -5,9 +5,12 @@ const multer = require('multer');
 const sharp = require('sharp');
 const fs = require('fs');
 
+const User = require('./../models').User;
 const Post = require('./../models').Post;
-const Comment = require('./../models').Comment;
 const Category = require('./../models').Category;
+const Comment = require('./../models').Comment;
+const Reply = require('./../models').Reply;
+const Like = require('./../models').Like;
 
 const destDir = 'public/uploads/';
 const storage = multer.diskStorage({
@@ -66,8 +69,7 @@ router.post('/post', upload.single('image'), async (req, res, next) => {
         content: req.body.content,
         user_id: req.user.id,
         category_id: req.body.category_id,
-    }
-    ).then(result => {
+    }).then(result => {
         res.redirect(302, `/posts/detail/${result.id}`);
     });
 
@@ -82,8 +84,7 @@ router.get('/comment/:id', async (req, res, next) => {
 
     Post.findOne({
         where: { id: req.params["id"] }
-    }
-    ).then(post => {
+    }).then(post => {
         if (post) {
             res.render('create/comment', {
                 user: req.user,
@@ -93,7 +94,7 @@ router.get('/comment/:id', async (req, res, next) => {
             res.redirect(302, '/posts/');
         }
     });
-    
+
 });
 
 /* POST 作成処理 */
@@ -104,13 +105,71 @@ router.post('/comment/', async (req, res, next) => {
         post_id: req.body.post_id,
         comment: req.body.comment,
         user_id: req.user.id,
-    }
-    ).then(result => {
-        res.redirect(302,  `/posts/detail/${req.body.post_id}`);
+    }).then(result => {
+        res.redirect(302, `/posts/detail/${req.body.post_id}`);
     });
 
 });
 
+/* --------------------------------------
+    ▽ リプライ作成 ▽
+-------------------------------------- */
+
+/* GET 作成ページ */
+router.get('/reply/:id', async (req, res, next) => {
+
+    await Comment.findOne({
+        where: { id: req.params["id"] },
+        include: [{ model: User }]
+    }).then(comment => {
+        // res.send(comment);
+        if (comment) {
+            res.render('create/reply', {
+                user: req.user,
+                comment
+            });
+        } else {
+            res.redirect(302, '/posts/');
+        }
+    });
+
+});
+
+/* POST 作成処理 */
+router.post('/reply/', async (req, res, next) => {
+
+    /* ▽ リプライクリエイト処理 ▽  */
+    Reply.create({
+        comment_id: req.body.comment_id,
+        reply: req.body.reply,
+        user_id: req.user.id,
+    }).then(result => {
+        res.redirect(302, `/posts/detail/${req.body.post_id}`);
+    });
+
+});
+
+/* --------------------------------------
+    ▽ お気に入り作成 ▽
+-------------------------------------- */
+
+/* POST お気に入り登録 作成処理 */
+router.post('/like/:postId', async (req, res, next) => {
+
+    /* ▽ お気に入り登録処理 ▽  */
+    await Like.create({
+        post_id: req.params["postId"],
+        user_id: req.user.id,
+    });
+
+    Like.findAll({
+        where: { post_id: req.body.post_id }
+    }).then(result => {
+        // res.send(result);
+        return res.json({ likeCount: result.length })
+    });
+
+});
 
 /* --------------------------------------
     ▽ CKEditor 画像アップロード処理 ▽
@@ -134,7 +193,7 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
     } else {
         saveImageName = '';
     }
-    
+
     /* ▽ ckeditor.jsに返却するデータを生成する ▽ */
     const CKEditorFuncNum = req.query.CKEditorFuncNum;
     const imgaePath = `/uploads/${saveImageName}`;
@@ -143,7 +202,7 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
     /* ▽ HTMLを返す ▽ */
     res.header('Content-Type', 'text/html;charset=utf-8');
     res.send(sendTxt);
-    
+
 });
 
 module.exports = router;
