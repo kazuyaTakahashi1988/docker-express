@@ -91,11 +91,11 @@ a:hover{
 .balloon1:before {
   content: "";
   position: absolute;
-  top: 50%;
+  top: 20%;
   left: -30px;
   margin-top: -15px;
-  border: 15px solid transparent;
-  border-right: 15px solid #e3f2fd;
+  border: 10px solid transparent;
+  border-right: 20px solid #e3f2fd;
 }
 .balloon1 p{
   font-size: 14px;
