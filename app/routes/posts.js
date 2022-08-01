@@ -25,7 +25,7 @@ router.get('/', async (req, res, next) => {
     }).then(result => {
         const posts = result.rows; // 取得記事
         const count = Math.ceil(result.count / perPage); // ページ総数
-        const pegePath = '';
+        const pegePath = '/posts';
         const pageTitle = 'Q & A 一覧'
         res.render('posts', {
             user: req.user, // 認証ユーザー情報
@@ -55,7 +55,7 @@ router.get('/user/:id', async (req, res, next) => {
     }).then(result => {
         const posts = result.rows;
         const count = Math.ceil(result.count / perPage);
-        const pegePath = `/user/${req.params["id"]}`;
+        const pegePath = `/posts/user/${req.params["id"]}`;
         const pageTitle = `ユーザー：${userOne.name}`;
         res.render('posts', {
             user: req.user,
@@ -85,7 +85,7 @@ router.get('/category/:id', async (req, res, next) => {
     }).then(result => {
         const posts = result.rows;
         const count = Math.ceil(result.count / perPage);
-        const pegePath = `/category/${req.params["id"]}`;
+        const pegePath = `/posts/category/${req.params["id"]}`;
         const pageTitle = `カテゴリー：${categoryOne.category_name}`;
         res.render('posts', {
             user: req.user,

@@ -43,8 +43,8 @@ let args = {
       <p class="text-left text-primary"><b>Like：<%- post.Likes.length %></b></p>
       <% } else { %>
       <div id="likeBtnArea" class="<%- judge && 'likeOn' %>">
-        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn(<%= post.id %>, '/create/like/')" id="like"><small class="text-primary"><b>Like：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
-        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn(<%= post.id %>, '/create/unlike/')" id="unLike"><small class="text-info"><b>Like：<span class="likeCount"><%= post.Likes.length %></span></b></small></button>
+        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn(<%= post.id %>, '/create/like/')" id="like"><small class="text-primary"><b>Like 　    ：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
+        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn(<%= post.id %>, '/create/unlike/')" id="unLike"><small class="text-info"><b>Like (済)：<span class="likeCount"><%= post.Likes.length %></span></b></small></button>
       </div>
       <% }  %><br>
       <p class="text-left mb-2">
