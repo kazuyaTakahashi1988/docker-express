@@ -91,7 +91,7 @@ const APP_KEY = 'YOUR-SECRET-KEY';
 //   }
 // };
 const authJudge = (req, res, next) => {
-  if (req.cookies.remember_me) {
+  if (!req.isAuthenticated() && req.cookies.remember_me) {
     const [rememberToken, hash] = req.cookies.remember_me.split('|');
     User.findAll({
       where: {
@@ -105,14 +105,14 @@ const authJudge = (req, res, next) => {
           .digest('hex');
         if (hash === verifyingHash) {
           return req.login(user, () => {
-            next();
+            res.redirect(302, '/');
           });
         }
       }
-      res.redirect(302, '/login');
+      res.redirect(302, '/');
     });
   } else {
-    res.redirect(302, '/login');
+    next();
   }
 };
 

@@ -29,7 +29,7 @@ let args = {
   <%- include('./../_inc/load-body-header',{ args, user }) %>
 
   <div class="container bg-white p-5 rounded">
-    <form method="POST" action="/create/reply/">
+    <form method="POST" action="/create/reply/<%= comment.id %>">
 
       <div class="form-group mb-4">
         <label for="form-label"><b class="h4"><%= comment.User.name %></b>さんへのコメントリプライを作成</label>
@@ -38,7 +38,6 @@ let args = {
         <label for="form-label">・内容</label>
         <textarea class="form-control" name="reply" id="reply" rows="8"></textarea>
       </div>
-      <input type="hidden" value="<%= comment.id %>" name="comment_id">
       <input type="hidden" value="<%= comment.post_id %>" name="post_id">
       <button type="submit" class="btn btn-primary">C r e a t e</button>
     </form>

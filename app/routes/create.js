@@ -99,11 +99,11 @@ router.get('/comment/:id', async (req, res, next) => {
 });
 
 /* POST 作成処理 */
-router.post('/comment/', async (req, res, next) => {
+router.post('/comment/:id', async (req, res, next) => {
 
     /* ▽ コメントクリエイト処理 ▽  */
     Comment.create({
-        post_id: req.body.post_id,
+        post_id: req.params["id"],
         comment: req.body.comment,
         user_id: req.user.id,
     }).then(result => {
@@ -137,11 +137,11 @@ router.get('/reply/:id', async (req, res, next) => {
 });
 
 /* POST 作成処理 */
-router.post('/reply/', async (req, res, next) => {
+router.post('/reply/:id', async (req, res, next) => {
 
     /* ▽ リプライクリエイト処理 ▽  */
     Reply.create({
-        comment_id: req.body.comment_id,
+        comment_id: req.params["id"],
         reply: req.body.reply,
         user_id: req.user.id,
     }).then(result => {
@@ -155,19 +155,19 @@ router.post('/reply/', async (req, res, next) => {
 -------------------------------------- */
 
 /* POST お気に入り登録 処理 */
-router.post('/like/:postId', async (req, res, next) => {
+router.post('/like/:id', async (req, res, next) => {
 
     /* ▽ お気に入り登録処理 ▽  */
     Like.findOrCreate({
-        where: {post_id: req.params["postId"], user_id: req.user.id },
+        where: {post_id: req.params["id"], user_id: req.user.id },
         defaults: {
-            post_id: req.params["postId"],
+            post_id: req.params["id"],
             user_id: req.user.id
         }
     }).then(created => {
         if (created) { // データが新規作成された場合
             Like.findAndCountAll({
-                where: { post_id: req.params["postId"] }
+                where: { post_id: req.params["id"] }
             }).then(result => {
                 return res.json({ likeCount: result.count })
             });
@@ -179,18 +179,18 @@ router.post('/like/:postId', async (req, res, next) => {
 });
 
 /* POST お気に入り解除 処理 */
-router.post('/unlike/:postId', async (req, res, next) => {
+router.post('/unlike/:id', async (req, res, next) => {
 
     /* ▽ お気に入り解除処理 ▽  */
     Like.findOne({
         where: {
-            post_id: req.params["postId"],
+            post_id: req.params["id"],
             user_id: req.user.id
         },
     }).then( async ( resolt ) => {
         await resolt.destroy();
         Like.findAndCountAll({
-            where: { post_id: req.params["postId"] }
+            where: { post_id: req.params["id"] }
         }).then(result => {
             return res.json({ likeCount: result.count })
         });
