@@ -6,12 +6,12 @@
       "label": "docker-build",
       "platform": "node",
       "dockerBuild": {
-        "dockerfile": "${workspaceFolder}/dockerExpress/Dockerfile",
-        "context": "${workspaceFolder}/dockerExpress",
+        "dockerfile": "${workspaceFolder}/app/Dockerfile",
+        "context": "${workspaceFolder}/app",
         "pull": true
       },
       "node": {
-        "package": "${workspaceFolder}/dockerExpress/package.json"
+        "package": "${workspaceFolder}/app/package.json"
       }
     },
     {
@@ -22,7 +22,7 @@
       ],
       "platform": "node",
       "node": {
-        "package": "${workspaceFolder}/dockerExpress/package.json"
+        "package": "${workspaceFolder}/app/package.json"
       }
     },
     {
@@ -38,7 +38,7 @@
         }
       },
       "node": {
-        "package": "${workspaceFolder}/dockerExpress/package.json",
+        "package": "${workspaceFolder}/app/package.json",
         "enableDebugging": true
       }
     }

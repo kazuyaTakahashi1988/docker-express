@@ -46,9 +46,9 @@ router.get('/post', async (req, res, next) => {
 router.post('/post', upload.single('image'), async (req, res, next) => {
 
     /* ▽ 保存画像ネーミング ▽  */
-    const nowDate = new Date();
+    const now = new Date();
     let saveImageName =
-        "PostImage-".concat(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
+        "PostImage-".concat(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
 
     /* ▽ 画像圧縮処理 ▽  */
     if (req.file) {
@@ -159,7 +159,7 @@ router.post('/like/:postId', async (req, res, next) => {
 
     /* ▽ お気に入り登録処理 ▽  */
     Like.findOrCreate({
-        where: { post_id: req.params["postId"], user_id: req.user.id },
+        where: {post_id: req.params["postId"], user_id: req.user.id },
         defaults: {
             post_id: req.params["postId"],
             user_id: req.user.id
@@ -209,9 +209,9 @@ router.post('/unlike/:postId', async (req, res, next) => {
 router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) => {
 
     /* ▽ 保存画像ネーミング ▽  */
-    const nowDate = new Date();
+    const now = new Date();
     let saveImageName =
-        "CKEditorImage-".concat(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
+        "CKEditorImage-".concat(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
 
     /* ▽ 画像圧縮処理 ▽  */
     if (req.file) {
@@ -228,11 +228,11 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
     /* ▽ ckeditor.jsに返却するデータを生成する ▽ */
     const CKEditorFuncNum = req.query.CKEditorFuncNum;
     const imagePath = `/uploads/${saveImageName}`;
-    const sendTxt = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imagePath}', 'アップロード成功')</script>`;
+    const sendText = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imagePath}', 'アップロード成功')</script>`;
 
     /* ▽ HTMLを返す ▽ */
     res.header('Content-Type', 'text/html;charset=utf-8');
-    res.send(sendTxt);
+    res.send(sendText);
 
 });
 

@@ -7,8 +7,8 @@
       "preLaunchTask": "docker-run: debug",
       "platform": "node",
       "node": {
-        "package": "${workspaceFolder}/dockerExpress/package.json",
-        "localRoot": "${workspaceFolder}/dockerExpress"
+        "package": "${workspaceFolder}/app/package.json",
+        "localRoot": "${workspaceFolder}/app"
       }
     }
   ]

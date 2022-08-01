@@ -73,8 +73,8 @@ let args = {
     ▽ 画像のドラッグ＆ドロップ処理 ▽
   ------------------------------- */%>
   <script>
-    var fileArea = document.getElementById('drag-drop-area');
-    var fileInput = document.getElementById('fileInput');
+    const fileArea = document.getElementById('drag-drop-area');
+    const fileInput = document.getElementById('fileInput');
 
     fileArea.addEventListener('dragover', function(evt) {
       evt.preventDefault();
@@ -88,7 +88,7 @@ let args = {
     fileArea.addEventListener('drop', function(evt) {
       evt.preventDefault();
       fileArea.classList.remove('dragenter');
-      var files = evt.dataTransfer.files;
+      const files = evt.dataTransfer.files;
       fileInput.files = files;
     });
   </script>
