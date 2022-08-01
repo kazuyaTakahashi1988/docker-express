@@ -91,9 +91,7 @@ const APP_KEY = 'YOUR-SECRET-KEY';
 //   }
 // };
 const authJudge = (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    next();
-  } else if (req.cookies.remember_me) {
+  if (req.cookies.remember_me) {
     const [rememberToken, hash] = req.cookies.remember_me.split('|');
     User.findAll({
       where: {
