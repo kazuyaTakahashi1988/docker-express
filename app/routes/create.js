@@ -123,7 +123,6 @@ router.get('/reply/:id', async (req, res, next) => {
         where: { id: req.params["id"] },
         include: [{ model: User }]
     }).then(result => {
-        // res.send(result);
         if (result) {
             res.render('create/reply', {
                 user: req.user,
@@ -159,7 +158,7 @@ router.post('/like/:id', async (req, res, next) => {
 
     /* ▽ お気に入り登録処理 ▽  */
     Like.findOrCreate({
-        where: {post_id: req.params["id"], user_id: req.user.id },
+        where: { post_id: req.params["id"], user_id: req.user.id },
         defaults: {
             post_id: req.params["id"],
             user_id: req.user.id
@@ -178,16 +177,16 @@ router.post('/like/:id', async (req, res, next) => {
 
 });
 
-/* POST お気に入り解除 処理 */
+/* POST お気に入り削除 処理 */
 router.post('/unlike/:id', async (req, res, next) => {
 
-    /* ▽ お気に入り解除処理 ▽  */
+    /* ▽ お気に入り削除処理 ▽  */
     Like.findOne({
         where: {
             post_id: req.params["id"],
             user_id: req.user.id
         },
-    }).then( async ( resolt ) => {
+    }).then(async (resolt) => {
         await resolt.destroy();
         Like.findAndCountAll({
             where: { post_id: req.params["id"] }

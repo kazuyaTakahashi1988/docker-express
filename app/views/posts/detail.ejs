@@ -43,7 +43,7 @@ let args = {
       <p class="text-left text-primary"><b>Like：<%- post.Likes.length %></b></p>
       <% } else { %>
       <div id="likeBtnArea" class="<%- judge && 'likeOn' %>">
-        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn('/create/like/<%= post.id %>')" id="like"><small class="text-primary"><b>Like 　    ：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
+        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn('/create/like/<%= post.id %>')" id="like"><small class="text-primary"><b>Like 　 ：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
         <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn('/create/unlike/<%= post.id %>')" id="unLike"><small class="text-info"><b>Like (済)：<span class="likeCount"><%= post.Likes.length %></span></b></small></button>
       </div>
       <% }  %><br>
@@ -84,6 +84,22 @@ let args = {
     <div class="d-block p-2 mb-4 border bg-white rounded"><a href="/create/reply/<%= comment.id %>" class="d-block"> <small>+ リプライ</small> </a></div>
   </div>
   <% }); %>
+
+  <% if(count > 1){ %>
+  <div aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      <% if(page > 1){ %>
+      <li class="page-item"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${page - 1}` %>">&laquo;</a></li>
+      <% } %>
+      <% for(let index = 1; index <= count; index++){ %>
+      <li class="page-item <%- page == index && `active` %>"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${index}` %>"><%= index %></a></li>
+      <% } %>
+      <% if(page < count){ %>
+      <li class="page-item"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${++page}` %>">&raquo;</a></li>
+      <% } %>
+    </ul>
+  </div>
+  <% } %>
 
   <%- include('./../_inc/load-body-footer',{ args, user }) %>
   <%- include('./../_inc/load-body-js',{ args, user }) %>

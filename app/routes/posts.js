@@ -16,24 +16,20 @@ const perPage = 6; // 表示ページ数
 
 /* GET 一覧（Q & A） */
 router.get('/', async (req, res, next) => {
-
     const page = req.query.page || 1; // ?page= のクエリ情報
+
     Post.findAndCountAll({
         order: [['id', 'DESC']],
         offset: (page - 1) * perPage,
         limit: perPage
     }).then(result => {
-        const posts = result.rows; // 取得記事
-        const count = Math.ceil(result.count / perPage); // ページ総数
-        const pegePath = '/posts';
-        const pageTitle = 'Q & A 一覧'
         res.render('posts', {
             user: req.user, // 認証ユーザー情報
-            posts, // 取得記事情報
-            count, // ページ総数（ページャー生成用）
-            page, // ページ総数から何件目（ページャー生成用）
-            pegePath, // ページのパス（ページャー生成用）
-            pageTitle // ページのタイトル
+            posts: result.rows, // 取得記事情報
+            count: Math.ceil(result.count / perPage), // ページ総数（ページャー生成用）
+            pegePath: '/posts', // ページのパス（ページャー生成用）
+            pageTitle: 'Q & A 一覧', // ページのタイトル
+            page // ?page= のクエリ情報（ページャー生成用）
         });
     });
 
@@ -53,17 +49,13 @@ router.get('/user/:id', async (req, res, next) => {
         offset: (page - 1) * perPage,
         limit: perPage
     }).then(result => {
-        const posts = result.rows;
-        const count = Math.ceil(result.count / perPage);
-        const pegePath = `/posts/user/${req.params["id"]}`;
-        const pageTitle = `ユーザー：${userOne.name}`;
         res.render('posts', {
             user: req.user,
-            posts,
-            count,
+            posts: result.rows,
+            count: Math.ceil(result.count / perPage),
+            pegePath: `/posts/user/${req.params["id"]}`,
+            pageTitle: `ユーザー：${userOne.name}`,
             page,
-            pegePath,
-            pageTitle
         });
     });
 
@@ -83,17 +75,13 @@ router.get('/category/:id', async (req, res, next) => {
         offset: (page - 1) * perPage,
         limit: perPage
     }).then(result => {
-        const posts = result.rows;
-        const count = Math.ceil(result.count / perPage);
-        const pegePath = `/posts/category/${req.params["id"]}`;
-        const pageTitle = `カテゴリー：${categoryOne.category_name}`;
         res.render('posts', {
             user: req.user,
-            posts,
-            count,
-            page,
-            pegePath,
-            pageTitle
+            posts: result.rows,
+            count: Math.ceil(result.count / perPage),
+            pegePath: `/posts/category/${req.params["id"]}`,
+            pageTitle: `カテゴリー：${categoryOne.category_name}`,
+            page
         });
     });
 
@@ -105,18 +93,20 @@ router.get('/category/:id', async (req, res, next) => {
 
 /* GET 詳細 */
 router.get('/detail/:id', async (req, res, next) => {
+    const page = req.query.page || 1; // ?page= のクエリ情報
 
-    const comments = await Comment.findAll({
-        order: [['id', 'DESC']],
-        where: { post_id: req.params["id"] },
-        include: [{ model: User }, { model: Reply, include: [{ model: User }] }]
-    });
-
-    Post.findOne({
+    const postResult = await Post.findOne({
         where: { id: req.params["id"] },
         include: [{ model: User }, { model: Category }, { model: Like }]
-    }).then( async ( post ) => {
-        // res.send(post);
+    });
+
+    Comment.findAndCountAll({
+        order: [['id', 'DESC']],
+        where: { post_id: req.params["id"] },
+        offset: (page - 1) * perPage,
+        limit: perPage,
+        include: [{ model: User }, { model: Reply, include: [{ model: User }] }]
+    }).then(async (result) => {
         let judge = false; // Likeしたかの判定
         if (req.user) {
             judge = await Like.findOne({
@@ -128,8 +118,11 @@ router.get('/detail/:id', async (req, res, next) => {
         }
         res.render('posts/detail', {
             user: req.user,
-            post,
-            comments,
+            post: postResult,
+            comments: result.rows,
+            count: Math.ceil(result.count / perPage),
+            pegePath: `/posts/detail/${req.params["id"]}`,
+            page,
             judge
         });
     });
