@@ -83,11 +83,38 @@ app.use(logger('dev'));
 const APP_KEY = 'YOUR-SECRET-KEY';
 
 // 認証判定
+// const authJudge = (req, res, next) => {
+//   if (!req.isAuthenticated()) {
+//     next();
+//   } else {
+//     res.redirect(302, '/');
+//   }
+// };
 const authJudge = (req, res, next) => {
   if (!req.isAuthenticated()) {
     next();
+  } else if (req.cookies.remember_me) {
+    const [rememberToken, hash] = req.cookies.remember_me.split('|');
+    User.findAll({
+      where: {
+        rememberToken: rememberToken
+      }
+    }).then(users => {
+      for (let i in users) {
+        const user = users[i];
+        const verifyingHash = crypto.createHmac('sha256', APP_KEY)
+          .update(user.id + '-' + rememberToken)
+          .digest('hex');
+        if (hash === verifyingHash) {
+          return req.login(user, () => {
+            next();
+          });
+        }
+      }
+      res.redirect(302, '/login');
+    });
   } else {
-    res.redirect(302, '/');
+    res.redirect(302, '/login');
   }
 };
 
