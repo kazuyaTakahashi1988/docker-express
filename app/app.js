@@ -20,6 +20,7 @@ const postsRouter = require('./routes/posts');
 const likesRouter = require('./routes/likes');
 const createRouter = require('./routes/create');
 const dashboardRouter = require('./routes/dashboard');
+const { send } = require('process');
 const app = express();
 
 // use 認証関連
@@ -37,7 +38,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // use Router
-const adminAuthMiddleware = (req, res, next) => {
+// 認証判定
+const autoAuthMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else if (req.cookies.remember_me) {
@@ -58,17 +60,29 @@ const adminAuthMiddleware = (req, res, next) => {
           });
         }
       }
-      res.redirect(302, '/login');
+      next();
     });
   } else {
-    res.redirect(302, '/login');
+    next();
   }
 };
-app.use('/', indexRouter);
-app.use('/posts', postsRouter);
-app.use('/likes', adminAuthMiddleware, likesRouter);
-app.use('/create', adminAuthMiddleware, createRouter);
-app.use('/dashboard', adminAuthMiddleware, dashboardRouter);
+
+const adminPageMW = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    return res.render('auth/login', {
+      errorMessage: undefined,
+      rePATH: req.originalUrl
+    });
+  }
+}
+
+app.use('/', autoAuthMW, indexRouter);
+app.use('/posts', autoAuthMW, postsRouter);
+app.use('/likes', autoAuthMW, adminPageMW, likesRouter);
+app.use('/create', autoAuthMW, adminPageMW, createRouter);
+app.use('/dashboard', autoAuthMW, adminPageMW, dashboardRouter);
 
 // use view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -83,15 +97,10 @@ app.use(logger('dev'));
 const APP_KEY = 'YOUR-SECRET-KEY';
 
 // 認証判定
-// const authJudge = (req, res, next) => {
-//   if (!req.isAuthenticated()) {
-//     next();
-//   } else {
-//     res.redirect(302, '/');
-//   }
-// };
 const authJudge = (req, res, next) => {
-  if (!req.isAuthenticated() && req.cookies.remember_me) {
+  if (req.isAuthenticated()) {
+    res.redirect(302, '/');
+  } else if (req.cookies.remember_me) {
     const [rememberToken, hash] = req.cookies.remember_me.split('|');
     User.findAll({
       where: {
@@ -109,7 +118,7 @@ const authJudge = (req, res, next) => {
           });
         }
       }
-      res.redirect(302, '/');
+      next();
     });
   } else {
     next();
@@ -178,7 +187,8 @@ app.post('/register', regiValidRules, (req, res) => {
 app.get('/login', authJudge, (req, res) => {
   const errorMessage = req.flash('error').join('<br>');
   res.render('auth/login', {
-    errorMessage: errorMessage
+    errorMessage: errorMessage,
+    rePATH: undefined
   });
 });
 
@@ -208,7 +218,11 @@ app.post('/login',
     return next();
   },
   (req, res) => {
+    if(req.body.reURL){
+      res.redirect(req.body.reURL);
+    } else {
       res.redirect('/dashboard');
+    }
   }
 );
 
