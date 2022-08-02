@@ -56,7 +56,12 @@ let args = {
       <p class="text-left"><%- post.content %></p><br><br>
       <div class="d-flex justify-content-between py-1 pt-3 mb-3">
         <div></div>
-        <div><span class="text3"><small><%= post.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+        <%
+          let date = new Date(post.createdAt);
+          date.setTime(date.getTime() + 1000*60*60*9);// JSTに変換
+          const TIME = ''.concat(date.getFullYear(),'年',date.getMonth() + 1,'月',date.getDate(),'日 ',date.getHours(),':',date.getMinutes());
+        %>
+        <div><span class="text3"><small><%- TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
       </div>
       <div class="d-block my-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white p-2">+ コメント</a></div>
       <a href="javascript:history.back();"><small>&raquo; 前ページに戻る</small></a><br />
@@ -69,7 +74,12 @@ let args = {
       <div class="second py-2 px-2"> <span class="text1"><%- comment.comment %></span>
         <div class="d-flex justify-content-between py-1 pt-3">
           <div><a href="/posts/user/<%= comment.User.id %>"><small><span class="text-dark">ユーザー：</span><span class="text2"><%= comment.User.name %></span></small></a></div>
-          <div><span class="text3"><small><%= comment.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+          <%
+            let date = new Date(comment.createdAt);
+            date.setTime(date.getTime() + 1000*60*60*9);// JSTに変換
+            const TIME = ''.concat(date.getFullYear(),'年',date.getMonth() + 1,'月',date.getDate(),'日 ',date.getHours(),':',date.getMinutes());
+          %>
+          <div><span class="text3"><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
         </div>
       </div>
     </div>
@@ -78,7 +88,12 @@ let args = {
       <p class="text1"><%= Reply.reply %></p>
       <div class="d-flex justify-content-between py-1 pt-3">
         <div><a href="/posts/user/<%= Reply.User.id %>"><small><span class="text-dark">ユーザー：</span><span class="text2"><%= Reply.User.name %></span></small></a></div>
-        <div><span class="text3"><small><%= Reply.createdAt %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+          <%
+            let date = new Date(Reply.createdAt);
+            date.setTime(date.getTime() + 1000*60*60*9);// JSTに変換
+            const TIME = ''.concat(date.getFullYear(),'年',date.getMonth() + 1,'月',date.getDate(),'日 ',date.getHours(),':',date.getMinutes());
+          %>
+        <div><span class="text3"><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
       </div>
     </div>
     <% }); %>

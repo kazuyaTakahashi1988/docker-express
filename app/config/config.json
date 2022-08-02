@@ -4,20 +4,23 @@
     "password": "root",
     "database": "express_db",
     "host": "express-mysql",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone":"Asia/Tokyo"
   },
   "test": {
     "username": "root",
     "password": "root",
     "database": "express_db",
     "host": "express-mysql",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone":"Asia/Tokyo"
   },
   "production": {
     "username": "root",
     "password": "root",
     "database": "express_db",
     "host": "express-mysql",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone":"Asia/Tokyo"
   }
 }
