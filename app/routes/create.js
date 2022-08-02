@@ -4,6 +4,7 @@ const router = express.Router();
 const multer = require('multer');
 const sharp = require('sharp');
 const fs = require('fs');
+const { check, validationResult } = require('express-validator');
 
 const User = require('./../models').User;
 const Post = require('./../models').Post;
@@ -11,6 +12,10 @@ const Category = require('./../models').Category;
 const Comment = require('./../models').Comment;
 const Reply = require('./../models').Reply;
 const Like = require('./../models').Like;
+
+/* --------------------------------------
+    ▽ 画像UPロード ▽
+-------------------------------------- */
 
 const destDir = 'public/uploads/';
 const storage = multer.diskStorage({
@@ -25,6 +30,25 @@ const upload = multer({
 });
 
 /* --------------------------------------
+    ▽ バリデーション・ルール ▽
+-------------------------------------- */
+
+const postValidRules = [
+    check('title').not().isEmpty().withMessage('タイトルの項目は必須入力です。'),
+    check('category_id').not().isEmpty().withMessage('カテゴリーの項目は必須入力です。'),
+    check('content').not().isEmpty().withMessage('内容の項目は必須入力です。')
+]; // post 
+
+const commentValidRules = [
+    check('comment').not().isEmpty().withMessage('内容の項目は必須入力です。')
+]; // comment
+
+const replyValidRules = [
+    check('reply').not().isEmpty().withMessage('内容の項目は必須入力です。')
+]; // reply
+
+
+/* --------------------------------------
     ▽ Q & A 記事作成 ▽
 -------------------------------------- */
 
@@ -36,14 +60,35 @@ router.get('/post', async (req, res, next) => {
     }).then(result => {
         res.render('create/post', {
             user: req.user,
-            categories: result
+            categories: result,
+            errors: '',
+            value: ''
         });
     });
 
 });
 
 /* POST 作成処理 */
-router.post('/post', upload.single('image'), async (req, res, next) => {
+router.post('/post', upload.single('image'), postValidRules, async (req, res, next) => {
+
+    /* ▽ バリデーション エラー時 ▽  */
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const categoryResult = await Category.findAll({
+            order: [['id', 'DESC']]
+        });
+        const value = {
+            title: req.body.title,
+            category: req.body.category_id,
+            content: req.body.content,
+        }
+        return res.render('create/post', {
+            user: req.user,
+            categories: categoryResult,
+            errors: errors.array(),
+            value
+        });
+    }
 
     /* ▽ 保存画像ネーミング ▽  */
     const now = new Date();
@@ -89,7 +134,8 @@ router.get('/comment/:id', async (req, res, next) => {
         if (result) {
             res.render('create/comment', {
                 user: req.user,
-                post: result
+                post: result,
+                errors: '',
             });
         } else {
             res.redirect(302, '/posts/');
@@ -99,7 +145,20 @@ router.get('/comment/:id', async (req, res, next) => {
 });
 
 /* POST 作成処理 */
-router.post('/comment/:id', async (req, res, next) => {
+router.post('/comment/:id', commentValidRules, async (req, res, next) => {
+
+    /* ▽ バリデーション エラー時 ▽  */
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const postResult = await Post.findOne({
+            where: { id: req.params["id"] }
+        });
+        return res.render('create/comment', {
+            user: req.user,
+            post: postResult,
+            errors: errors.array()
+        });
+    }
 
     /* ▽ コメントクリエイト処理 ▽  */
     Comment.create({
@@ -126,7 +185,9 @@ router.get('/reply/:id', async (req, res, next) => {
         if (result) {
             res.render('create/reply', {
                 user: req.user,
-                comment: result
+                comment: result,
+                errors: '',
+
             });
         } else {
             res.redirect(302, '/posts/');
@@ -136,7 +197,21 @@ router.get('/reply/:id', async (req, res, next) => {
 });
 
 /* POST 作成処理 */
-router.post('/reply/:id', async (req, res, next) => {
+router.post('/reply/:id', replyValidRules, async (req, res, next) => {
+
+    /* ▽ バリデーション エラー時 ▽  */
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const commentResult = await Comment.findOne({
+            where: { id: req.params["id"] },
+            include: [{ model: User }]
+        });
+        return res.render('create/reply', {
+            user: req.user,
+            comment: commentResult,
+            errors: errors.array()
+        });
+    }
 
     /* ▽ リプライクリエイト処理 ▽  */
     Reply.create({

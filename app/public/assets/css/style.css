@@ -58,7 +58,6 @@ a:hover{
   pointer-events: none;
 }
 .thum{
-  border-radius: 100%;
   width: 100%;
   height: 140px;
   overflow: hidden;
@@ -113,4 +112,25 @@ a:hover{
 .balloon1 p {
   margin: 0;
   padding: 0;
+}
+
+
+#likeBtnArea #like {
+  pointer-events: inherit;
+  display: block;
+}
+
+#likeBtnArea #unLike {
+  pointer-events: none;
+  display: none;
+}
+
+#likeBtnArea.likeOn #like {
+  pointer-events: none;
+  display: none;
+}
+
+#likeBtnArea.likeOn #unLike {
+  pointer-events: inherit;
+  display: block;
 }

@@ -28,6 +28,15 @@ let args = {
   <%- include('./../_inc/load-body-header',{ args, user }) %>
 
   <div class="container bg-white p-5 rounded">
+
+    <% if(errors){ %>
+    <% errors.forEach( error => { %>
+    <div class="alert alert-danger">
+      <%= error.msg %>
+    </div>
+    <% }) %>
+    <% } %>
+
     <form method="POST" action="/create/post/" enctype="multipart/form-data">
       <div class="form-group mb-4">
         <label for="title" class="form-label">・サムネイル画像</label>
@@ -42,7 +51,7 @@ let args = {
 
       <div class="form-group mb-4">
         <label class="form-label">・タイトル</label>
-        <input type="text" class="form-control" name="title" id="title">
+        <input type="text" class="form-control" name="title" id="title" value="<%- value.title && value.title %>" >
       </div>
 
       <div class="form-group mb-4">
@@ -50,7 +59,7 @@ let args = {
         <select class="form-control" name="category_id" id="category_id">
           <option selected value="">---</option>
           <% categories.forEach( category => { %>
-          <option value="<%= category.id %>">
+          <option value="<%= category.id %>" <%- value.category == category.id && 'selected' %> >
             <%= category.category_name %>
           </option>
           <% }) %>
@@ -59,7 +68,9 @@ let args = {
 
       <div class="form-group mb-4">
         <label for="form-label">・内容</label>
-        <textarea class="form-control" name="content" id="content"></textarea>
+        <textarea class="form-control" name="content" id="content">
+          <%- value.content && value.content %>
+        </textarea>
       </div>
 
       <button type="submit" class="btn btn-primary">C r e a t e</button>

@@ -29,7 +29,7 @@ let args = {
 
   <% if(!user){ %>
   <div class="container bg-white p-4">
-    <h5 class="h5 d-inline" href="/"><img src="/images/common/favicon.ico" alt="" class="d-inline mb-2" width="64"> Q & A site <small>- ナゼナゼ Express -</small></h5> は質問を投稿、及び回答することができるC to C サービスです。</p>
+    <h5 class="h5 d-inline"><img src="/images/common/favicon.ico" alt="" class="d-inline mb-2" width="64"> Q & A site <small>- ナゼナゼ Express -</small></h5> は質問を投稿、及び回答することができるC to C サービスです。<br><br>
     <p>質問者の投稿に気軽にコメントとリプライを送ることができ、名前とメールアドレスの登録だけで簡単に始められます。<br>下記のボタンからアカウント作成して本サイトをご活用ください。</p>
     <p class="text-center mt-5">
       <a href="/login/" class="btn btn-primary text-white mr-3 px-5 py-2">▷&nbsp;&nbsp;ログインはこちら</a>
@@ -47,15 +47,16 @@ let args = {
       <div class="col-lg-4 mb-5">
         <a href="<%= `/posts/detail/${post.id}` %>" class="d-block text-dark">
           <div class="thum">
-            <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <%- post.image ? `<img src="/uploads/${post.image}" alt="">` : `
+            <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
               <title>No Image</title>
               <rect width="100%" height="100%" fill="#777"></rect><text x="37px" y="50%" fill="#fff" dy=".3em">No Image</text>
             </svg>
-            <%- post.image && `<img src="/uploads/${post.image}">` %>
+            ` %>
           </div>
           <h5 class="pTitle my-3 text-left"><b>Q.&nbsp;&nbsp;</b><b><%= post.title %></b></h5>
           <p class="pContent text-left"><%= post.content.replace(/(<([^>]+)>)/gi, "").slice(0, 150) %></p>
-          <p><span class="btn btn-primary" href="<%= `/posts/detail/${post.id}` %>">もっと見る »</span></p>
+          <p><span class="btn btn-primary">もっと見る »</span></p>
         </a>
       </div>
       <% }) %>
