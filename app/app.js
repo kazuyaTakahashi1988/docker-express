@@ -110,35 +110,6 @@ app.use(logger('dev'));
 // 暗号化につかうキー
 const APP_KEY = 'YOUR-SECRET-KEY';
 
-/* login・registerアクセス時、認証済みならTOP redirect */
-const judgeAuthMW = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    res.redirect(302, '/');
-  } else if (req.cookies.remember_me) {
-    const [rememberToken, hash] = req.cookies.remember_me.split('|');
-    User.findAll({
-      where: {
-        rememberToken: rememberToken
-      }
-    }).then(users => {
-      for (let i in users) {
-        const user = users[i];
-        const verifyingHash = crypto.createHmac('sha256', APP_KEY)
-          .update(user.id + '-' + rememberToken)
-          .digest('hex');
-        if (hash === verifyingHash) {
-          return req.login(user, () => {
-            res.redirect(302, '/');
-          });
-        }
-      }
-      next();
-    });
-  } else {
-    next();
-  }
-};
-
 // バリデーション・ルール
 const regiValidRules = [
   check('name')
@@ -157,6 +128,15 @@ const regiValidRules = [
     })
 ];
 
+// 認証済みならTOPリダイレクト ミドルウェア
+const judgeAuthMW = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    res.redirect(302, '/');
+  } else {
+    next();
+  }
+};
+
 /* ---------------------------
   ▽ アカウント作成 ▽
 --------------------------- */
@@ -169,7 +149,7 @@ app.get('/register', judgeAuthMW, (req, res) => {
 });
 
 // 作成実行
-app.post('/register', regiValidRules, (req, res) => {
+app.post('/register', judgeAuthMW, regiValidRules, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) { // バリデーション失敗
     // return res.status(422).json({ errors: errors.array() });
@@ -207,7 +187,7 @@ app.get('/login', judgeAuthMW, (req, res) => {
 });
 
 // 認証実行
-app.post('/login',
+app.post('/login', judgeAuthMW,
   passport.authenticate('local', {
     failureRedirect: '/login',
     failureFlash: true,
