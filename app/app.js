@@ -70,19 +70,48 @@ const autoAuthMW = (req, res, next) => {
 };
 
 /* 認証必須ページの処理 */
-const authMustMW = (req, res, next) => {
+const mustAuthMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
-    res.cookie('authRedirectPATH', req.originalUrl);
-    return res.render('auth/login', {
-      errorMessage: undefined
-    });
+    res.cookie('afterAuthPATH', req.originalUrl);
+    return res.redirect(302, '/login');
   }
 }
 
+/* ---------------------------
+  ▽ Router ▽
+--------------------------- */
+const indexRouter = require('./routes/index');
+const postsRouter = require('./routes/posts');
+const likesRouter = require('./routes/likes');
+const createRouter = require('./routes/create');
+const dashboardRouter = require('./routes/dashboard');
+app.use('/', autoAuthMW, indexRouter);
+app.use('/posts', autoAuthMW, postsRouter);
+app.use('/likes', autoAuthMW, mustAuthMW, likesRouter);
+app.use('/create', autoAuthMW, mustAuthMW, createRouter);
+app.use('/dashboard', autoAuthMW, mustAuthMW, dashboardRouter);
+
+/* ---------------------------
+  ▽ ejs setup ▽
+--------------------------- */
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(logger('dev'));
+
+
+/* ------------------------------------------------
+/*
+/*  ▽ 認証関連 処理 ▽
+/*
+/* ------------------------------------------------ */
+
+// 暗号化につかうキー
+const APP_KEY = 'YOUR-SECRET-KEY';
+
 /* login・registerアクセス時、認証済みならTOP redirect */
-const authJudgeMW = (req, res, next) => {
+const judgeAuthMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.redirect(302, '/');
   } else if (req.cookies.remember_me) {
@@ -110,37 +139,6 @@ const authJudgeMW = (req, res, next) => {
   }
 };
 
-/* ---------------------------
-  ▽ Router ▽
---------------------------- */
-const indexRouter = require('./routes/index');
-const postsRouter = require('./routes/posts');
-const likesRouter = require('./routes/likes');
-const createRouter = require('./routes/create');
-const dashboardRouter = require('./routes/dashboard');
-app.use('/', autoAuthMW, indexRouter);
-app.use('/posts', autoAuthMW, postsRouter);
-app.use('/likes', autoAuthMW, authMustMW, likesRouter);
-app.use('/create', autoAuthMW, authMustMW, createRouter);
-app.use('/dashboard', autoAuthMW, authMustMW, dashboardRouter);
-
-/* ---------------------------
-  ▽ ejs setup ▽
---------------------------- */
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(logger('dev'));
-
-
-/* ------------------------------------------------
-/*
-/*  ▽ 認証関連 処理 ▽
-/*
-/* ------------------------------------------------ */
-
-// 暗号化につかうキー
-const APP_KEY = 'YOUR-SECRET-KEY';
-
 // バリデーション・ルール
 const regiValidRules = [
   check('name')
@@ -164,7 +162,7 @@ const regiValidRules = [
 --------------------------- */
 
 // 作成ページ
-app.get('/register', authJudgeMW, (req, res) => {
+app.get('/register', judgeAuthMW, (req, res) => {
   return res.render('auth/register', {
     errors: undefined
   });
@@ -201,7 +199,7 @@ app.post('/register', regiValidRules, (req, res) => {
 --------------------------- */
 
 // 認証ページ
-app.get('/login', authJudgeMW, (req, res) => {
+app.get('/login', judgeAuthMW, (req, res) => {
   const errorMessage = req.flash('error').join('<br>');
   res.render('auth/login', {
     errorMessage: errorMessage
@@ -234,8 +232,8 @@ app.post('/login',
     return next();
   },
   (req, res) => {
-    if (req.cookies.authRedirectPATH) {
-      res.redirect(req.cookies.authRedirectPATH);
+    if (req.cookies.afterAuthPATH) {
+      res.redirect(req.cookies.afterAuthPATH);
     } else {
       res.redirect('/dashboard');
     }
