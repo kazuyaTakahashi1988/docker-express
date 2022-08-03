@@ -246,7 +246,7 @@ router.post('/like/:id', async (req, res, next) => {
                 return res.json({ likeCount: result.count })
             });
         } else {
-            return res.json({ likeCount: 'erroor01' })
+            return res.json({ likeCount: 'erroor' })
         }
     });
 

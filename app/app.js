@@ -70,7 +70,7 @@ const autoAuthMW = (req, res, next) => {
 };
 
 /* ログイン必須ページへの処理 */
-const authJudgeMW = (req, res, next) => {
+const authMustMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
@@ -81,8 +81,8 @@ const authJudgeMW = (req, res, next) => {
   }
 }
 
-/* login・registerアクセス、ログイン済みの際の処理 */
-const authedMW = (req, res, next) => {
+/* login・registerアクセス時、ログイン済みの場合TOPへredirect */
+const authJudgeMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.redirect(302, '/');
   } else if (req.cookies.remember_me) {
@@ -120,9 +120,9 @@ const createRouter = require('./routes/create');
 const dashboardRouter = require('./routes/dashboard');
 app.use('/', autoAuthMW, indexRouter);
 app.use('/posts', autoAuthMW, postsRouter);
-app.use('/likes', autoAuthMW, authJudgeMW, likesRouter);
-app.use('/create', autoAuthMW, authJudgeMW, createRouter);
-app.use('/dashboard', autoAuthMW, authJudgeMW, dashboardRouter);
+app.use('/likes', autoAuthMW, authMustMW, likesRouter);
+app.use('/create', autoAuthMW, authMustMW, createRouter);
+app.use('/dashboard', autoAuthMW, authMustMW, dashboardRouter);
 
 /* ---------------------------
   ▽ ejs setup ▽
@@ -139,17 +139,6 @@ app.use(logger('dev'));
 
 // 暗号化につかうキー
 const APP_KEY = 'YOUR-SECRET-KEY';
-
-/* ---------------------------
-  ▽ アカウント作成 ▽
---------------------------- */
-
-// アカウント作成ページ
-app.get('/register', authedMW, (req, res) => {
-  return res.render('auth/register', {
-    errors: undefined
-  });
-});
 
 // バリデーション・ルール
 const regiValidRules = [
@@ -168,6 +157,17 @@ const regiValidRules = [
       return true;
     })
 ];
+
+/* ---------------------------
+  ▽ アカウント作成 ▽
+--------------------------- */
+
+// アカウント作成ページ
+app.get('/register', authJudgeMW, (req, res) => {
+  return res.render('auth/register', {
+    errors: undefined
+  });
+});
 
 // アカウント作成実行
 app.post('/register', regiValidRules, (req, res) => {
@@ -200,7 +200,7 @@ app.post('/register', regiValidRules, (req, res) => {
 --------------------------- */
 
 // ログインページ
-app.get('/login', authedMW, (req, res) => {
+app.get('/login', authJudgeMW, (req, res) => {
   const errorMessage = req.flash('error').join('<br>');
   res.render('auth/login', {
     errorMessage: errorMessage,
