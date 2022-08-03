@@ -24,7 +24,7 @@ let args = {
 </head>
 
 <body class="pagetype-home">
-  <%- // include('./_inc/load-body-svg') %>
+  <%- /* include('./_inc/load-body-svg') */ %>
   <%- include('./_inc/load-body-header',{ args, user }) %>
 
   <% if(!user){ %>
@@ -38,7 +38,7 @@ let args = {
   </div><br><br><br>
   <% } else { %>
   <h4 class="text-center mb-5"><a href="/create/post">▶︎&nbsp;&nbsp;質問を投稿しましょう！！</a></h4>
-  <% }  %>
+  <% } %>
 
   <div class="container bg-white p-5">
     <h4 class="mb-5 text-center">-&nbsp;&nbsp;新着 Q & A &nbsp;&nbsp;-</h4>

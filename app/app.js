@@ -1,9 +1,15 @@
+/* ------------------------------------------------
+/*
+/*  ▽ set up ▽
+/*
+/* ------------------------------------------------ */
+
 const createError = require('http-errors');
 const express = require('express');
 const logger = require('morgan');
 const path = require('path');
 
-// 認証関連
+// 認証関連 ミドルウェア
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const passport = require('./auth');
@@ -13,17 +19,10 @@ const { check, validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const User = require('./models').User;
-
-// Router
-const indexRouter = require('./routes/index');
-const postsRouter = require('./routes/posts');
-const likesRouter = require('./routes/likes');
-const createRouter = require('./routes/create');
-const dashboardRouter = require('./routes/dashboard');
 const { send } = require('process');
 const app = express();
 
-// use 認証関連
+// use 認証関連 ミドルウェア
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(flash());
@@ -37,8 +36,11 @@ app.use(passport.session());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// use Router
-// 認証判定
+/* ---------------------------
+  ▽ Router ミドルウェア ▽
+--------------------------- */
+
+/* 「次回から省略」済みユーザーへの処理 */
 const autoAuthMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
@@ -67,7 +69,8 @@ const autoAuthMW = (req, res, next) => {
   }
 };
 
-const adminPageMW = (req, res, next) => {
+/* ログイン必須ページへの処理 */
+const authJudgeMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
@@ -78,26 +81,8 @@ const adminPageMW = (req, res, next) => {
   }
 }
 
-app.use('/', autoAuthMW, indexRouter);
-app.use('/posts', autoAuthMW, postsRouter);
-app.use('/likes', autoAuthMW, adminPageMW, likesRouter);
-app.use('/create', autoAuthMW, adminPageMW, createRouter);
-app.use('/dashboard', autoAuthMW, adminPageMW, dashboardRouter);
-
-// use view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(logger('dev'));
-
-/* ------------------------------------------------
-  ▽ 認証関連 ▽
------------------------------------------------- */
-
-// 暗号化につかうキー
-const APP_KEY = 'YOUR-SECRET-KEY';
-
-// 認証判定
-const authJudge = (req, res, next) => {
+/* login・registerアクセス、ログイン済みの際の処理 */
+const authedMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.redirect(302, '/');
   } else if (req.cookies.remember_me) {
@@ -126,11 +111,41 @@ const authJudge = (req, res, next) => {
 };
 
 /* ---------------------------
-  アカウント作成 
+  ▽ Router ▽
+--------------------------- */
+const indexRouter = require('./routes/index');
+const postsRouter = require('./routes/posts');
+const likesRouter = require('./routes/likes');
+const createRouter = require('./routes/create');
+const dashboardRouter = require('./routes/dashboard');
+app.use('/', autoAuthMW, indexRouter);
+app.use('/posts', autoAuthMW, postsRouter);
+app.use('/likes', autoAuthMW, authJudgeMW, likesRouter);
+app.use('/create', autoAuthMW, authJudgeMW, createRouter);
+app.use('/dashboard', autoAuthMW, authJudgeMW, dashboardRouter);
+
+/* ---------------------------
+  ▽ ejs setup ▽
+--------------------------- */
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(logger('dev'));
+
+/* ------------------------------------------------
+/*
+/*  ▽ 認証関連 処理 ▽
+/*
+/* ------------------------------------------------ */
+
+// 暗号化につかうキー
+const APP_KEY = 'YOUR-SECRET-KEY';
+
+/* ---------------------------
+  ▽ アカウント作成 ▽
 --------------------------- */
 
 // アカウント作成ページ
-app.get('/register', authJudge, (req, res) => {
+app.get('/register', authedMW, (req, res) => {
   return res.render('auth/register', {
     errors: undefined
   });
@@ -154,6 +169,7 @@ const regiValidRules = [
     })
 ];
 
+// アカウント作成実行
 app.post('/register', regiValidRules, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) { // バリデーション失敗
@@ -180,11 +196,11 @@ app.post('/register', regiValidRules, (req, res) => {
 });
 
 /* ---------------------------
-  ログイン
+  ▽ ログイン ▽
 --------------------------- */
 
 // ログインページ
-app.get('/login', authJudge, (req, res) => {
+app.get('/login', authedMW, (req, res) => {
   const errorMessage = req.flash('error').join('<br>');
   res.render('auth/login', {
     errorMessage: errorMessage,
@@ -218,7 +234,7 @@ app.post('/login',
     return next();
   },
   (req, res) => {
-    if(req.body.reURL){
+    if (req.body.reURL) {
       res.redirect(req.body.reURL);
     } else {
       res.redirect('/dashboard');
