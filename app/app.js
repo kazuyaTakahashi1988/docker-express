@@ -233,7 +233,9 @@ app.post('/login',
   },
   (req, res) => {
     if (req.cookies.afterAuthPATH) {
-      res.redirect(req.cookies.afterAuthPATH);
+      const rePATH = req.cookies.afterAuthPATH;
+      res.clearCookie('afterAuthPATH');
+      res.redirect(rePATH);
     } else {
       res.redirect('/dashboard');
     }
