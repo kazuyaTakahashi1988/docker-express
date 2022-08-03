@@ -69,19 +69,19 @@ const autoAuthMW = (req, res, next) => {
   }
 };
 
-/* ログイン必須ページへの処理 */
+/* 認証必須ページの処理 */
 const authMustMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
+    res.cookie('authRedirectPATH', req.originalUrl);
     return res.render('auth/login', {
-      errorMessage: undefined,
-      rePATH: req.originalUrl
+      errorMessage: undefined
     });
   }
 }
 
-/* login・registerアクセス時、ログイン済みの場合TOPへredirect */
+/* login・registerアクセス時、認証済みならTOP redirect */
 const authJudgeMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.redirect(302, '/');
@@ -131,6 +131,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(logger('dev'));
 
+
 /* ------------------------------------------------
 /*
 /*  ▽ 認証関連 処理 ▽
@@ -162,14 +163,14 @@ const regiValidRules = [
   ▽ アカウント作成 ▽
 --------------------------- */
 
-// アカウント作成ページ
+// 作成ページ
 app.get('/register', authJudgeMW, (req, res) => {
   return res.render('auth/register', {
     errors: undefined
   });
 });
 
-// アカウント作成実行
+// 作成実行
 app.post('/register', regiValidRules, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) { // バリデーション失敗
@@ -182,7 +183,7 @@ app.post('/register', regiValidRules, (req, res) => {
   const name = req.body.name;
   const email = req.body.email;
   const password = req.body.password;
-  // ユーザーデータを登録（仮登録）
+  // ユーザーデータを登録
   User.findOrCreate({
     where: { email: email },
     defaults: {
@@ -196,19 +197,18 @@ app.post('/register', regiValidRules, (req, res) => {
 });
 
 /* ---------------------------
-  ▽ ログイン ▽
+  ▽ ログイン認証 ▽
 --------------------------- */
 
-// ログインページ
+// 認証ページ
 app.get('/login', authJudgeMW, (req, res) => {
   const errorMessage = req.flash('error').join('<br>');
   res.render('auth/login', {
-    errorMessage: errorMessage,
-    rePATH: undefined
+    errorMessage: errorMessage
   });
 });
 
-// ログイン実行
+// 認証実行
 app.post('/login',
   passport.authenticate('local', {
     failureRedirect: '/login',
@@ -234,8 +234,8 @@ app.post('/login',
     return next();
   },
   (req, res) => {
-    if (req.body.reURL) {
-      res.redirect(req.body.reURL);
+    if (req.cookies.authRedirectPATH) {
+      res.redirect(req.cookies.authRedirectPATH);
     } else {
       res.redirect('/dashboard');
     }
