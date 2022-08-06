@@ -44,8 +44,8 @@ let args = {
       <p class="text-left text-primary"><b>Like：<%- post.Likes.length %></b></p>
       <% } else { %>
       <div id="likeBtnArea" class="<%- judge && 'likeOn' %>">
-        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn('/create/like/<%= post.id %>')" id="like"><small class="text-primary"><b>Like 　 ：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
-        <button type="button" class="btn btn-light py-0 px-1" onClick="likeBtn('/create/unlike/<%= post.id %>')" id="unLike"><small class="text-info"><b>Like (済)：<span class="likeCount"><%= post.Likes.length %></span></b></small></button>
+        <button type="button" class="btn btn-secondary py-0 px-1" onClick="likeBtn('/create/like/<%= post.id %>')" id="like"><small class="text-white"><b>&nbsp;Like 　 &nbsp;：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
+        <button type="button" class="btn btn-warning py-0 px-1" onClick="likeBtn('/create/unlike/<%= post.id %>')" id="unLike"><small class="text-dark"><b>&nbsp;Like (済)：<span class="likeCount"><%= post.Likes.length %></span></b></small></button>
       </div>
       <% }  %><br>
       <p class="text-left mb-2">
@@ -79,7 +79,7 @@ let args = {
           %>
         <div><span class="text3"><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
       </div>
-      <div class="d-block p-2 mt-3 border bg-white rounded"><a href="/create/reply/<%= comment.id %>" class="d-block"> <small>+ リプライ</small> </a></div>
+      <div class="d-block p-1 mt-3 rounded btn btn-light"><a href="/create/reply/<%= comment.id %>" class="d-block"> <small>+ リプライ</small> </a></div>
 
       <% comment.Replies.forEach( Reply => { %>
       <div class="px-5 py-3 reply text-secondary">
