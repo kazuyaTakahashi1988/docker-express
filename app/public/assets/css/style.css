@@ -1,6 +1,11 @@
 html{
   overflow-y: scroll;
 }
+img{
+  max-width: 100%;
+  height: auto;
+  width: auto;
+}
 body {
   padding: 0 0 40px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -88,12 +93,12 @@ a:hover{
   color: #555;
   font-size: 16px;
   background: #e3f2fd;
-  margin: 0 0 20px auto;
+  margin: 40px 0 0 auto;
 }
 .balloon1:before {
   content: "";
   position: absolute;
-  top: 20%;
+  top: 50px;
   left: -30px;
   margin-top: -15px;
   border: 10px solid transparent;
@@ -104,19 +109,47 @@ a:hover{
   line-height: 20px;
 }
 .balloon1:nth-of-type(2n + 1){
-  margin: 0 auto 20px 0;
+  margin: 40px auto 0 0;
 }
 .balloon1:nth-of-type(2n + 1):before {
   left: inherit;
   right: -30px;
   transform: rotate(180deg);
 }
+.balloon1 .user{
+  position: absolute;
+  top: 32px;
+  left: -140px;
+  font-size: 20px;
+  font-weight: bold;
+  max-width: 125px;
+  text-align: center;
+}
+.balloon1 .user span{
+  display: inline-block;
+  vertical-align: middle;
+}
+.balloon1 .user span:nth-child(1){
+  font-size: 12px;
+}
+.balloon1:nth-of-type(2n + 1) .user{
+  left: inherit;
+  right: -140px;
+}
 
 .balloon1 p {
   margin: 0;
   padding: 0;
 }
-
+.reply{
+  border-left: 1px solid #ccc;
+  width: calc(100% - 50px);
+  margin-left: auto;
+  margin-top: 30px;
+}
+.balloon1 .reply:nth-of-type(1){
+  margin-top: 20px!important;
+}
 
 #likeBtnArea #like {
   pointer-events: inherit;
