@@ -118,12 +118,13 @@ a:hover{
 }
 .balloon1 .user{
   position: absolute;
-  top: 32px;
-  left: -140px;
+  top: 30px;
+  left: -145px;
   font-size: 20px;
   font-weight: bold;
-  max-width: 125px;
+  width: 125px;
   text-align: center;
+  display: inline-block;
 }
 .balloon1 .user span{
   display: inline-block;
