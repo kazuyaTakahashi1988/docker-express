@@ -27,14 +27,123 @@ let args = {
   <%- // include('./../_inc/load-body-svg') %>
   <%- include('./../_inc/load-body-header',{ args, user }) %>
 
-  <div class="container bg-white p-4">
+  <div class="container mb-4 p-0" style="background: none; box-shadow: none;">
     <p class="text-right"><a href="/logout/" class="btn btn-secondary text-white px-5 py-2">ログアウトはこちら</a></p>
-    <p>
-    <h1>開発中...</h1>（ User：<%= user.name %>のダッシュボード )</p><br>
+    <h3><%= user.name %>のダッシュボード</h3><br>
+    <a href="/posts/user/<%= user.id %>"><%= user.name %>の Q & A 一覧</a>
+
+    <% if(errors){ %>
+    <br><br>
+    <% errors.forEach( error => { %>
+    <div class="alert alert-danger">
+      <%= error.msg %>
+    </div>
+    <% }) %>
+    <% } %>
   </div>
-  
+
+  <div class="container bg-white p-4 mb-4">
+    <p class="h5 mb-5">プロフィールの更新<br><small class="text-secondary">アカウントのプロフィール情報とメールアドレスを更新します。</small></p>
+    <form method="POST" action="/dashboard/profile" enctype="multipart/form-data">
+      <div class="form-group row">
+        <label for="image" class="col-md-4 col-form-label text-md-right pt-5"><br>プロフィール画像</label>
+        <div id="drag-drop-area" class="outline-none transition duration-100 px-3 py-2 col-md-6 bg-white">
+          <div class="drag-drop-inside bg-gray-50 text-gray-800 border focus:ring ring-indigo-300 rounded px-3 py-2">
+            <p class="drag-drop-info">ここに新しいファイルをドロップ</p>
+            <p>または</p>
+            <p class="drag-drop-buttons"><input id="fileInput" type="file" accept="image/*" value="ファイルを選択" name="image"></p>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="name" class="col-md-4 col-form-label text-md-right">名前</label>
+        <div class="col-md-6">
+          <input type="text" class="form-control" name="name" value="<%= user.name %>">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="email" class="col-md-4 col-form-label text-md-right">メールアドレス</label>
+        <div class="col-md-6">
+          <input type="email" class="form-control" name="email" value="<%= user.email %>">
+        </div>
+      </div>
+      <div class="form-group row mb-0 mt-4">
+        <div class="col-md-8 offset-md-4">
+          <button type="submit" class="btn btn-dark">S a v e</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="container bg-white p-4 mb-4">
+    <p class="h5 mb-5">パスワードの更新<br><small class="text-secondary">アカウントが安全を確保するために、長いランダムなパスワードを使用していることを勧めます</small></p>
+    <form method="POST" action="/dashboard/password">
+      <div class="form-group row">
+        <label for="name" class="col-md-4 col-form-label text-md-right">現在のパスワード</label>
+        <div class="col-md-6">
+          <input type="password" class="form-control" name="currentpassword">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="name" class="col-md-4 col-form-label text-md-right">新しいパスワード</label>
+        <div class="col-md-6">
+          <input type="password" class="form-control" name="password">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="name" class="col-md-4 col-form-label text-md-right">新しいパスワード（確認）</label>
+        <div class="col-md-6">
+          <input type="password" class="form-control" name="passwordConfirmation">
+        </div>
+      </div>
+      <div class="form-group row mb-0 mt-4">
+        <div class="col-md-8 offset-md-4">
+          <button type="submit" class="btn btn-dark">S a v e</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="container bg-white p-4">
+
+    <form method="POST" action="/dashboard/deleat">
+      <div class="form-group row mb-0 p-3">
+        <label for="email" class="col-md-4 col-form-label text-md-right">
+          <p class="h5 mb-0">アカウントを削除します<br><small class="text-secondary"></small></p>
+        </label>
+        <div class="col-md-6">
+          <button type="submit" class="btn btn-danger">D e l e t e 　 A c c o u n t</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
   <%- include('./../_inc/load-body-footer',{ args, user }) %>
   <%- include('./../_inc/load-body-js',{ args, user }) %>
+
+  <% /* -------------------------
+    ▽ 画像のドラッグ＆ドロップ処理 ▽
+  ------------------------------- */%>
+  <script>
+    const fileArea = document.getElementById('drag-drop-area');
+    const fileInput = document.getElementById('fileInput');
+
+    fileArea.addEventListener('dragover', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.add('dragover');
+    });
+
+    fileArea.addEventListener('dragleave', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.remove('dragover');
+    });
+    fileArea.addEventListener('drop', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.remove('dragenter');
+      const files = evt.dataTransfer.files;
+      fileInput.files = files;
+    });
+  </script>
 </body>
 
 </html>
