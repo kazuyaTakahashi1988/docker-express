@@ -9,8 +9,15 @@
       <div class="d-flex" id="navbarNav">
         <ul class="navbar-nav">
           <% if(user){ %>
+          <%- user.image && `<li class="nav-item ml-2">
+            <a class="nav-link nav-icon" aria-current="page" href="/dashboard/">
+            <img src="/uploads/${user.image}">
+            </a>
+          </li>` %>
           <li class="nav-item ml-2">
-            <a class="nav-link" aria-current="page" href="/dashboard/">Dashboard</a>
+            <a class="nav-link" aria-current="page" href="/dashboard/">
+              Dashboard
+            </a>
           </li>
           <li class="nav-item ml-4">
             <a class="nav-link" href="/posts/">Q & A 一覧</a>

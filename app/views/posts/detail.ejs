@@ -61,7 +61,8 @@ let args = {
           date.setTime(date.getTime() + 1000*60*60*9);// JSTに変換
           const TIME = ''.concat(date.getFullYear(),'年',date.getMonth() + 1,'月',date.getDate(),'日 ',date.getHours(),':',date.getMinutes());
         %>
-        <div><span class="text3"><small><%- TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+        <div>
+        <%- post.User.image && `<a href="/posts/user/${post.User.id}" class="icon"><img src="/uploads/${post.User.image}"></a>` %><span class="text3"><small><%- TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
       </div>
       <div class="d-block my-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white p-2">+ コメント</a></div>
       <a href="javascript:history.back();">&raquo; 前ページに戻る</a>
@@ -71,7 +72,10 @@ let args = {
     <div class="balloon1 p-4">
       <p class="text1"><%- comment.comment %></p>
       <div class="d-flex justify-content-between py-1 pt-3">
-        <div><a href="/posts/user/<%= comment.User.id %>" class="user"><small><span class="text-dark">ユーザー：</span><span class="text2"><%= comment.User.name %></span></small></a></div>
+        <div><a href="/posts/user/<%= comment.User.id %>" class="user">
+          <%- comment.User.image && `<b><img src="/uploads/${comment.User.image}"></b><br>` %>
+          <small><span class="text-dark">ユーザー：</span><span class="text2"><%= comment.User.name %></span></small>
+        </a></div>
         <%
             let date = new Date(comment.createdAt);
             date.setTime(date.getTime() + 1000*60*60*9);// JSTに変換

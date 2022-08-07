@@ -126,6 +126,22 @@ a:hover{
   text-align: center;
   display: inline-block;
 }
+.balloon1 .user b{
+  display: block;
+  margin: -10px auto;
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.balloon1 .user img{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
 .balloon1 .user span{
   display: inline-block;
   vertical-align: middle;
@@ -170,4 +186,40 @@ a:hover{
 #likeBtnArea.likeOn #unLike {
   pointer-events: inherit;
   display: block;
+}
+.navbar-nav{
+  align-items: center;
+}
+.nav-icon{
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 100%;
+}
+.nav-icon img{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+.detail-lavel{
+  position: relative;
+}
+.icon{
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.icon img{
+  position: absolute;
+  width: 50px;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
 }
