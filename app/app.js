@@ -213,7 +213,7 @@ app.post('/login', judgeAuthMW,
   },
   (req, res) => {
     if (req.cookies.afterAuthPATH) {
-      const rePATH = req.cookies.afterAuthPATH;
+      const rePATH = req.cookies.afterAuthPATH.slice();
       res.clearCookie('afterAuthPATH');
       res.redirect(rePATH);
     } else {
