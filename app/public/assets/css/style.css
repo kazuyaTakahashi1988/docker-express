@@ -1,51 +1,62 @@
-html{
+html {
   overflow-y: scroll;
 }
-img{
+
+img {
   max-width: 100%;
   height: auto;
   width: auto;
 }
+
 body {
   padding: 0 0 40px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  word-break:break-all;
+  word-break: break-all;
   background-color: rgb(0 0 0 / 1%);
 }
-nav{
+
+nav {
   box-shadow: 0px 2px 3px 0px rgb(0 0 0 / 15%);
 }
-.container{
+
+.container {
   box-shadow: 0px 2px 5px 0px rgb(0 0 0 / 15%);
 }
+
 a {
   color: #00B7FF;
 }
-.pList .pTitle{
+
+.pList .pTitle {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.pList .pContent{
+
+.pList .pContent {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 65px;
 }
-a:hover{
-  text-decoration: none!important;
+
+a:hover {
+  text-decoration: none !important;
 }
-.pList a:hover .btn-primary{
+
+.pList a:hover .btn-primary {
   background-color: #444;
   border-color: #444;
 }
-#drag-drop-area{
+
+#drag-drop-area {
   position: relative;
   background-color: rgb(0 0 0 / 2%);
 }
-#drag-drop-area.dragover::after{
+
+#drag-drop-area.dragover::after {
   content: "SET OK";
   position: absolute;
   top: 50%;
@@ -53,7 +64,8 @@ a:hover{
   transform: translateX(-50%) translateY(-50%);
   z-index: 10;
 }
-#drag-drop-area.dragover::before{
+
+#drag-drop-area.dragover::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -65,14 +77,16 @@ a:hover{
   opacity: 0.6;
   pointer-events: none;
 }
-.thum{
+
+.thum {
   width: 100%;
   height: 140px;
   overflow: hidden;
   position: relative;
   margin: 0 auto;
 }
-.thum img{
+
+.thum img {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -81,8 +95,8 @@ a:hover{
   max-height: 100%;
 }
 
-.cke_chrome{
-  border: none!important;
+.cke_chrome {
+  border: none !important;
 }
 
 .balloon1 {
@@ -95,6 +109,7 @@ a:hover{
   background: #e3f2fd;
   margin: 40px 0 0 auto;
 }
+
 .balloon1:before {
   content: "";
   position: absolute;
@@ -104,19 +119,23 @@ a:hover{
   border: 10px solid transparent;
   border-right: 20px solid #e3f2fd;
 }
-.balloon1 p{
-  font-size: 14px;
+
+.balloon1 p {
+  font-size: 16px;
   line-height: 20px;
 }
-.balloon1:nth-of-type(2n + 1){
+
+.balloon1:nth-of-type(2n + 1) {
   margin: 40px auto 0 0;
 }
+
 .balloon1:nth-of-type(2n + 1):before {
   left: inherit;
   right: -30px;
   transform: rotate(180deg);
 }
-.balloon1 .user{
+
+.balloon1 .user {
   position: absolute;
   top: 30px;
   left: -145px;
@@ -126,7 +145,8 @@ a:hover{
   text-align: center;
   display: inline-block;
 }
-.balloon1 .user b{
+
+.balloon1 .user b {
   display: block;
   margin: -10px auto;
   width: 50px;
@@ -136,20 +156,23 @@ a:hover{
   position: relative;
 }
 
-.balloon1 .user img{
+.balloon1 .user img {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
 }
-.balloon1 .user span{
+
+.balloon1 .user span {
   display: inline-block;
   vertical-align: middle;
 }
-.balloon1 .user span:nth-child(1){
+
+.balloon1 .user span:nth-child(1) {
   font-size: 12px;
 }
-.balloon1:nth-of-type(2n + 1) .user{
+
+.balloon1:nth-of-type(2n + 1) .user {
   left: inherit;
   right: -140px;
 }
@@ -158,14 +181,16 @@ a:hover{
   margin: 0;
   padding: 0;
 }
-.reply{
+
+.reply {
   border-left: 1px solid #ccc;
   width: calc(100% - 50px);
   margin-left: auto;
   margin-top: 30px;
 }
-.balloon1 .reply:nth-of-type(1){
-  margin-top: 20px!important;
+
+.balloon1 .reply:nth-of-type(1) {
+  margin-top: 20px !important;
 }
 
 #likeBtnArea #like {
@@ -187,26 +212,31 @@ a:hover{
   pointer-events: inherit;
   display: block;
 }
-.navbar-nav{
+
+.navbar-nav {
   align-items: center;
 }
-.nav-icon{
+
+.nav-icon {
   width: 50px;
   height: 50px;
   overflow: hidden;
   position: relative;
   border-radius: 100%;
 }
-.nav-icon img{
+
+.nav-icon img {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
 }
-.detail-lavel{
+
+.detail-lavel {
   position: relative;
 }
-.icon{
+
+.icon {
   width: 50px;
   height: 50px;
   border-radius: 100%;
@@ -216,10 +246,18 @@ a:hover{
   vertical-align: middle;
   margin-right: 10px;
 }
-.icon img{
+
+.icon img {
   position: absolute;
   width: 50px;
   top: 50%;
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
+}
+
+.postContent {
+  font-size: 20px;
+  margin-top: 20px;
+  border-top: 1px solid #ccc;
+  padding-top: 20px;
 }

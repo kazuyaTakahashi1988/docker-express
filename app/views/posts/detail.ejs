@@ -53,7 +53,7 @@ let args = {
         <a href="<%= `/posts/category/${post.Category.id}` %>"><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></a>
       </p>
 
-      <p class="text-left"><%- post.content %></p><br><br>
+      <p class="text-left postContent"><%- post.content %></p><br><br>
       <div class="d-flex justify-content-between py-1 pt-3 mb-3">
         <div></div>
         <%
@@ -87,7 +87,7 @@ let args = {
 
       <% comment.Replies.forEach( Reply => { %>
       <div class="px-5 py-3 reply text-secondary">
-        <p class=""><small><%= Reply.reply %></small></p>
+        <p class=""><%= Reply.reply %></p>
         <div class="d-flex justify-content-between py-1 pt-3">
           <div><a href="/posts/user/<%= Reply.User.id %>"><small><span class="text-secondary">ユーザー：</span><span class=""><%= Reply.User.name %></span></small></a></div>
           <%
