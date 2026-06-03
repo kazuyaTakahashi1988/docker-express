@@ -46,6 +46,18 @@ DB を作り直す場合は以下を実行します。
 docker compose exec dockerexpress npm run db:reset
 ```
 
+
+## TypeScript / EJS 開発
+
+バックエンドの Express ロジックは TypeScript で記述し、`npm run build` で `app/dist` にコンパイルして実行します。静的 HTML のレンダリングは引き続き EJS テンプレートを使用します。
+
+```bash
+docker compose exec dockerexpress npm run typecheck
+docker compose exec dockerexpress npm run build
+```
+
+開発時の `npm run dev` は nodemon が TypeScript / EJS / 静的アセットの変更を監視し、ビルド後の `dist/bin/www.js` を起動します。EJS へ渡す locals の形は `app/types/ejs-locals.d.ts` に ViewModel として定義しているため、テンプレートに渡すデータ構造を TypeScript 側から確認しやすくしています。
+
 ## MySQL 5.7 から MySQL 8.4 への移行メモ
 
 このリポジトリは MySQL 5.7 の既存データディレクトリを直接 MySQL 8.4 にマウントしないよう、デフォルトのデータ保存先を `./.data/mysql8.4` に変更しています。
