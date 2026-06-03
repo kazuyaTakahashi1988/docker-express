@@ -4,3 +4,6 @@
 **/.DS_Store
 app/public/uploads/*
 !app/public/uploads/.gitignore
+
+# TypeScript build output
+app/dist/

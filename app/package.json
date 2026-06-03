@@ -3,11 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "nodemon ./bin/www",
-    "migrate": "sequelize-cli db:migrate",
-    "seed": "sequelize-cli db:seed:all",
-    "db:reset": "sequelize-cli db:migrate:undo:all && sequelize-cli db:migrate && sequelize-cli db:seed:all",
+    "start": "node ./dist/bin/www.js",
+    "dev": "nodemon",
+    "build": "tsc && npm run copy:assets",
+    "copy:assets": "node ./scripts/copy-assets.cjs",
+    "typecheck": "tsc --noEmit",
+    "migrate": "npm run build && sequelize-cli --config dist/config/config.js db:migrate",
+    "seed": "npm run build && sequelize-cli --config dist/config/config.js db:seed:all",
+    "db:reset": "npm run build && sequelize-cli --config dist/config/config.js db:migrate:undo:all && sequelize-cli --config dist/config/config.js db:migrate && sequelize-cli --config dist/config/config.js db:seed:all",
     "audit": "npm audit"
   },
   "dependencies": {
@@ -31,7 +34,8 @@
     "sharp": "^0.34.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "typescript": "^6.0.3"
   },
   "engines": {
     "node": ">=24.0.0",

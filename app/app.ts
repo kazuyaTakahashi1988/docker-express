@@ -18,7 +18,7 @@ const flash = require('connect-flash');
 const { check, validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
-const User = require('./models').User;
+const User = require('./models').default.User;
 const app = express();
 
 // use 認証関連 ミドルウェア
@@ -241,4 +241,4 @@ app.use((err, req, res, next) => {
   res.render('error');
 });
 
-module.exports = app;
+export = app;

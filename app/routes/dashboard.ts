@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const { check, validationResult } = require('express-validator');
 
-const User = require('./../models').User;
+const User = require('./../models').default.User;
 
 /* --------------------------------------
     ▽ 画像UPロード ▽
@@ -80,7 +80,7 @@ router.post('/profile', upload.single('image'), profileValidRules, async (req, r
   /* ▽ 保存画像ネーミング ▽  */
   const now = new Date();
   let saveImageName =
-    "UserImage-".concat(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
+    `UserImage-${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}${Math.random().toString(36).slice(-10)}.jpg`;
 
   /* ▽ 画像圧縮処理 ▽  */
   if (req.file) {
@@ -151,4 +151,4 @@ router.post('/deleat', async (req, res, next) => {
 
 });
 
-module.exports = router;
+export = router;

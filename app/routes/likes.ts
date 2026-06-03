@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Like = require('./../models').Like;
-const Post = require('./../models').Post;
-const User = require('./../models').User;
+const Like = require('./../models').default.Like;
+const Post = require('./../models').default.Post;
+const User = require('./../models').default.User;
 
 const perPage = 6; // 表示ページ数
 
@@ -17,7 +17,7 @@ router.get('/', async (req, res, next) => {
         limit: perPage,
         include: [{ model: Post, include: [{ model: User }] }]
     }).then(result => {
-        let postsResult = []; // 取得記事
+        let postsResult: any[] = []; // 取得記事
         result.rows.forEach(post => {
             postsResult.push(post.Post);
         });
@@ -33,4 +33,4 @@ router.get('/', async (req, res, next) => {
 
 });
 
-module.exports = router;
+export = router;
