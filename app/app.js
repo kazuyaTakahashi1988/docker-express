@@ -19,7 +19,6 @@ const { check, validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const User = require('./models').User;
-const { send } = require('process');
 const app = express();
 
 // use 認証関連 ミドルウェア
@@ -27,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(flash());
 app.use(session({
-  secret: 'YOUR-SECRET-STRING',
+  secret: process.env.SESSION_SECRET || 'change-me-in-local-env',
   resave: true,
   saveUninitialized: true
 }));
@@ -108,7 +107,7 @@ app.use(logger('dev'));
 /* ------------------------------------------------ */
 
 // 暗号化につかうキー
-const APP_KEY = 'YOUR-SECRET-KEY';
+const APP_KEY = process.env.APP_KEY || 'change-me-in-local-env';
 
 // バリデーション・ルール
 const regiValidRules = [
