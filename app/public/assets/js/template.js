@@ -1,1 +1,1 @@
-console.log('☆ template.min.js だよ ☆');
+console.log("☆ template.min.js だよ ☆");

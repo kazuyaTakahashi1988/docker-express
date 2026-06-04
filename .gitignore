@@ -1,4 +1,9 @@
-node_modules/*
-.data/*
-!.DS_Store
-uploads/*
+.env
+.data/
+**/node_modules/
+**/.DS_Store
+app/public/uploads/*
+!app/public/uploads/.gitignore
+
+# TypeScript build output
+app/dist/

@@ -1,71 +1,70 @@
 <html>
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>アカウント作成・フォーム</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
-</head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>アカウント作成・フォーム</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+  </head>
 
-<body>
+  <body>
 
-  <div id="app" class="mt-5 container">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <h5 class="h5 mb-4"><a href="/" class="text-dark"><img src="/assets/images/common/favicon.ico" alt="" class="d-inline mb-2" width="64"> Q & A site <small>- ナゼナゼ Express -</small></a></h5>
-        <div class="card">
-          <div class="card-header">アカウント作成・フォーム</div>
-          <div class="card-body">
-            <form method="POST" action="/register">
+    <div id="app" class="mt-5 container">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <h5 class="h5 mb-4"><a href="/" class="text-dark"><img src="/assets/images/common/favicon.ico" alt="" class="d-inline mb-2" width="64"> Q & A site <small>- ナゼナゼ Express -</small></a></h5>
+          <div class="card">
+            <div class="card-header">アカウント作成・フォーム</div>
+            <div class="card-body">
+              <form method="POST" action="/register">
 
-              <div class="form-group row">
-                <label for="name" class="col-md-4 col-form-label text-md-right">名前</label>
-                <div class="col-md-6">
-                  <input type="text" class="form-control" name="name" v-model="params.name">
+                <div class="form-group row">
+                  <label for="name" class="col-md-4 col-form-label text-md-right">名前</label>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="name" v-model="params.name">
+                  </div>
                 </div>
-              </div>
-              <div class="form-group row">
-                <label for="email" class="col-md-4 col-form-label text-md-right">メールアドレス</label>
-                <div class="col-md-6">
-                  <input type="email" class="form-control" name="email" v-model="params.email">
+                <div class="form-group row">
+                  <label for="email" class="col-md-4 col-form-label text-md-right">メールアドレス</label>
+                  <div class="col-md-6">
+                    <input type="email" class="form-control" name="email" v-model="params.email">
+                  </div>
                 </div>
-              </div>
-              <div class="form-group row">
-                <label for="password" class="col-md-4 col-form-label text-md-right">パスワード</label>
-                <div class="col-md-6">
-                  <input type="password" class="form-control" name="password" v-model="params.password">
+                <div class="form-group row">
+                  <label for="password" class="col-md-4 col-form-label text-md-right">パスワード</label>
+                  <div class="col-md-6">
+                    <input type="password" class="form-control" name="password" v-model="params.password">
+                  </div>
                 </div>
-              </div>
-              <div class="form-group row">
-                <label for="password-confirm" class="col-md-4 col-form-label text-md-right">パスワード（確認）</label>
-                <div class="col-md-6">
-                  <input type="password" class="form-control" name="passwordConfirmation" v-model="params.passwordConfirmation">
+                <div class="form-group row">
+                  <label for="password-confirm" class="col-md-4 col-form-label text-md-right">パスワード（確認）</label>
+                  <div class="col-md-6">
+                    <input type="password" class="form-control" name="passwordConfirmation" v-model="params.passwordConfirmation">
+                  </div>
                 </div>
-              </div>
-              <div class="form-group row mb-0">
-                <div class="col-md-8 offset-md-4">
+                <div class="form-group row mb-0">
+                  <div class="col-md-8 offset-md-4">
 
-                  <% if(errors){ %>
-                  <% errors.forEach( error => { %>
-                  <small class="alert alert-danger d-block">
-                    <%= error.msg %>
-                  </small>
-                  <% }) %>
-                  <% } %>
-                  <button type="submit" class="btn btn-primary">C r e a t e</button>
+                    <% if(errors){ %>
+                      <% errors.forEach( error => { %>
+                        <small class="alert alert-danger d-block">
+                          <%= error.msg %>
+                        </small>
+                      <% }) %>
+                    <% } %>
+                    <button type="submit" class="btn btn-primary">C r e a t e</button>
+                  </div>
                 </div>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
+    <div id="app">
+      <div class="card-body">
+      </div>
+    </body>
 
-  <div id="app">
-    <div class="card-body">
-    </div>
-</body>
-
-</html>
+  </html>

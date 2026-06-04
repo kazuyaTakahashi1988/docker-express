@@ -1,0 +1,7 @@
+{
+  "watch": ["*.ts", "bin/**/*.ts", "config/**/*.ts", "models/**/*.ts", "routes/**/*.ts"],
+  "ext": "ts,json",
+  "ignore": ["dist", "node_modules", "public/uploads"],
+  "exec": "npm run build:dev && LIVE_RELOAD=true node ./dist/bin/www.js",
+  "delay": "200ms"
+}

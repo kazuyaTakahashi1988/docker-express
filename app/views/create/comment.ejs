@@ -1,89 +1,88 @@
 <%
 let args = {
-    pageTtl: 'コメント投稿' + post.id,
-    // pageDes: '',
-    // pageKey: '',
-    // pageUrl: `/posts/create/`,
-    // pageImg: '/top/ogp.png',
-    // pageCss: '/top.css',
-    // pageJs: '/top.min.js',
-    // pageCss02: '',
-    // pageJs02: '',
-    // is_jquery: true,
-    // is_home: true,
+  pageTtl: "コメント投稿" + post.id,
+  // pageDes: "",
+  // pageKey: "",
+  // pageUrl: `/posts/create/`,
+  // pageImg: "/top/ogp.png",
+  // pageCss: "/top.css",
+  // pageJs: "/top.min.js",
+  // pageCss02: "",
+  // pageJs02: "",
+  // is_jquery: true,
+  // is_home: true,
 };
 %>
 <!DOCTYPE html>
 <html lang="ja">
 
-<head>
-  <%- include('./../_inc/load-head-ga') %>
-  <%- include('./../_inc/load-head-meta',{ args, user }) %>
-  <%- include('./../_inc/load-head-css',{ args, user }) %>
-  <%- include('./../_inc/load-head-js',{ args, user }) %>
-  <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
-</head>
+  <head>
+    <%- include("./../_inc/load-head-ga") %>
+    <%- include("./../_inc/load-head-meta",{ args, user }) %>
+    <%- include("./../_inc/load-head-css",{ args, user }) %>
+    <%- include("./../_inc/load-head-js",{ args, user }) %>
+    <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
+  </head>
 
-<body class="pagetype-home">
-  <%- // include('./../_inc/load-body-svg') %>
-  <%- include('./../_inc/load-body-header',{ args, user }) %>
+  <body class="pagetype-home">
+    <%- /* include("./../_inc/load-body-svg") */ %>
+    <%- include("./../_inc/load-body-header",{ args, user }) %>
 
+    <div class="container bg-white p-5 rounded">
 
-  <div class="container bg-white p-5 rounded">
+      <% if(errors){ %>
+        <% errors.forEach( error => { %>
+          <div class="alert alert-danger">
+            <%= error.msg %>
+          </div>
+        <% }) %>
+      <% } %>
 
-    <% if(errors){ %>
-    <% errors.forEach( error => { %>
-    <div class="alert alert-danger">
-      <%= error.msg %>
+      <form method="POST" action="/create/comment/<%= post.id %>">
+        <div class="form-group mb-4">
+          <label for="form-label"><b class="h4">Q</b>『<b><%= post.title %></b>』へのコメントを作成</label>
+        </div>
+        <div class="form-group mb-4">
+          <label for="form-label">・内容</label>
+          <textarea class="form-control" name="comment" id="comment"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">C r e a t e</button>
+      </form>
     </div>
-    <% }) %>
-    <% } %>
-    
-    <form method="POST" action="/create/comment/<%= post.id %>">
-      <div class="form-group mb-4">
-        <label for="form-label"><b class="h4">Q</b>『<b><%= post.title %></b>』へのコメントを作成</label>
-      </div>
-      <div class="form-group mb-4">
-        <label for="form-label">・内容</label>
-        <textarea class="form-control" name="comment" id="comment"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">C r e a t e</button>
-    </form>
-  </div>
 
-  <%- include('./../_inc/load-body-footer',{ args, user }) %>
-  <%- include('./../_inc/load-body-js',{ args, user }) %>
+    <%- include("./../_inc/load-body-footer",{ args, user }) %>
+    <%- include("./../_inc/load-body-js",{ args, user }) %>
 
-  <% /* -------------------------
+    <% /* -------------------------
     ▽ ckeditor ▽
-  ------------------------------- */%>
-  <script>
-    CKEDITOR.replace('comment', {
-      filebrowserUploadUrl: "/create/CKEditorUpload",
-      filebrowserUploadMethod: 'form',
-      // スペルチェック機能OFF
-      scayt_autoStartup: false,
-      // Enterを押した際に改行タグを挿入
-      enterMode: CKEDITOR.ENTER_BR,
-      // Shift+Enterを押した際に段落タグを挿入
-      shiftEnterMode: CKEDITOR.ENTER_P,
-      // idやclassを指定可能にする
-      allowedContent: true,
-      // preコード挿入時
-      format_pre: {
-        element: "pre",
-        attributes: {
-          class: "code",
+    ------------------------------- */%>
+    <script>
+      CKEDITOR.replace("comment", {
+        filebrowserUploadUrl: "/create/CKEditorUpload",
+        filebrowserUploadMethod: "form",
+        // スペルチェック機能OFF
+        scayt_autoStartup: false,
+        // Enterを押した際に改行タグを挿入
+        enterMode: CKEDITOR.ENTER_BR,
+        // Shift+Enterを押した際に段落タグを挿入
+        shiftEnterMode: CKEDITOR.ENTER_P,
+        // idやclassを指定可能にする
+        allowedContent: true,
+        // preコード挿入時
+        format_pre: {
+          element: "pre",
+          attributes: {
+            class: "code",
+          },
         },
-      },
-      // webからコピペした際でもプレーンテキストを貼り付けるようにする
-      forcePasteAsPlainText: true,
-      // 自動で空白を挿入しないようにする
-      fillEmptyBlocks: false,
-      // タブの入力を無効にする
-      tabSpaces: 0,
-    });
-  </script>
-</body>
+        // webからコピペした際でもプレーンテキストを貼り付けるようにする
+        forcePasteAsPlainText: true,
+        // 自動で空白を挿入しないようにする
+        fillEmptyBlocks: false,
+        // タブの入力を無効にする
+        tabSpaces: 0,
+      });
+    </script>
+  </body>
 
 </html>

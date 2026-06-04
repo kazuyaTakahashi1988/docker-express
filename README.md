@@ -1,25 +1,51 @@
-docker-compose.yml ファイルがある場所でターミナルを開き、以下のコマンドを叩く　　
+# 必要ローカル開発環境
 
-※　ポート番号　80　/　3000　をそれぞれ使用します
+- Docker v29.5.2 以降
+- Docker Compose v5.1.4 以降<br>
+  <sub>※ コンテナ内：Node.js 24 LTS 系を使用（`node:24-alpine`）</sub><br>
+  <sub>※ コンテナ内：MySQL 8.4 LTS 系を使用（`mysql:8.4`）</sub>
+<br>
+
+# 初回セットアップ
+
+compose.yaml ファイルがある場所でターミナルを開き、以下のコマンドを叩く　　
+
+<sub>※ ポート番号は　80　/　3000　をそれぞれ使用</sub>
+```bash
+cp .env.example .env
+
+docker compose build
+docker compose up -d
 ```
-$ docker-compose up -d　
+上記コマンド成功後、ローカルフォルダ `app` 内に `dist` & `node_modules` フォルダが自動生成される
+<br>
+<sub>（裏でコンパイルおよびシンクが走っているため2~3分、要待ち）</sub>
+<br>
+<br>
+↓↓↓↓↓
+<br>
+<br>
+自動生成されたのを確認できた後、以下のコマンドを叩く　
+
+```bash
+docker compose exec dockerexpress npm run migrate
+docker compose exec dockerexpress npm run seed
 ```
-　　　　　↓↓↓↓
-     
-# Open "[http://localhost](http://localhost/)" in your browser　
-アイパス『 root 』でphpMyAdminにログインできます。
+↓↓↓↓↓
+<br>
 
-DB『 express_db 』を作成、照合順序は『 utf8_general_ci 』としてください。
+## Open in your browser
 
-　　　　　↓↓↓↓　　
-     
-再度 docker-compose.yml ファイルがある場所でターミナルを開き、以下のコマンドを順に叩く
+- アプリ： <http://localhost:3000>
+- phpMyAdmin： <http://localhost:8080><br>
+  <sub>※ phpMyAdmin はアイパス『 root 』でログイン可</sub>
+  
+<br>
 
+## アプリが開けない場合、追加で以下のコマンドを叩く
+
+```bash
+docker compose exec dockerexpress npm run typecheck
+docker compose exec dockerexpress npm run build
+docker compose exec dockerexpress npm run dev
 ```
-$ docker exec -it express-app /bin/sh
-$ npx sequelize-cli db:migrate
-$ npx sequelize-cli db:seed:all
-```
-
-　　　　　↓↓↓↓
-# Open "[http://localhost:3000](http://localhost:3000/)" in your browser　

@@ -1,139 +1,139 @@
 <%
 let args = {
-    pageTtl: '投稿',
-    // pageDes: '',
-    // pageKey: '',
-    // pageUrl: `/posts/create/`,
-    // pageImg: '/top/ogp.png',
-    // pageCss: '/top.css',
-    // pageJs: '/top.min.js',
-    // pageCss02: '',
-    // pageJs02: '',
-    // is_jquery: true,
-    // is_home: true,
+  pageTtl: "投稿",
+  // pageDes: "",
+  // pageKey: "",
+  // pageUrl: `/posts/create/`,
+  // pageImg: "/top/ogp.png",
+  // pageCss: "/top.css",
+  // pageJs: "/top.min.js",
+  // pageCss02: "",
+  // pageJs02: "",
+  // is_jquery: true,
+  // is_home: true,
 };
 %>
 <!DOCTYPE html>
 <html lang="ja">
 
-<head>
-  <%- include('./../_inc/load-head-ga') %>
-  <%- include('./../_inc/load-head-meta',{ args, user }) %>
-  <%- include('./../_inc/load-head-css',{ args, user }) %>
-  <%- include('./../_inc/load-head-js',{ args, user }) %>
-</head>
+  <head>
+    <%- include("./../_inc/load-head-ga") %>
+    <%- include("./../_inc/load-head-meta",{ args, user }) %>
+    <%- include("./../_inc/load-head-css",{ args, user }) %>
+    <%- include("./../_inc/load-head-js",{ args, user }) %>
+  </head>
 
-<body class="pagetype-home">
-  <%- // include('./../_inc/load-body-svg') %>
-  <%- include('./../_inc/load-body-header',{ args, user }) %>
+  <body class="pagetype-home">
+    <%- /* include("./../_inc/load-body-svg") */  %>
+    <%- include("./../_inc/load-body-header",{ args, user }) %>
 
-  <div class="container bg-white p-5 rounded">
+    <div class="container bg-white p-5 rounded">
 
-    <% if(errors){ %>
-    <% errors.forEach( error => { %>
-    <div class="alert alert-danger">
-      <%= error.msg %>
-    </div>
-    <% }) %>
-    <% } %>
+      <% if(errors){ %>
+        <% errors.forEach( error => { %>
+          <div class="alert alert-danger">
+            <%= error.msg %>
+          </div>
+        <% }) %>
+      <% } %>
 
-    <form method="POST" action="/create/post/" enctype="multipart/form-data">
-      <div class="form-group mb-4">
-        <label for="title" class="form-label">・サムネイル画像</label>
-        <div id="drag-drop-area" class="w-full bg-gray-50 text-gray-800 border focus:ring ring-indigo-300 rounded outline-none transition duration-100 px-3 py-2">
-          <div class="drag-drop-inside">
-            <p class="drag-drop-info">ここにファイルをドロップ</p>
-            <p>または</p>
-            <p class="drag-drop-buttons"><input id="fileInput" type="file" accept="image/*" value="ファイルを選択" name="image"></p>
+      <form method="POST" action="/create/post/" enctype="multipart/form-data">
+        <div class="form-group mb-4">
+          <label for="title" class="form-label">・サムネイル画像</label>
+          <div id="drag-drop-area" class="w-full bg-gray-50 text-gray-800 border focus:ring ring-indigo-300 rounded outline-none transition duration-100 px-3 py-2">
+            <div class="drag-drop-inside">
+              <p class="drag-drop-info">ここにファイルをドロップ</p>
+              <p>または</p>
+              <p class="drag-drop-buttons"><input id="fileInput" type="file" accept="image/*" value="ファイルを選択" name="image"></p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="form-group mb-4">
-        <label class="form-label">・タイトル</label>
-        <input type="text" class="form-control" name="title" id="title" value="<%- value.title && value.title %>" >
-      </div>
+        <div class="form-group mb-4">
+          <label class="form-label">・タイトル</label>
+          <input type="text" class="form-control" name="title" id="title" value="<%- value.title && value.title %>" >
+        </div>
 
-      <div class="form-group mb-4">
-        <label class="form-label">・カテゴリー</label>
-        <select class="form-control" name="category_id" id="category_id">
-          <option selected value="">---</option>
-          <% categories.forEach( category => { %>
-          <option value="<%= category.id %>" <%- value.category == category.id && 'selected' %> >
-            <%= category.category_name %>
-          </option>
-          <% }) %>
-        </select>
-      </div>
+        <div class="form-group mb-4">
+          <label class="form-label">・カテゴリー</label>
+          <select class="form-control" name="category_id" id="category_id">
+            <option selected value="">---</option>
+            <% categories.forEach( category => { %>
+              <option value="<%= category.id %>" <%- value.category == category.id && "selected" %> >
+                <%= category.category_name %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
 
-      <div class="form-group mb-4">
-        <label for="form-label">・内容</label>
-        <textarea class="form-control" name="content" id="content">
-          <%- value.content && value.content %>
-        </textarea>
-      </div>
+        <div class="form-group mb-4">
+          <label for="form-label">・内容</label>
+          <textarea class="form-control" name="content" id="content">
+            <%- value.content && value.content %>
+          </textarea>
+        </div>
 
-      <button type="submit" class="btn btn-primary">C r e a t e</button>
-    </form>
-  </div>
+        <button type="submit" class="btn btn-primary">C r e a t e</button>
+      </form>
+    </div>
 
-  <%- include('./../_inc/load-body-footer',{ args, user }) %>
-  <%- include('./../_inc/load-body-js',{ args, user }) %>
+    <%- include("./../_inc/load-body-footer",{ args, user }) %>
+    <%- include("./../_inc/load-body-js",{ args, user }) %>
 
-  <% /* -------------------------
+    <% /* -------------------------
     ▽ 画像のドラッグ＆ドロップ処理 ▽
-  ------------------------------- */%>
-  <script>
-    const fileArea = document.getElementById('drag-drop-area');
-    const fileInput = document.getElementById('fileInput');
+    ------------------------------- */%>
+    <script>
+      const fileArea = document.getElementById("drag-drop-area");
+      const fileInput = document.getElementById("fileInput");
 
-    fileArea.addEventListener('dragover', function(evt) {
-      evt.preventDefault();
-      fileArea.classList.add('dragover');
-    });
+      fileArea.addEventListener("dragover", function(evt) {
+        evt.preventDefault();
+        fileArea.classList.add("dragover");
+      });
 
-    fileArea.addEventListener('dragleave', function(evt) {
-      evt.preventDefault();
-      fileArea.classList.remove('dragover');
-    });
-    fileArea.addEventListener('drop', function(evt) {
-      evt.preventDefault();
-      fileArea.classList.remove('dragenter');
-      const files = evt.dataTransfer.files;
-      fileInput.files = files;
-    });
-  </script>
-  <% /* -------------------------
+      fileArea.addEventListener("dragleave", function(evt) {
+        evt.preventDefault();
+        fileArea.classList.remove("dragover");
+      });
+      fileArea.addEventListener("drop", function(evt) {
+        evt.preventDefault();
+        fileArea.classList.remove("dragenter");
+        const files = evt.dataTransfer.files;
+        fileInput.files = files;
+      });
+    </script>
+    <% /* -------------------------
     ▽ ckeditor ▽
-  ------------------------------- */%>
-  <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
-  <script>
-    CKEDITOR.replace('content', {
-      filebrowserUploadUrl: "/create/CKEditorUpload",
-      filebrowserUploadMethod: 'form',
-      // スペルチェック機能OFF
-      scayt_autoStartup: false,
-      // Enterを押した際に改行タグを挿入
-      enterMode: CKEDITOR.ENTER_BR,
-      // Shift+Enterを押した際に段落タグを挿入
-      shiftEnterMode: CKEDITOR.ENTER_P,
-      // idやclassを指定可能にする
-      allowedContent: true,
-      // preコード挿入時
-      format_pre: {
-        element: "pre",
-        attributes: {
-          class: "code",
+    ------------------------------- */%>
+    <script src="/modules/ckeditor/ckeditor/ckeditor.js"></script>
+    <script>
+      CKEDITOR.replace("content", {
+        filebrowserUploadUrl: "/create/CKEditorUpload",
+        filebrowserUploadMethod: "form",
+        // スペルチェック機能OFF
+        scayt_autoStartup: false,
+        // Enterを押した際に改行タグを挿入
+        enterMode: CKEDITOR.ENTER_BR,
+        // Shift+Enterを押した際に段落タグを挿入
+        shiftEnterMode: CKEDITOR.ENTER_P,
+        // idやclassを指定可能にする
+        allowedContent: true,
+        // preコード挿入時
+        format_pre: {
+          element: "pre",
+          attributes: {
+            class: "code",
+          },
         },
-      },
-      // webからコピペした際でもプレーンテキストを貼り付けるようにする
-      forcePasteAsPlainText: true,
-      // 自動で空白を挿入しないようにする
-      fillEmptyBlocks: false,
-      // タブの入力を無効にする
-      tabSpaces: 0,
-    });
-  </script>
-</body>
+        // webからコピペした際でもプレーンテキストを貼り付けるようにする
+        forcePasteAsPlainText: true,
+        // 自動で空白を挿入しないようにする
+        fillEmptyBlocks: false,
+        // タブの入力を無効にする
+        tabSpaces: 0,
+      });
+    </script>
+  </body>
 
 </html>

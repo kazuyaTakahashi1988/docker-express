@@ -1,0 +1,9 @@
+node_modules/
+dist/
+public/modules/
+public/assets/js/min/
+public/assets/images/
+package-lock.json
+
+public/assets/js/jquery.js
+public/assets/js/swiper.js

@@ -1,141 +1,138 @@
 <%
 let args = {
-    pageTtl: post.title,
-    pageDes: post.content.replace(/(<([^>]+)>)/gi, "").slice(0, 130),
-    // pageKey: ' QA詳細キー',
-    pageUrl: `/posts/detail/${post.id}`,
-    pageImg: post.image ? `/uploads/${post.image}` : '',
-    // pageCss: '/top.css',
-    // pageJs: '/top.min.js',
-    // pageCss02: '',
-    // pageJs02: '',
-    // is_jquery: true,
-    // is_home: true,
+  pageTtl: post.title,
+  pageDes: post.content.replace(/(<([^>]+)>)/gi, "").slice(0, 130),
+  // pageKey: " QA詳細キー",
+  pageUrl: `/posts/detail/${post.id}`,
+  pageImg: post.image ? `/uploads/${post.image}` : "",
+  // pageCss: "/top.css",
+  // pageJs: "/top.min.js",
+  // pageCss02: "",
+  // pageJs02: "",
+  // is_jquery: true,
+  // is_home: true,
 };
 %>
 <!DOCTYPE html>
 <html lang="ja">
 
-<head>
-  <%- include('./../_inc/load-head-ga') %>
-  <%- include('./../_inc/load-head-meta',{ args, user }) %>
-  <%- include('./../_inc/load-head-css',{ args, user }) %>
-  <%- include('./../_inc/load-head-js',{ args, user }) %>
-</head>
+  <head>
+    <%- include("./../_inc/load-head-ga") %>
+    <%- include("./../_inc/load-head-meta",{ args, user }) %>
+    <%- include("./../_inc/load-head-css",{ args, user }) %>
+    <%- include("./../_inc/load-head-js",{ args, user }) %>
+  </head>
 
-<body class="pagetype-home">
-  <%- // include('./../_inc/load-body-svg') %>
-  <%- include('./../_inc/load-body-header',{ args, user }) %>
+  <body class="pagetype-home">
+    <%- /* include("./../_inc/load-body-svg") */  %>
+    <%- include("./../_inc/load-body-header",{ args, user }) %>
 
-  <div class="container bg-white p-5 mb-5 rounded">
-    <h4 class="text-center mb-5"><b class="h2">Q.&nbsp;&nbsp;</b><%= post.title %></h4>
+    <div class="container bg-white p-5 mb-5 rounded">
+      <h4 class="text-center mb-5"><b class="h2">Q.&nbsp;&nbsp;</b><%= post.title %></h4>
 
-    <div class="text-center pList mb-3">
-      <div class="thum">
-        <%- post.image ? `<img src="/uploads/${post.image}">` :
+      <div class="text-center pList mb-3">
+        <div class="thum">
+          <%- post.image ? `<img src="/uploads/${post.image}">` :
           `<svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
-          <title>No Image</title>
-          <rect width="100%" height="100%" fill="#777"></rect><text x="37px" y="50%" fill="#fff" dy=".3em">No Image</text>
-        </svg>`
-        %>
-      </div>
-
-      <% if(!user){ %>
-      <p class="text-left text-primary"><b>Like：<%- post.Likes.length %></b></p>
-      <% } else { %>
-      <div id="likeBtnArea" class="<%- judge && 'likeOn' %>">
-        <button type="button" class="btn btn-secondary py-0 px-1" onClick="likeBtn('/create/like/<%= post.id %>')" id="like"><small class="text-white"><b>Like：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
-        <button type="button" class="btn btn-warning py-0 px-1" onClick="likeBtn('/create/unlike/<%= post.id %>')" id="unLike"><small class="text-dark"><b>Like：<span class="likeCount"><%= post.Likes.length %></span></b></small></button>
-      </div>
-      <% }  %><br>
-      <p class="text-left mb-2">
-        <a href="<%= `/posts/user/${post.User.id}` %>"><span class="text-dark">ユーザー：</span><%= post.User.name %></a><br>
-        <a href="<%= `/posts/category/${post.Category.id}` %>"><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></a>
-      </p>
-
-      <p class="text-left postContent"><%- post.content %></p><br><br>
-      <div class="d-flex justify-content-between py-1 pt-3 mb-3">
-        <div></div>
-        <%
-          let date = new Date(post.createdAt);
-          date.setTime(date.getTime() + 1000*60*60*9);// JSTに変換
-          const TIME = ''.concat(date.getFullYear(),'年',date.getMonth() + 1,'月',date.getDate(),'日 ',date.getHours(),':',date.getMinutes());
-        %>
-        <div>
-        <%- post.User.image && `<a href="/posts/user/${post.User.id}" class="icon"><img src="/uploads/${post.User.image}"></a>` %><span class="text3"><small><%- TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
-      </div>
-      <div class="d-block my-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white p-2">+ コメント</a></div>
-      <a href="javascript:history.back();">&raquo; 前ページに戻る</a>
-    </div>
-
-    <% comments.forEach( comment => { %>
-    <div class="balloon1 p-4">
-      <p class="text1"><%- comment.comment %></p>
-      <div class="d-flex justify-content-between py-1 pt-3">
-        <div><a href="/posts/user/<%= comment.User.id %>" class="user">
-          <%- comment.User.image && `<b><img src="/uploads/${comment.User.image}"></b><br>` %>
-          <small><span class="text-dark">ユーザー：</span><span class="text2"><%= comment.User.name %></span></small>
-        </a></div>
-        <%
-            let date = new Date(comment.createdAt);
-            date.setTime(date.getTime() + 1000*60*60*9);// JSTに変換
-            const TIME = ''.concat(date.getFullYear(),'年',date.getMonth() + 1,'月',date.getDate(),'日 ',date.getHours(),':',date.getMinutes());
+            <title>No Image</title>
+            <rect width="100%" height="100%" fill="#777"></rect><text x="37px" y="50%" fill="#fff" dy=".3em">No Image</text>
+          </svg>`
           %>
-        <div><span class="text3"><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
-      </div>
-      <div class="d-block p-1 mt-3 rounded btn btn-light"><a href="/create/reply/<%= comment.id %>" class="d-block"> <small>+ リプライ</small> </a></div>
-
-      <% comment.Replies.forEach( Reply => { %>
-      <div class="px-5 py-3 reply text-secondary">
-        <p class=""><%= Reply.reply %></p>
-        <div class="d-flex justify-content-between py-1 pt-3">
-          <div><a href="/posts/user/<%= Reply.User.id %>"><small><span class="text-secondary">ユーザー：</span><span class=""><%= Reply.User.name %></span></small></a></div>
-          <%
-            let date = new Date(Reply.createdAt);
-            date.setTime(date.getTime() + 1000*60*60*9);// JSTに変換
-            const TIME = ''.concat(date.getFullYear(),'年',date.getMonth() + 1,'月',date.getDate(),'日 ',date.getHours(),':',date.getMinutes());
-          %>
-          <div><span><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
         </div>
+
+        <% if(!user){ %>
+          <p class="text-left text-primary"><b>Like：<%- post.Likes.length %></b></p>
+        <% } else { %>
+          <div id="likeBtnArea" class="<%- judge && "likeOn" %>">
+            <button type="button" class="btn btn-secondary py-0 px-1" onClick="likeBtn('/create/like/<%= post.id %>')" id="like"><small class="text-white"><b>Like：<span class="likeCount"><%- post.Likes.length %></span></b></small></button>
+            <button type="button" class="btn btn-warning py-0 px-1" onClick="likeBtn('/create/unlike/<%= post.id %>')" id="unLike"><small class="text-dark"><b>Like：<span class="likeCount"><%= post.Likes.length %></span></b></small></button>
+          </div>
+        <% }  %><br>
+        <p class="text-left mb-2">
+          <a href="<%= `/posts/user/${post.User.id}` %>"><span class="text-dark">ユーザー：</span><%= post.User.name %></a><br>
+          <a href="<%= `/posts/category/${post.Category.id}` %>"><span class="text-dark">カテゴリー：</span><%= post.Category.category_name %></a>
+        </p>
+
+        <p class="text-left postContent"><%- post.content %></p><br><br>
+        <div class="d-flex justify-content-between py-1 pt-3 mb-3">
+          <div></div>
+          <%
+          let date = new Date(post.createdAt);
+          const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",date.getHours(),":",date.getMinutes());
+          %>
+          <div>
+            <%- post.User.image && `<a href="/posts/user/${post.User.id}" class="icon"><img src="/uploads/${post.User.image}"></a>` %><span class="text3"><small><%- TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+        </div>
+        <div class="d-block my-5 border rounded btn btn-primary"><a href="/create/comment/<%= post.id %>" class="d-block text-white p-2">+ コメント</a></div>
+        <a href="javascript:history.back();">&raquo; 前ページに戻る</a>
       </div>
+
+      <% comments.forEach( comment => { %>
+        <div class="balloon1 p-4">
+          <p class="text1"><%- comment.comment %></p>
+          <div class="d-flex justify-content-between py-1 pt-3">
+            <div><a href="/posts/user/<%= comment.User.id %>" class="user">
+                <%- comment.User.image && `<b><img src="/uploads/${comment.User.image}"></b><br>` %>
+                <small><span class="text-dark">ユーザー：</span><span class="text2"><%= comment.User.name %></span></small>
+              </a></div>
+            <%
+            let date = new Date(comment.createdAt);
+            const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",date.getHours(),":",date.getMinutes());
+            %>
+            <div><span class="text3"><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+          </div>
+          <div class="d-block p-1 mt-3 rounded btn btn-light"><a href="/create/reply/<%= comment.id %>" class="d-block"> <small>+ リプライ</small> </a></div>
+
+          <% comment.Replies.forEach( Reply => { %>
+            <div class="px-5 py-3 reply text-secondary">
+              <p class=""><%= Reply.reply %></p>
+              <div class="d-flex justify-content-between py-1 pt-3">
+                <div><a href="/posts/user/<%= Reply.User.id %>"><small><span class="text-secondary">ユーザー：</span><span class=""><%= Reply.User.name %></span></small></a></div>
+                <%
+                let date = new Date(Reply.createdAt);
+                const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",date.getHours(),":",date.getMinutes());
+                %>
+                <div><span><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
       <% }); %>
     </div>
-    <% }); %>
-  </div>
 
-  <% if(count > 1){ %>
-  <div aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-      <% if(page > 1){ %>
-      <li class="page-item"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${page - 1}` %>">&laquo;</a></li>
-      <% } %>
-      <% for(let index = 1; index <= count; index++){ %>
-      <li class="page-item <%- page == index && `active` %>"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${index}` %>"><%= index %></a></li>
-      <% } %>
-      <% if(page < count){ %>
-      <li class="page-item"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${++page}` %>">&raquo;</a></li>
-      <% } %>
-    </ul>
-  </div>
-  <% } %>
+    <% if(count > 1){ %>
+      <div aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <% if(page > 1){ %>
+            <li class="page-item"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${page - 1}` %>">&laquo;</a></li>
+          <% } %>
+          <% for(let index = 1; index <= count; index++){ %>
+            <li class="page-item <%- page == index && `active` %>"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${index}` %>"><%= index %></a></li>
+          <% } %>
+          <% if(page < count){ %>
+            <li class="page-item"><a class="page-link" href="<%- pegePath && pegePath %><%= `?page=${++page}` %>">&raquo;</a></li>
+          <% } %>
+        </ul>
+      </div>
+    <% } %>
 
-  <%- include('./../_inc/load-body-footer',{ args, user }) %>
-  <%- include('./../_inc/load-body-js',{ args, user }) %>
+    <%- include("./../_inc/load-body-footer",{ args, user }) %>
+    <%- include("./../_inc/load-body-js",{ args, user }) %>
 
-  <script>
-    const likeBtnArea = document.getElementById('likeBtnArea');
-    const likeCount = document.getElementsByClassName('likeCount');
-    const likeBtn = async (sURL) => {
-      likeBtnArea.classList.toggle('likeOn');
-      const response = await fetch(sURL, {
-        method: 'POST'
-      });
-      const jsondata = await response.json();
-      for (let index = 0; index < likeCount.length; index++) {
-        likeCount[index].innerHTML = jsondata['likeCount'];
+    <script>
+      const likeBtnArea = document.getElementById("likeBtnArea");
+      const likeCount = document.getElementsByClassName("likeCount");
+      const likeBtn = async (sURL) => {
+        likeBtnArea.classList.toggle("likeOn");
+        const response = await fetch(sURL, {
+          method: "POST",
+        });
+        const jsondata = await response.json();
+        for (let index = 0; index < likeCount.length; index++) {
+          likeCount[index].innerHTML = jsondata["likeCount"];
+        }
       }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 
 </html>
