@@ -25,6 +25,7 @@ const isLiveReloadEnabled = process.env.LIVE_RELOAD === "true";
 const sourceRoot = process.cwd();
 const publicDir = isLiveReloadEnabled ? path.join(sourceRoot, "public") : path.join(__dirname, "public");
 const viewsDir = isLiveReloadEnabled ? path.join(sourceRoot, "views") : path.join(__dirname, "views");
+const liveReloadServerId = `${Date.now()}-${process.pid}`;
 
 // use 認証関連 ミドルウェア
 app.use(express.json());
@@ -74,7 +75,7 @@ if (isLiveReloadEnabled) {
       Connection: "keep-alive",
     });
     res.flushHeaders?.();
-    res.write("event: connected\ndata: ok\n\n");
+    res.write(`event: connected\ndata: ${liveReloadServerId}\n\n`);
     liveReloadClients.add(res);
     req.on("close", () => liveReloadClients.delete(res));
   });
@@ -83,7 +84,15 @@ if (isLiveReloadEnabled) {
     res.type("application/javascript");
     res.send(`
       (() => {
+        const serverIdKey = "__liveReloadServerId";
         const events = new EventSource("/__live-reload/events");
+        events.addEventListener("connected", (event) => {
+          const previousServerId = sessionStorage.getItem(serverIdKey);
+          sessionStorage.setItem(serverIdKey, event.data);
+          if (previousServerId && previousServerId !== event.data) {
+            window.location.reload();
+          }
+        });
         events.addEventListener("reload", () => window.location.reload());
       })();
     `);
