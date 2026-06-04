@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 export = (sequelize, DataTypes) => {
   class Reply extends Model {
     /**
@@ -11,19 +9,12 @@ export = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Reply.belongsTo(models.User, {
-        foreignKey: 'user_id',
-        targetKey: 'id'
-      })
+      Reply.belongsTo(models.User, { foreignKey: "user_id", targetKey: "id" });
     }
   }
-  Reply.init({
-    user_id: DataTypes.INTEGER,
-    comment_id: DataTypes.INTEGER,
-    reply: DataTypes.TEXT
-  }, {
-    sequelize,
-    modelName: 'Reply',
-  });
+  Reply.init(
+    { user_id: DataTypes.INTEGER, comment_id: DataTypes.INTEGER, reply: DataTypes.TEXT },
+    { sequelize, modelName: "Reply" },
+  );
   return Reply;
 };

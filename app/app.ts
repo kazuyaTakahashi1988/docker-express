@@ -4,36 +4,38 @@
 /*
 /* ------------------------------------------------ */
 
-const createError = require('http-errors');
-const express = require('express');
-const logger = require('morgan');
-const path = require('path');
+const createError = require("http-errors");
+const express = require("express");
+const logger = require("morgan");
+const path = require("path");
 
 // 認証関連 ミドルウェア
-const cookieParser = require('cookie-parser');
-const crypto = require('crypto');
-const passport = require('./auth');
-const session = require('express-session');
-const flash = require('connect-flash');
-const { check, validationResult } = require('express-validator');
-const nodemailer = require('nodemailer');
-const bcrypt = require('bcryptjs');
-const User = require('./models').default.User;
+const cookieParser = require("cookie-parser");
+const crypto = require("crypto");
+const passport = require("./auth");
+const session = require("express-session");
+const flash = require("connect-flash");
+const { check, validationResult } = require("express-validator");
+const nodemailer = require("nodemailer");
+const bcrypt = require("bcryptjs");
+const User = require("./models").default.User;
 const app = express();
 
 // use 認証関連 ミドルウェア
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(flash());
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'change-me-in-local-env',
-  resave: true,
-  saveUninitialized: true
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "change-me-in-local-env",
+    resave: true,
+    saveUninitialized: true,
+  }),
+);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 /* ---------------------------
   ▽ Router ミドルウェア ▽
@@ -44,17 +46,14 @@ const autoAuthMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else if (req.cookies.remember_me) {
-    const [rememberToken, hash] = req.cookies.remember_me.split('|');
-    User.findAll({
-      where: {
-        rememberToken: rememberToken
-      }
-    }).then(users => {
+    const [rememberToken, hash] = req.cookies.remember_me.split("|");
+    User.findAll({ where: { rememberToken: rememberToken } }).then((users) => {
       for (let i in users) {
         const user = users[i];
-        const verifyingHash = crypto.createHmac('sha256', APP_KEY)
-          .update(user.id + '-' + rememberToken)
-          .digest('hex');
+        const verifyingHash = crypto
+          .createHmac("sha256", APP_KEY)
+          .update(user.id + "-" + rememberToken)
+          .digest("hex");
         if (hash === verifyingHash) {
           return req.login(user, () => {
             next();
@@ -73,32 +72,31 @@ const mustAuthMW = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
-    res.cookie('afterAuthPATH', req.originalUrl);
-    return res.redirect(302, '/login');
+    res.cookie("afterAuthPATH", req.originalUrl);
+    return res.redirect(302, "/login");
   }
-}
+};
 
 /* ---------------------------
   ▽ Router ▽
 --------------------------- */
-const indexRouter = require('./routes/index');
-const postsRouter = require('./routes/posts');
-const likesRouter = require('./routes/likes');
-const createRouter = require('./routes/create');
-const dashboardRouter = require('./routes/dashboard');
-app.use('/', autoAuthMW, indexRouter);
-app.use('/posts', autoAuthMW, postsRouter);
-app.use('/likes', autoAuthMW, mustAuthMW, likesRouter);
-app.use('/create', autoAuthMW, mustAuthMW, createRouter);
-app.use('/dashboard', autoAuthMW, mustAuthMW, dashboardRouter);
+const indexRouter = require("./routes/index");
+const postsRouter = require("./routes/posts");
+const likesRouter = require("./routes/likes");
+const createRouter = require("./routes/create");
+const dashboardRouter = require("./routes/dashboard");
+app.use("/", autoAuthMW, indexRouter);
+app.use("/posts", autoAuthMW, postsRouter);
+app.use("/likes", autoAuthMW, mustAuthMW, likesRouter);
+app.use("/create", autoAuthMW, mustAuthMW, createRouter);
+app.use("/dashboard", autoAuthMW, mustAuthMW, dashboardRouter);
 
 /* ---------------------------
   ▽ ejs setup ▽
 --------------------------- */
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(logger('dev'));
-
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+app.use(logger("dev"));
 
 /* ------------------------------------------------
 /*
@@ -107,30 +105,35 @@ app.use(logger('dev'));
 /* ------------------------------------------------ */
 
 // 暗号化につかうキー
-const APP_KEY = process.env.APP_KEY || 'change-me-in-local-env';
+const APP_KEY = process.env.APP_KEY || "change-me-in-local-env";
 
 // バリデーション・ルール
 const regiValidRules = [
-  check('name')
-    .not().isEmpty().withMessage('名前は項目は必須入力です。'),
-  check('email')
-    .not().isEmpty().withMessage('メールアドレスは項目は必須入力です。')
-    .isEmail().withMessage('有効なメールアドレス形式で指定してください。'),
-  check('password')
-    .not().isEmpty().withMessage('パスワードはこの項目は必須入力です。')
-    .isLength({ min: 8, max: 25 }).withMessage('パスワードは8文字から25文字にしてください。')
+  check("name").not().isEmpty().withMessage("名前は項目は必須入力です。"),
+  check("email")
+    .not()
+    .isEmpty()
+    .withMessage("メールアドレスは項目は必須入力です。")
+    .isEmail()
+    .withMessage("有効なメールアドレス形式で指定してください。"),
+  check("password")
+    .not()
+    .isEmpty()
+    .withMessage("パスワードはこの項目は必須入力です。")
+    .isLength({ min: 8, max: 25 })
+    .withMessage("パスワードは8文字から25文字にしてください。")
     .custom((value, { req }) => {
       if (req.body.password !== req.body.passwordConfirmation) {
-        throw new Error('パスワード（確認）と一致しません。');
+        throw new Error("パスワード（確認）と一致しません。");
       }
       return true;
-    })
+    }),
 ];
 
 // 認証済みならTOPリダイレクト ミドルウェア
 const judgeAuthMW = (req, res, next) => {
   if (req.isAuthenticated()) {
-    res.redirect(302, '/');
+    res.redirect(302, "/");
   } else {
     next();
   }
@@ -141,20 +144,17 @@ const judgeAuthMW = (req, res, next) => {
 --------------------------- */
 
 // 作成ページ
-app.get('/register', judgeAuthMW, (req, res) => {
-  return res.render('auth/register', {
-    errors: undefined
-  });
+app.get("/register", judgeAuthMW, (req, res) => {
+  return res.render("auth/register", { errors: undefined });
 });
 
 // 作成実行
-app.post('/register', judgeAuthMW, regiValidRules, (req, res) => {
+app.post("/register", judgeAuthMW, regiValidRules, (req, res) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) { // バリデーション失敗
+  if (!errors.isEmpty()) {
+    // バリデーション失敗
     // return res.status(422).json({ errors: errors.array() });
-    return res.render('auth/register', {
-      errors: errors.array()
-    })
+    return res.render("auth/register", { errors: errors.array() });
   }
   // 送信されたデータ
   const name = req.body.name;
@@ -166,10 +166,10 @@ app.post('/register', judgeAuthMW, regiValidRules, (req, res) => {
     defaults: {
       name: name,
       email: email,
-      password: bcrypt.hashSync(password, bcrypt.genSaltSync(8))
-    }
+      password: bcrypt.hashSync(password, bcrypt.genSaltSync(8)),
+    },
   }).then(([user]) => {
-    res.redirect(307, '/login');
+    res.redirect(307, "/login");
   });
 });
 
@@ -178,54 +178,56 @@ app.post('/register', judgeAuthMW, regiValidRules, (req, res) => {
 --------------------------- */
 
 // 認証ページ
-app.get('/login', judgeAuthMW, (req, res) => {
-  const errorMessage = req.flash('error').join('<br>');
-  res.render('auth/login', {
-    errorMessage: errorMessage
-  });
+app.get("/login", judgeAuthMW, (req, res) => {
+  const errorMessage = req.flash("error").join("<br>");
+  res.render("auth/login", { errorMessage: errorMessage });
 });
 
 // 認証実行
-app.post('/login', judgeAuthMW,
-  passport.authenticate('local', {
-    failureRedirect: '/login',
+app.post(
+  "/login",
+  judgeAuthMW,
+  passport.authenticate("local", {
+    failureRedirect: "/login",
     failureFlash: true,
-    badRequestMessage: '「メールアドレス」と「パスワード」は必須入力です。'
+    badRequestMessage: "「メールアドレス」と「パスワード」は必須入力です。",
   }),
   (req, res, next) => {
-    if (!req.body.remember) {  // 次回もログインを省略しない場合
-      res.clearCookie('remember_me');
+    if (!req.body.remember) {
+      // 次回もログインを省略しない場合
+      res.clearCookie("remember_me");
       return next();
     }
     const user = req.user;
-    const rememberToken = crypto.randomBytes(20).toString('hex'); // ランダムな文字列
-    const hash = crypto.createHmac('sha256', APP_KEY)
-      .update(user.id + '-' + rememberToken)
-      .digest('hex');
+    const rememberToken = crypto.randomBytes(20).toString("hex"); // ランダムな文字列
+    const hash = crypto
+      .createHmac("sha256", APP_KEY)
+      .update(user.id + "-" + rememberToken)
+      .digest("hex");
     user.rememberToken = rememberToken;
     user.save();
-    res.cookie('remember_me', rememberToken + '|' + hash, {
-      path: '/',
-      maxAge: 5 * 365 * 24 * 60 * 60 * 1000 // 5年
+    res.cookie("remember_me", rememberToken + "|" + hash, {
+      path: "/",
+      maxAge: 5 * 365 * 24 * 60 * 60 * 1000, // 5年
     });
     return next();
   },
   (req, res) => {
     if (req.cookies.afterAuthPATH) {
       const rePATH = req.cookies.afterAuthPATH.slice();
-      res.clearCookie('afterAuthPATH');
+      res.clearCookie("afterAuthPATH");
       res.redirect(rePATH);
     } else {
-      res.redirect('/dashboard');
+      res.redirect("/dashboard");
     }
-  }
+  },
 );
 
 // ログアウトページ
-app.get('/logout', (req, res) => {
+app.get("/logout", (req, res) => {
   req.session.passport.user = undefined;
-  res.clearCookie('remember_me');
-  res.redirect('/')
+  res.clearCookie("remember_me");
+  res.redirect("/");
 });
 
 /* ------------------------------------------------
@@ -236,9 +238,9 @@ app.use((req, res, next) => {
 });
 app.use((err, req, res, next) => {
   res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.error = req.app.get("env") === "development" ? err : {};
   res.status(err.status || 500);
-  res.render('error');
+  res.render("error");
 });
 
 export = app;

@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const rootDir = path.resolve(__dirname, '..');
-const distDir = path.join(rootDir, 'dist');
-const targets = ['views', 'public'];
+const rootDir = path.resolve(__dirname, "..");
+const distDir = path.join(rootDir, "dist");
+const targets = ["views", "public"];
 
 for (const target of targets) {
   const source = path.join(rootDir, target);

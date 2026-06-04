@@ -1,1 +1,1 @@
-console.log('☆ top.min.js だよ ☆');
+console.log("☆ top.min.js だよ ☆");

@@ -15,13 +15,6 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": [
-    "**/*.ts",
-    "types/**/*.d.ts"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "public"
-  ]
+  "include": ["**/*.ts", "types/**/*.d.ts"],
+  "exclude": ["dist", "node_modules", "public"]
 }

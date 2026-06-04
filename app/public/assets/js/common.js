@@ -41,7 +41,7 @@ const MoveTo = (() => {
   const defaults = {
     tolerance: 0,
     duration: 1600,
-    easing: 'easeOutQuart',
+    easing: "easeOutQuart",
     container: window,
     callback() {},
   };
@@ -69,11 +69,11 @@ const MoveTo = (() => {
    */
   function mergeObject(obj1, obj2) {
     const obj3 = {};
-    Object.keys(obj1).forEach(propertyName => {
+    Object.keys(obj1).forEach((propertyName) => {
       obj3[propertyName] = obj1[propertyName];
     });
 
-    Object.keys(obj2).forEach(propertyName => {
+    Object.keys(obj2).forEach((propertyName) => {
       obj3[propertyName] = obj2[propertyName];
     });
     return obj3;
@@ -85,8 +85,8 @@ const MoveTo = (() => {
    * @return {string} the converted value
    */
   function kebabCase(val) {
-    return val.replace(/([A-Z])/g, $1 => {
-      return '-' + $1.toLowerCase();
+    return val.replace(/([A-Z])/g, ($1) => {
+      return "-" + $1.toLowerCase();
     });
   }
 
@@ -111,7 +111,7 @@ const MoveTo = (() => {
   function MoveTo(options = {}, easeFunctions = {}) {
     this.options = mergeObject(defaults, options);
     // eslint-disable-next-line object-curly-newline
-    this.easeFunctions = mergeObject({easeOutQuart}, easeFunctions);
+    this.easeFunctions = mergeObject({ easeOutQuart }, easeFunctions);
   }
 
   /**
@@ -120,34 +120,29 @@ const MoveTo = (() => {
    * @param  {function} callback Callback function
    * @return {function|void} unregister function
    */
-  MoveTo.prototype.registerTrigger = function(dom, callback) {
+  MoveTo.prototype.registerTrigger = function (dom, callback) {
     if (!dom) {
       return;
     }
 
-    const href = dom.getAttribute('href') || dom.getAttribute('data-target');
+    const href = dom.getAttribute("href") || dom.getAttribute("data-target");
     // The element to be scrolled
     const target =
-      href && href !== '#'
-        ? document.getElementById(href.substring(1))
-        : document.body;
-    const options = mergeObject(
-      this.options,
-      _getOptionsFromTriggerDom(dom, this.options),
-    );
+      href && href !== "#" ? document.getElementById(href.substring(1)) : document.body;
+    const options = mergeObject(this.options, _getOptionsFromTriggerDom(dom, this.options));
 
-    if (typeof callback === 'function') {
+    if (typeof callback === "function") {
       options.callback = callback;
     }
 
-    const listener = e => {
+    const listener = (e) => {
       e.preventDefault();
       this.move(target, options);
     };
 
-    dom.addEventListener('click', listener, false);
+    dom.addEventListener("click", listener, false);
 
-    return () => dom.removeEventListener('click', listener, false);
+    return () => dom.removeEventListener("click", listener, false);
   };
 
   /**
@@ -156,22 +151,21 @@ const MoveTo = (() => {
    * @param  {HTMLElement|number} target Target element to be scrolled or target position
    * @param  {object} options Custom options
    */
-  MoveTo.prototype.move = function(target, options = {}) {
+  MoveTo.prototype.move = function (target, options = {}) {
     if (target !== 0 && !target) {
       return;
     }
 
     options = mergeObject(this.options, options);
 
-    let distance =
-      typeof target === 'number' ? target : target.getBoundingClientRect().top;
+    let distance = typeof target === "number" ? target : target.getBoundingClientRect().top;
     const from = countScrollTop(options.container);
     let startTime = null;
     let lastYOffset;
     distance -= options.tolerance;
 
     // rAF loop
-    const loop = currentTime => {
+    const loop = (currentTime) => {
       const currentYOffset = countScrollTop(this.options.container);
 
       if (!startTime) {
@@ -193,12 +187,7 @@ const MoveTo = (() => {
       }
       lastYOffset = currentYOffset;
 
-      const val = this.easeFunctions[options.easing](
-        timeElapsed,
-        from,
-        distance,
-        options.duration,
-      );
+      const val = this.easeFunctions[options.easing](timeElapsed, from, distance, options.duration);
 
       options.container.scroll(0, val);
 
@@ -218,7 +207,7 @@ const MoveTo = (() => {
    * @param {string}   name Ease function name
    * @param {function} fn   Ease function
    */
-  MoveTo.prototype.addEaseFunction = function(name, fn) {
+  MoveTo.prototype.addEaseFunction = function (name, fn) {
     this.easeFunctions[name] = fn;
   };
 
@@ -232,7 +221,7 @@ const MoveTo = (() => {
     // eslint-disable-next-line object-curly-newline
     const domOptions = {};
 
-    Object.keys(options).forEach(key => {
+    Object.keys(options).forEach((key) => {
       const value = dom.getAttribute(`data-mt-${kebabCase(key)}`);
       if (value) {
         domOptions[key] = isNaN(value) ? value : parseInt(value, 10);
@@ -244,12 +233,12 @@ const MoveTo = (() => {
   return MoveTo;
 })();
 
-if (typeof module !== 'undefined') {
+if (typeof module !== "undefined") {
   module.exports = MoveTo;
 } else {
   window.MoveTo = MoveTo;
 }
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const easeFunctions = {
     easeInQuad(t, b, c, d) {
       t /= d;
@@ -260,16 +249,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return -c * t * (t - 2) + b;
     },
   };
-  const moveTo = new MoveTo(
-    {
-      ease: 'easeInQuad',
-    },
-    easeFunctions,
-  );
-  const triggers = document.getElementsByClassName('js-trigger');
+  const moveTo = new MoveTo({ ease: "easeInQuad" }, easeFunctions);
+  const triggers = document.getElementsByClassName("js-trigger");
   for (let i = 0; i < triggers.length; i++) {
     moveTo.registerTrigger(triggers[i]);
   }
 });
 
-console.log('☆ common.min.js ☆');
+console.log("☆ common.min.js ☆");

@@ -10,10 +10,6 @@
     "public/**/*.css"
   ],
   "ext": "ts,ejs,js,css,json",
-  "ignore": [
-    "dist",
-    "node_modules",
-    "public/uploads"
-  ],
+  "ignore": ["dist", "node_modules", "public/uploads"],
   "exec": "npm run build && node ./dist/bin/www.js"
 }
