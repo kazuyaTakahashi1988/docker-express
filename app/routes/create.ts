@@ -6,12 +6,12 @@ const sharp = require('sharp');
 const fs = require('fs');
 const { check, validationResult } = require('express-validator');
 
-const User = require('./../models').User;
-const Post = require('./../models').Post;
-const Category = require('./../models').Category;
-const Comment = require('./../models').Comment;
-const Reply = require('./../models').Reply;
-const Like = require('./../models').Like;
+const User = require('./../models').default.User;
+const Post = require('./../models').default.Post;
+const Category = require('./../models').default.Category;
+const Comment = require('./../models').default.Comment;
+const Reply = require('./../models').default.Reply;
+const Like = require('./../models').default.Like;
 
 /* --------------------------------------
     ▽ 画像UPロード ▽
@@ -93,7 +93,7 @@ router.post('/post', upload.single('image'), postValidRules, async (req, res, ne
     /* ▽ 保存画像ネーミング ▽  */
     const now = new Date();
     let saveImageName =
-        "PostImage-".concat(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
+        `PostImage-${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}${Math.random().toString(36).slice(-10)}.jpg`;
 
     /* ▽ 画像圧縮処理 ▽  */
     if (req.file) {
@@ -285,7 +285,7 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
     /* ▽ 保存画像ネーミング ▽  */
     const now = new Date();
     let saveImageName =
-        "CKEditorImage-".concat(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), Math.random().toString(36).slice(-10), '.jpg');
+        `CKEditorImage-${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}${Math.random().toString(36).slice(-10)}.jpg`;
 
     /* ▽ 画像圧縮処理 ▽  */
     if (req.file) {
@@ -310,4 +310,4 @@ router.post('/CKEditorUpload', upload.single('upload'), async (req, res, next) =
 
 });
 
-module.exports = router;
+export = router;

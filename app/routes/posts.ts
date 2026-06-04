@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-const User = require('./../models').User;
-const Post = require('./../models').Post;
-const Category = require('./../models').Category;
-const Comment = require('./../models').Comment;
-const Reply = require('./../models').Reply;
-const Like = require('./../models').Like;
+const User = require('./../models').default.User;
+const Post = require('./../models').default.Post;
+const Category = require('./../models').default.Category;
+const Comment = require('./../models').default.Comment;
+const Reply = require('./../models').default.Reply;
+const Like = require('./../models').default.Like;
 
 const perPage = 6; // 表示ページ数
 
@@ -129,4 +129,4 @@ router.get('/detail/:id', async (req, res, next) => {
 
 });
 
-module.exports = router;
+export = router;

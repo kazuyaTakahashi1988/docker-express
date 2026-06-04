@@ -9,7 +9,7 @@ const baseConfig = {
   logging: process.env.DB_LOGGING === 'true'
 };
 
-module.exports = {
+const config = {
   development: baseConfig,
   test: {
     ...baseConfig,
@@ -17,3 +17,5 @@ module.exports = {
   },
   production: baseConfig
 };
+
+export = config;
