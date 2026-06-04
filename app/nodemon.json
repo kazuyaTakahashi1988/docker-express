@@ -4,12 +4,10 @@
     "bin/**/*.ts",
     "config/**/*.ts",
     "models/**/*.ts",
-    "routes/**/*.ts",
-    "views/**/*.ejs",
-    "public/**/*.js",
-    "public/**/*.css"
+    "routes/**/*.ts"
   ],
-  "ext": "ts,ejs,js,css,json",
+  "ext": "ts,json",
   "ignore": ["dist", "node_modules", "public/uploads"],
-  "exec": "npm run build && node ./dist/bin/www.js"
+  "exec": "npm run build:dev && LIVE_RELOAD=true node ./dist/bin/www.js",
+  "delay": "200ms"
 }

@@ -6,6 +6,7 @@
 
 const createError = require("http-errors");
 const express = require("express");
+const fs = require("fs");
 const logger = require("morgan");
 const path = require("path");
 
@@ -20,6 +21,10 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const User = require("./models").default.User;
 const app = express();
+const isLiveReloadEnabled = process.env.LIVE_RELOAD === "true";
+const sourceRoot = process.cwd();
+const publicDir = isLiveReloadEnabled ? path.join(sourceRoot, "public") : path.join(__dirname, "public");
+const viewsDir = isLiveReloadEnabled ? path.join(sourceRoot, "views") : path.join(__dirname, "views");
 
 // use 認証関連 ミドルウェア
 app.use(express.json());
@@ -35,7 +40,131 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(publicDir));
+
+/* ---------------------------
+  ▽ ejs setup ▽
+--------------------------- */
+app.set("views", viewsDir);
+app.set("view engine", "ejs");
+app.set("view cache", !isLiveReloadEnabled);
+app.use(logger("dev"));
+
+if (isLiveReloadEnabled) {
+  const liveReloadClients = new Set<any>();
+  let reloadTimer: NodeJS.Timeout | undefined;
+
+  const sendReload = () => {
+    for (const client of liveReloadClients) {
+      client.write("event: reload\ndata: now\n\n");
+    }
+  };
+
+  const scheduleReload = () => {
+    if (reloadTimer) {
+      clearTimeout(reloadTimer);
+    }
+    reloadTimer = setTimeout(sendReload, 80);
+  };
+
+  app.get("/__live-reload/events", (req, res) => {
+    res.set({
+      "Cache-Control": "no-cache",
+      "Content-Type": "text/event-stream",
+      Connection: "keep-alive",
+    });
+    res.flushHeaders?.();
+    res.write("event: connected\ndata: ok\n\n");
+    liveReloadClients.add(res);
+    req.on("close", () => liveReloadClients.delete(res));
+  });
+
+  app.get("/__live-reload/client.js", (req, res) => {
+    res.type("application/javascript");
+    res.send(`
+      (() => {
+        const events = new EventSource("/__live-reload/events");
+        events.addEventListener("reload", () => window.location.reload());
+      })();
+    `);
+  });
+
+  app.use((req, res, next) => {
+    const originalSend = res.send;
+    res.send = function sendWithLiveReload(body) {
+      const contentType = String(res.getHeader("Content-Type") || "");
+      const looksLikeHtml =
+        typeof body === "string" && (contentType.includes("text/html") || /^\s*(<!doctype html|<html)/i.test(body));
+      if (looksLikeHtml && body.includes("</body>")) {
+        body = body.replace("</body>", '<script src="/__live-reload/client.js"></script></body>');
+      }
+      return originalSend.call(this, body);
+    };
+    next();
+  });
+
+  const watchedFiles = new Map<string, number>();
+  const watchExtensions = new Set([".css", ".ejs", ".js"]);
+  const ignoredDirs = new Set(["uploads"]);
+  const watchRoots = [viewsDir, path.join(publicDir, "assets")];
+
+  const scanFile = (filePath: string, seenFiles: Set<string>) => {
+    if (!watchExtensions.has(path.extname(filePath))) {
+      return false;
+    }
+
+    const modifiedAt = fs.statSync(filePath).mtimeMs;
+    const previousModifiedAt = watchedFiles.get(filePath);
+    watchedFiles.set(filePath, modifiedAt);
+    seenFiles.add(filePath);
+
+    return previousModifiedAt !== undefined && previousModifiedAt !== modifiedAt;
+  };
+
+  const scanDirectory = (directory: string, seenFiles: Set<string>) => {
+    let hasChanges = false;
+
+    if (!fs.existsSync(directory)) {
+      return hasChanges;
+    }
+
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const entryPath = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        if (!ignoredDirs.has(entry.name)) {
+          hasChanges = scanDirectory(entryPath, seenFiles) || hasChanges;
+        }
+      } else if (entry.isFile()) {
+        hasChanges = scanFile(entryPath, seenFiles) || hasChanges;
+      }
+    }
+
+    return hasChanges;
+  };
+
+  const scanLiveReloadFiles = () => {
+    const seenFiles = new Set<string>();
+    let hasChanges = false;
+
+    for (const root of watchRoots) {
+      hasChanges = scanDirectory(root, seenFiles) || hasChanges;
+    }
+
+    for (const filePath of watchedFiles.keys()) {
+      if (!seenFiles.has(filePath)) {
+        watchedFiles.delete(filePath);
+        hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      scheduleReload();
+    }
+  };
+
+  scanLiveReloadFiles();
+  setInterval(scanLiveReloadFiles, 250).unref();
+}
 
 /* ---------------------------
   ▽ Router ミドルウェア ▽
@@ -90,13 +219,6 @@ app.use("/posts", autoAuthMW, postsRouter);
 app.use("/likes", autoAuthMW, mustAuthMW, likesRouter);
 app.use("/create", autoAuthMW, mustAuthMW, createRouter);
 app.use("/dashboard", autoAuthMW, mustAuthMW, dashboardRouter);
-
-/* ---------------------------
-  ▽ ejs setup ▽
---------------------------- */
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
-app.use(logger("dev"));
 
 /* ------------------------------------------------
 /*
