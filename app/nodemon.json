@@ -4,12 +4,9 @@
     "bin/**/*.ts",
     "config/**/*.ts",
     "models/**/*.ts",
-    "routes/**/*.ts",
-    "views/**/*.ejs",
-    "public/**/*.js",
-    "public/**/*.css"
+    "routes/**/*.ts"
   ],
-  "ext": "ts,ejs,js,css,json",
+  "ext": "ts,json",
   "ignore": [
     "dist",
     "node_modules",

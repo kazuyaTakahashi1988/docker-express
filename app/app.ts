@@ -6,8 +6,11 @@
 
 const createError = require('http-errors');
 const express = require('express');
+const fs = require('fs');
 const logger = require('morgan');
 const path = require('path');
+const sourceRoot = path.resolve(__dirname, '..');
+const appRoot = fs.existsSync(path.join(sourceRoot, 'views')) ? sourceRoot : __dirname;
 
 // 認証関連 ミドルウェア
 const cookieParser = require('cookie-parser');
@@ -33,7 +36,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(appRoot, 'public')));
 
 /* ---------------------------
   ▽ Router ミドルウェア ▽
@@ -95,7 +98,7 @@ app.use('/dashboard', autoAuthMW, mustAuthMW, dashboardRouter);
 /* ---------------------------
   ▽ ejs setup ▽
 --------------------------- */
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(appRoot, 'views'));
 app.set('view engine', 'ejs');
 app.use(logger('dev'));
 

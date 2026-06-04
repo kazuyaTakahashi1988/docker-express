@@ -5,7 +5,7 @@ const baseConfig = {
   host: process.env.DB_HOST || 'mysql',
   port: Number(process.env.DB_PORT || 3306),
   dialect: process.env.DB_DIALECT || 'mysql',
-  timezone: process.env.TZ || 'Asia/Tokyo',
+  timezone: process.env.DB_TIMEZONE || '+09:00',
   logging: process.env.DB_LOGGING === 'true'
 };
 

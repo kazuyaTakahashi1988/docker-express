@@ -53,6 +53,7 @@ services:
       DB_USER: ${MYSQL_USER:-root}
       DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       DB_DIALECT: mysql
+      DB_TIMEZONE: ${DB_TIMEZONE:-+09:00}
       TZ: ${TZ:-Asia/Tokyo}
       SESSION_SECRET: ${SESSION_SECRET:-change-me-in-local-env}
       APP_KEY: ${APP_KEY:-change-me-in-local-env}
