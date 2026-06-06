@@ -249,7 +249,37 @@ gcloud artifacts docker tags list \
 
 `demo` tag が表示されれば、Cloud Run に渡す image の準備は完了です。
 
-### 6-5. `storage.objects.get` 権限エラーが出た場合
+### 6-5. 間違った branch で build & push した場合
+
+Artifact Registry の Docker tag は、repository で immutable tag を有効化していない限り、同じ tag を別の image digest に付け替えられます。今回の `${IMAGE}` は `:demo` tag なので、main branch で誤って push しても、通常は正しい branch に切り替えて同じ `gcloud builds submit app --tag "${IMAGE}"` を再実行すれば `demo` tag が正しい image を指すようになります。先に削除する必要はありません。
+
+```bash
+git switch codex/find-recommended-google-cloud-resources
+git branch --show-current
+git log -1 --oneline
+
+gcloud builds submit app --tag "${IMAGE}"
+
+gcloud artifacts docker tags list \
+  "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}"
+```
+
+その後、Cloud Run は image tag ではなく deploy 時点の image digest で revision を作るため、「7. Cloud Run にデプロイ」の `gcloud run deploy` をもう一度実行して、新しい revision を作成してください。
+
+間違って push した image をどうしても削除したい場合は、削除対象を取り違えないように digest を確認してから削除します。正しい branch で再 push した後に `${IMAGE}` を削除すると、今度は正しい `demo` tag 側を消してしまう可能性があるため注意してください。
+
+```bash
+gcloud artifacts docker images list \
+  "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}" \
+  --include-tags
+
+# 削除対象の DIGEST を確認してから実行します。
+gcloud artifacts docker images delete \
+  "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}@sha256:<DIGEST>" \
+  --quiet
+```
+
+### 6-6. `storage.objects.get` 権限エラーが出た場合
 
 `gcloud builds submit` は、まず source archive を Cloud Build 用の Cloud Storage bucket に置き、Cloud Build の実行サービスアカウントがその archive を読んで build します。次のようなエラーが出る場合、Cloud Build の実行サービスアカウントに source archive を読む権限が足りません。
 
@@ -273,7 +303,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${CLOUDBUILD_BUCKET}" \
   --role="roles/storage.objectViewer"
 ```
 
-### 6-6. Artifact Registry への push 権限エラーが出た場合
+### 6-7. Artifact Registry への push 権限エラーが出た場合
 
 Source archive の読み取りは通ったが、Artifact Registry への push で `Permission denied` や `denied: Permission` のようなエラーになる場合は、同じ build 実行サービスアカウントに Artifact Registry writer を付与してから再実行してください。
 
