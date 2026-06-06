@@ -114,22 +114,31 @@ gcloud artifacts repositories create "${REPOSITORY}" \
 
 勉強会デモ向けの最小構成例です。発表後は停止または削除してください。
 
+パスワードに `!` が含まれる場合、Bash では double quote (`"`) の中でも history expansion が働き、`bash: !xxx: event not found` になることがあります。Cloud Shell では次のように `read -rs` で変数へ入れてから実行すると、`!` を含むパスワードでも安全に扱えます。
+
 ```bash
+read -rs MYSQL_ROOT_PASSWORD
+echo
+read -rs DB_PASSWORD
+echo
+
 gcloud sql instances create "${INSTANCE}" \
   --database-version=MYSQL_8_4 \
   --region="${REGION}" \
   --tier=db-f1-micro \
   --storage-size=10GB \
   --availability-type=zonal \
-  --root-password="<ROOT_PASSWORD>"
+  --root-password="${MYSQL_ROOT_PASSWORD}"
 
 gcloud sql databases create "${DATABASE}" \
   --instance="${INSTANCE}"
 
 gcloud sql users create "${DB_USER}" \
   --instance="${INSTANCE}" \
-  --password="<DB_PASSWORD>"
+  --password="${DB_PASSWORD}"
 ```
+
+短いデモで直接パスワードを書く場合は、double quote ではなく single quote で囲んでください。例: `--root-password='your!strong%password'`。ただし、コマンド履歴に残りやすいため、上の `read -rs` 方式を推奨します。
 
 ## 4. Cloud Storage bucket を作成
 
@@ -153,7 +162,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
 ## 5. Secret Manager に秘密情報を登録
 
 ```bash
-printf '<DB_PASSWORD>' | gcloud secrets create DB_PASSWORD --data-file=-
+printf '%s' "${DB_PASSWORD}" | gcloud secrets create DB_PASSWORD --data-file=-
 openssl rand -base64 32 | gcloud secrets create SESSION_SECRET --data-file=-
 openssl rand -base64 32 | gcloud secrets create APP_KEY --data-file=-
 ```
@@ -161,7 +170,7 @@ openssl rand -base64 32 | gcloud secrets create APP_KEY --data-file=-
 作成済み secret の値を更新する場合は、次のように新しい version を追加します。
 
 ```bash
-printf '<NEW_DB_PASSWORD>' | gcloud secrets versions add DB_PASSWORD --data-file=-
+printf '%s' "${DB_PASSWORD}" | gcloud secrets versions add DB_PASSWORD --data-file=-
 ```
 
 Cloud Run から secret と Cloud SQL を使えるように、実行サービスアカウントへ権限を付与します。
