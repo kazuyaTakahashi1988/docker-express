@@ -190,8 +190,77 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 
 ## 6. Docker image を build & push
 
+Cloud Shell 上で作業している場合、ローカル PC 上の「起動済みコンテナ」を直接 Artifact Registry に送るのではなく、Cloud Shell にあるソースコードと `app/Dockerfile` から Cloud Build で Docker image を作り、その image を Artifact Registry に push します。
+
+Artifact Registry に登録する image 名は、`<REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/<IMAGE_NAME>:<TAG>` の形です。この手順では、前提値で定義した `${IMAGE}`、つまり `asia-northeast1-docker.pkg.dev/project-fa900d56-8f52-4a54-867/dockerexpress/dockerexpress:demo` に push します。
+
+### 6-1. Cloud Shell にソースコードを用意する
+
+Cloud Shell のターミナルで、まずこの README と `app/` ディレクトリがあるリポジトリの root に移動してください。
+
+```bash
+cd ~/docker-express
+```
+
+まだ Cloud Shell にソースコードがない場合は、次のどちらかで用意します。
+
+- GitHub などに push 済みなら、Cloud Shell で `git clone <YOUR_REPOSITORY_URL>` します。
+- ローカル PC にしかない場合は、Cloud Shell のメニューからファイルをアップロードするか、いったん GitHub などに push してから Cloud Shell で clone します。
+
+リポジトリ root にいることを確認します。
+
+```bash
+pwd
+test -f app/Dockerfile && test -f app/package.json && echo "OK: app build context exists"
+```
+
+### 6-2. 変数と Artifact Registry repository を確認する
+
+```bash
+gcloud config set project "${PROJECT_ID}"
+
+printf 'IMAGE=%s\n' "${IMAGE}"
+
+gcloud artifacts repositories describe "${REPOSITORY}" \
+  --location="${REGION}"
+```
+
+`gcloud artifacts repositories describe` が `NOT_FOUND` になる場合は、「2. Artifact Registry を作成」を先に実行してください。
+
+### 6-3. Cloud Build で build して Artifact Registry に push する
+
+このリポジトリでは Dockerfile が `app/Dockerfile` にあり、Docker build context も `app/` です。そのため、repo root から次を実行します。
+
 ```bash
 gcloud builds submit app --tag "${IMAGE}"
+```
+
+このコマンドは、`app/` ディレクトリを Cloud Build にアップロードし、`app/Dockerfile` を使って image を build し、成功した image を `${IMAGE}` として Artifact Registry に push します。ローカル PC の Docker image や起動中コンテナは使いません。
+
+### 6-4. push できたことを確認する
+
+```bash
+gcloud artifacts docker images list \
+  "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}"
+
+gcloud artifacts docker tags list \
+  "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}"
+```
+
+`demo` tag が表示されれば、Cloud Run に渡す image の準備は完了です。
+
+### 6-5. 権限エラーが出た場合
+
+Cloud Build のサービスアカウントに Artifact Registry への書き込み権限がない project では、`Permission denied` や `denied: Permission` のようなエラーになることがあります。その場合は、Cloud Build サービスアカウントに Artifact Registry writer を付与してから再実行してください。
+
+```bash
+PROJECT_NUMBER="$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')"
+CLOUD_BUILD_SERVICE_ACCOUNT="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
+
+gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
+  --location="${REGION}" \
+  --member="serviceAccount:${CLOUD_BUILD_SERVICE_ACCOUNT}" \
+  --role="roles/artifactregistry.writer"
 ```
 
 ## 7. Cloud Run にデプロイ
