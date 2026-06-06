@@ -77,6 +77,9 @@ DATABASE="express_db"
 DB_USER="dockerexpress_user"
 BUCKET="${PROJECT_ID}-dockerexpress-uploads"
 UPLOADS_BASE_URL="https://storage.googleapis.com/${BUCKET}/uploads"
+SITE_HOST="https://dockerexpress-720570741774.asia-northeast1.run.app"
+DEFAULT_OGP_IMAGE_URL="https://storage.googleapis.com/${BUCKET}/images/common/ogp.png"
+BUILD_PUSH_COUNT="1"
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:demo"
 CONNECTION_NAME="${PROJECT_ID}:${REGION}:${INSTANCE}"
 ```
@@ -86,7 +89,9 @@ CONNECTION_NAME="${PROJECT_ID}:${REGION}:${INSTANCE}"
 - Docker image の build 時に `npm run build` を実行し、Cloud Run の起動コマンド `npm start` が参照する `dist/bin/www.js` を image 内に生成します。
 - `DB_SOCKET_PATH=/cloudsql/<INSTANCE_CONNECTION_NAME>` を設定した場合、Sequelize が Cloud SQL の Unix socket で MySQL に接続します。
 - `GCS_BUCKET_NAME` を設定した場合、アップロード画像をローカルファイルシステムではなく Cloud Storage の `uploads/` prefix に保存します。
-- `UPLOADS_BASE_URL` を設定した場合、投稿画像・プロフィール画像・CKEditor 画像の URL に Cloud Storage の公開 URL を使います。未設定時は `/uploads/<fileName>` のアプリ経由 URL に fallback します。
+- `UPLOADS_BASE_URL` を設定した場合、投稿画像・プロフィール画像・CKEditor 画像の URL に Cloud Storage の公開 URL を使います。未設定でも `GCS_BUCKET_NAME` があれば `https://storage.googleapis.com/<bucket>/<prefix>` を使い、ローカルでは `/uploads/<fileName>` に fallback します。
+- `SITE_HOST` と `DEFAULT_OGP_IMAGE_URL` で OGP の URL を Cloud Run / Cloud Storage に合わせられます。
+- `BUILD_PUSH_COUNT` を deploy のたびに増やすと、TOP ページの browser console でどの build & push が反映されたか確認できます。
 
 ## 1. Google Cloud の API を有効化
 
@@ -241,6 +246,9 @@ gcloud artifacts repositories describe "${REPOSITORY}" \
 このリポジトリでは Dockerfile が `app/Dockerfile` にあり、Docker build context も `app/` です。そのため、repo root から次を実行します。
 
 ```bash
+# 例: 反映確認用に build & push のたびに数値を増やします。
+BUILD_PUSH_COUNT="2"
+
 gcloud builds submit app --tag "${IMAGE}"
 ```
 
@@ -340,7 +348,7 @@ gcloud run deploy "${SERVICE}" \
   --allow-unauthenticated \
   --port 3000 \
   --add-cloudsql-instances "${CONNECTION_NAME}" \
-  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},UPLOAD_MAX_BYTES=5242880" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},SITE_HOST=${SITE_HOST},DEFAULT_OGP_IMAGE_URL=${DEFAULT_OGP_IMAGE_URL},BUILD_PUSH_COUNT=${BUILD_PUSH_COUNT},UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --min-instances 0 \
   --max-instances 1
@@ -351,7 +359,7 @@ gcloud run deploy "${SERVICE}" \
 ```bash
 gcloud run services update "${SERVICE}" \
   --region "${REGION}" \
-  --update-env-vars "UPLOADS_BASE_URL=${UPLOADS_BASE_URL}"
+  --update-env-vars "UPLOADS_BASE_URL=${UPLOADS_BASE_URL},SITE_HOST=${SITE_HOST},DEFAULT_OGP_IMAGE_URL=${DEFAULT_OGP_IMAGE_URL},BUILD_PUSH_COUNT=${BUILD_PUSH_COUNT}"
 ```
 
 ## 8. DB 初期化: phpMyAdmin dump import または Cloud Run Jobs
@@ -395,7 +403,7 @@ gcloud run jobs create dockerexpress-migrate \
   --image "${IMAGE}" \
   --region "${REGION}" \
   --set-cloudsql-instances "${CONNECTION_NAME}" \
-  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},UPLOAD_MAX_BYTES=5242880" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},SITE_HOST=${SITE_HOST},DEFAULT_OGP_IMAGE_URL=${DEFAULT_OGP_IMAGE_URL},BUILD_PUSH_COUNT=${BUILD_PUSH_COUNT},UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --command npm \
   --args run,migrate
@@ -412,7 +420,7 @@ gcloud run jobs create dockerexpress-seed \
   --image "${IMAGE}" \
   --region "${REGION}" \
   --set-cloudsql-instances "${CONNECTION_NAME}" \
-  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},UPLOAD_MAX_BYTES=5242880" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},SITE_HOST=${SITE_HOST},DEFAULT_OGP_IMAGE_URL=${DEFAULT_OGP_IMAGE_URL},BUILD_PUSH_COUNT=${BUILD_PUSH_COUNT},UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --command npm \
   --args run,seed

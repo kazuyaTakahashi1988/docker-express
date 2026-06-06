@@ -66,6 +66,9 @@ let args = {
 
     <%- include("./_inc/load-body-footer",{ args, user }) %>
     <%- include("./_inc/load-body-js",{ args, user }) %>
+    <script>
+      console.log("dockerexpress build & push count:", "<%= buildPushCount %>");
+    </script>
   </body>
 
 </html>

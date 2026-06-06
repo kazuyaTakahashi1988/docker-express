@@ -58,6 +58,12 @@ app.use(passport.session());
 app.use(cookieParser());
 app.use((req, res, next) => {
   res.locals.uploadUrl = getStoredImageUrl;
+  res.locals.siteHost =
+    process.env.SITE_HOST || "https://dockerexpress-720570741774.asia-northeast1.run.app";
+  res.locals.defaultOgpImageUrl =
+    process.env.DEFAULT_OGP_IMAGE_URL ||
+    "https://storage.googleapis.com/project-fa900d56-8f52-4a54-867-dockerexpress-uploads/images/common/ogp.png";
+  res.locals.buildPushCount = process.env.BUILD_PUSH_COUNT || "unknown";
   next();
 });
 app.use(express.static(publicDir));

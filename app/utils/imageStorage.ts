@@ -4,9 +4,20 @@ import * as path from "path";
 const localUploadDir = path.join(process.cwd(), "public", "uploads");
 const uploadPrefix = process.env.GCS_UPLOAD_PREFIX || "uploads";
 
-const getUploadsBaseUrl = () => (process.env.UPLOADS_BASE_URL || "/uploads").replace(/\/$/, "");
-
 const getBucketName = () => process.env.GCS_BUCKET_NAME || "";
+const getNormalizedUploadPrefix = () => uploadPrefix.replace(/\/$/, "");
+const getUploadsBaseUrl = () => {
+  if (process.env.UPLOADS_BASE_URL) {
+    return process.env.UPLOADS_BASE_URL.replace(/\/$/, "");
+  }
+
+  const bucketName = getBucketName();
+  if (bucketName) {
+    return `https://storage.googleapis.com/${bucketName}/${getNormalizedUploadPrefix()}`;
+  }
+
+  return "/uploads";
+};
 const isCloudStorageEnabled = () => Boolean(getBucketName());
 
 const encodeObjectName = (objectName: string) =>
@@ -15,7 +26,7 @@ const encodeObjectName = (objectName: string) =>
     .map((part) => encodeURIComponent(part))
     .join("/");
 
-const getUploadObjectName = (fileName: string) => `${uploadPrefix.replace(/\/$/, "")}/${fileName}`;
+const getUploadObjectName = (fileName: string) => `${getNormalizedUploadPrefix()}/${fileName}`;
 
 const getAccessToken = async () => {
   const response = await fetch(

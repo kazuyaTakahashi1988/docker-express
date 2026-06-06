@@ -64,6 +64,9 @@ services:
       GCS_BUCKET_NAME: ${GCS_BUCKET_NAME:-}
       GCS_UPLOAD_PREFIX: ${GCS_UPLOAD_PREFIX:-uploads}
       UPLOADS_BASE_URL: ${UPLOADS_BASE_URL:-/uploads}
+      SITE_HOST: ${SITE_HOST:-https://dockerexpress-720570741774.asia-northeast1.run.app}
+      DEFAULT_OGP_IMAGE_URL: ${DEFAULT_OGP_IMAGE_URL:-https://storage.googleapis.com/project-fa900d56-8f52-4a54-867-dockerexpress-uploads/images/common/ogp.png}
+      BUILD_PUSH_COUNT: ${BUILD_PUSH_COUNT:-local}
       UPLOAD_MAX_BYTES: ${UPLOAD_MAX_BYTES:-5242880}
     ports:
       - "${APP_PORT:-3000}:3000"
