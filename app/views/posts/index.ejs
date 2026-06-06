@@ -42,7 +42,7 @@ let args = {
                 ` %>
               </div>
               <h5 class="pTitle my-3 text-left"><b>Q.&nbsp;&nbsp;</b><b><%= post.title %></b></h5>
-              <p class="pContent text-left"><%= post.content.replace(/(<([^>]+)>)/gi, "").slice(0, 150) %></p>
+              <p class="pContent text-left"><%= plainText(post.content, 150) %></p>
               <p><span class="btn btn-primary">もっと見る »</span></p>
             </a>
           </div>

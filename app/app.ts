@@ -42,6 +42,47 @@ const viewsDir = isLiveReloadEnabled
   : path.join(__dirname, "views");
 const liveReloadServerId = `${Date.now()}-${process.pid}`;
 
+const decodeHtmlEntity = (entity: string) => {
+  const namedEntities: Record<string, string> = {
+    "&amp;": "&",
+    "&lt;": "<",
+    "&gt;": ">",
+    "&quot;": '"',
+    "&#39;": "'",
+    "&apos;": "'",
+  };
+  const normalizedEntity = entity.toLowerCase();
+
+  if (
+    normalizedEntity === "&nbsp;" ||
+    normalizedEntity === "&#160;" ||
+    normalizedEntity === "&#xa0;"
+  ) {
+    return " ";
+  }
+
+  return namedEntities[normalizedEntity] || "";
+};
+
+const toPlainText = (html: unknown, maxLength?: number) => {
+  const text = String(html || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&(?:[a-zA-Z][a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+);/g, decodeHtmlEntity)
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return typeof maxLength === "number" ? text.slice(0, maxLength) : text;
+};
+
+const formatDateTime = (value: unknown) => {
+  const date = new Date(value as string | number | Date);
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${hours}:${minutes}`;
+};
+
 // use 認証関連 ミドルウェア
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -58,6 +99,8 @@ app.use(passport.session());
 app.use(cookieParser());
 app.use((req, res, next) => {
   res.locals.uploadUrl = getStoredImageUrl;
+  res.locals.plainText = toPlainText;
+  res.locals.formatDateTime = formatDateTime;
   res.locals.siteHost =
     process.env.SITE_HOST || "https://dockerexpress-720570741774.asia-northeast1.run.app";
   res.locals.defaultOgpImageUrl =
