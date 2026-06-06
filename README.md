@@ -249,19 +249,45 @@ gcloud artifacts docker tags list \
 
 `demo` tag が表示されれば、Cloud Run に渡す image の準備は完了です。
 
-### 6-5. 権限エラーが出た場合
+### 6-5. `storage.objects.get` 権限エラーが出た場合
 
-Cloud Build のサービスアカウントに Artifact Registry への書き込み権限がない project では、`Permission denied` や `denied: Permission` のようなエラーになることがあります。その場合は、Cloud Build サービスアカウントに Artifact Registry writer を付与してから再実行してください。
+`gcloud builds submit` は、まず source archive を Cloud Build 用の Cloud Storage bucket に置き、Cloud Build の実行サービスアカウントがその archive を読んで build します。次のようなエラーが出る場合、Cloud Build の実行サービスアカウントに source archive を読む権限が足りません。
+
+```text
+does not have storage.objects.get access to the Google Cloud Storage object
+```
+
+最近の project では、Cloud Build が legacy Cloud Build service account ではなく Compute Engine default service account (`<PROJECT_NUMBER>-compute@developer.gserviceaccount.com`) で実行されることがあります。エラーメッセージに `720570741774-compute@developer.gserviceaccount.com` のような service account が出ている場合は、次を実行してから `gcloud builds submit app --tag "${IMAGE}"` を再実行してください。
 
 ```bash
 PROJECT_NUMBER="$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')"
-CLOUD_BUILD_SERVICE_ACCOUNT="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
+BUILD_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+CLOUDBUILD_BUCKET="${PROJECT_ID}_cloudbuild"
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${BUILD_SERVICE_ACCOUNT}" \
+  --role="roles/cloudbuild.builds.builder"
+
+gcloud storage buckets add-iam-policy-binding "gs://${CLOUDBUILD_BUCKET}" \
+  --member="serviceAccount:${BUILD_SERVICE_ACCOUNT}" \
+  --role="roles/storage.objectViewer"
+```
+
+### 6-6. Artifact Registry への push 権限エラーが出た場合
+
+Source archive の読み取りは通ったが、Artifact Registry への push で `Permission denied` や `denied: Permission` のようなエラーになる場合は、同じ build 実行サービスアカウントに Artifact Registry writer を付与してから再実行してください。
+
+```bash
+PROJECT_NUMBER="$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')"
+BUILD_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
 gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
   --location="${REGION}" \
-  --member="serviceAccount:${CLOUD_BUILD_SERVICE_ACCOUNT}" \
+  --member="serviceAccount:${BUILD_SERVICE_ACCOUNT}" \
   --role="roles/artifactregistry.writer"
 ```
+
+エラーに `${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com` のような legacy Cloud Build service account が表示されている場合は、上の `BUILD_SERVICE_ACCOUNT` をそのメールアドレスに置き換えてください。
 
 ## 7. Cloud Run にデプロイ
 
