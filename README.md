@@ -321,6 +321,8 @@ gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
 
 ## 7. Cloud Run にデプロイ
 
+Cloud Run service では `PORT` は予約済み環境変数で、Cloud Run が自動でコンテナへ注入します。そのため `--set-env-vars` には `PORT=3000` を入れず、listen させたい port は `--port 3000` で指定します。
+
 ```bash
 gcloud run deploy "${SERVICE}" \
   --image "${IMAGE}" \
@@ -329,7 +331,7 @@ gcloud run deploy "${SERVICE}" \
   --allow-unauthenticated \
   --port 3000 \
   --add-cloudsql-instances "${CONNECTION_NAME}" \
-  --set-env-vars "NODE_ENV=production,PORT=3000,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --min-instances 0 \
   --max-instances 1
