@@ -337,15 +337,47 @@ gcloud run deploy "${SERVICE}" \
   --max-instances 1
 ```
 
-## 8. migration / seed を Cloud Run Jobs で実行
+## 8. DB 初期化: phpMyAdmin dump import または Cloud Run Jobs
 
-migration job を作成して実行します。
+勉強会デモなら、ローカルの phpMyAdmin から export した SQL dump を Cloud SQL に import する方法でも妥当です。Cloud Run Jobs で migration / seed を実行するより手順の見通しがよい場合は、まずこの方法で進めてください。
+
+### 方法 A: phpMyAdmin の SQL dump を Cloud SQL に import する
+
+ローカルの phpMyAdmin で `express_db` を選び、`エクスポート` から SQL 形式で dump を作成します。Cloud SQL に import する dump には MySQL user や `mysql` system database を含めず、アプリ用 database の table / data だけを含めてください。すでに Cloud SQL 側に table がある場合は、export 時に `DROP TABLE / VIEW / PROCEDURE / FUNCTION / EVENT / TRIGGER コマンドを追加する` 相当の option を有効にするか、Cloud SQL 側の database を作り直してから import します。
+
+Cloud Shell に dump file をアップロードしたら、例として `express_db.sql` という file 名で次を実行します。
+
+```bash
+IMPORT_FILE="express_db.sql"
+IMPORT_OBJECT="db-import/${IMPORT_FILE}"
+
+gcloud storage cp "${IMPORT_FILE}" "gs://${BUCKET}/${IMPORT_OBJECT}"
+
+CLOUD_SQL_SERVICE_ACCOUNT="$(gcloud sql instances describe "${INSTANCE}" --format='value(serviceAccountEmailAddress)')"
+
+gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
+  --member="serviceAccount:${CLOUD_SQL_SERVICE_ACCOUNT}" \
+  --role="roles/storage.objectAdmin"
+
+gcloud sql import sql "${INSTANCE}" "gs://${BUCKET}/${IMPORT_OBJECT}" \
+  --database="${DATABASE}"
+```
+
+import が成功したら、必要に応じて import 用 SQL dump を削除します。
+
+```bash
+gcloud storage rm "gs://${BUCKET}/${IMPORT_OBJECT}"
+```
+
+### 方法 B: Cloud Run Jobs で migration / seed を実行する
+
+Cloud Run Jobs で実行する場合、Cloud Run service の `--add-cloudsql-instances` ではなく、Cloud Run Jobs では `--set-cloudsql-instances` を使います。migration job を作成して実行します。
 
 ```bash
 gcloud run jobs create dockerexpress-migrate \
   --image "${IMAGE}" \
   --region "${REGION}" \
-  --add-cloudsql-instances "${CONNECTION_NAME}" \
+  --set-cloudsql-instances "${CONNECTION_NAME}" \
   --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --command npm \
@@ -362,7 +394,7 @@ seed job も同じ image で作成できます。
 gcloud run jobs create dockerexpress-seed \
   --image "${IMAGE}" \
   --region "${REGION}" \
-  --add-cloudsql-instances "${CONNECTION_NAME}" \
+  --set-cloudsql-instances "${CONNECTION_NAME}" \
   --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --command npm \
