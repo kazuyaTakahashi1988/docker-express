@@ -114,16 +114,19 @@ gcloud artifacts repositories create "${REPOSITORY}" \
 
 勉強会デモ向けの最小構成例です。発表後は停止または削除してください。
 
+MySQL 8.4 は edition を省略すると Cloud SQL Enterprise Plus として作成されますが、`db-f1-micro` は Enterprise Plus では使えません。勉強会デモで安価な shared-core の `db-f1-micro` を使うため、ここでは `--edition=ENTERPRISE` を明示します。
+
 パスワードに `!` が含まれる場合、Bash では double quote (`"`) の中でも history expansion が働き、`bash: !xxx: event not found` になることがあります。Cloud Shell では次のように `read -rs` で変数へ入れてから実行すると、`!` を含むパスワードでも安全に扱えます。
 
 ```bash
-read -rs MYSQL_ROOT_PASSWORD
+read -rsp "Cloud SQL root password: " MYSQL_ROOT_PASSWORD
 echo
-read -rs DB_PASSWORD
+read -rsp "Application DB user password: " DB_PASSWORD
 echo
 
 gcloud sql instances create "${INSTANCE}" \
   --database-version=MYSQL_8_4 \
+  --edition=ENTERPRISE \
   --region="${REGION}" \
   --tier=db-f1-micro \
   --storage-size=10GB \
