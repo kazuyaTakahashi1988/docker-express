@@ -1,22 +1,24 @@
-# 必要ローカル開発環境
+# ローカル開発環境
 
-- Docker v29.5.2 以降
-- Docker Compose v5.1.4 以降<br>
+- Docker v29.5.2 以降推奨
+- Docker Compose v5.1.4 以降推奨<br>
   <sub>※ コンテナ内：Node.js 24 LTS 系を使用（`node:24-alpine`）</sub><br>
   <sub>※ コンテナ内：MySQL 8.4 LTS 系を使用（`mysql:8.4`）</sub>
-<br>
+  <br>
 
 # 初回セットアップ
 
 compose.yaml ファイルがある場所でターミナルを開き、以下のコマンドを叩く　　
 
 <sub>※ ポート番号は　80　/　3000　をそれぞれ使用</sub>
+
 ```bash
 cp .env.example .env
 
 docker compose build
 docker compose up -d
 ```
+
 上記コマンド成功後、ローカルフォルダ `app` 内に `dist` & `node_modules` フォルダが自動生成される
 <br>
 <sub>（裏でコンパイルおよびシンクが走っているため2~3分、要待ち）</sub>
@@ -31,6 +33,7 @@ docker compose up -d
 docker compose exec dockerexpress npm run migrate
 docker compose exec dockerexpress npm run seed
 ```
+
 ↓↓↓↓↓
 <br>
 
@@ -39,7 +42,7 @@ docker compose exec dockerexpress npm run seed
 - アプリ： <http://localhost:3000>
 - phpMyAdmin： <http://localhost:8080><br>
   <sub>※ phpMyAdmin はアイパス『 root 』でログイン可</sub>
-  
+
 <br>
 
 ## アプリが開けない場合、追加で以下のコマンドを叩く
