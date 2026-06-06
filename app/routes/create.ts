@@ -6,7 +6,7 @@ const router = express.Router();
 import multer from "multer";
 import sharp from "sharp";
 import { check, validationResult } from "express-validator";
-import { createUploadMiddleware, saveImageBuffer } from "../utils/imageStorage";
+import { createUploadMiddleware, getStoredImageUrl, saveImageBuffer } from "../utils/imageStorage";
 
 const User = db.User;
 const Post = db.Post;
@@ -234,7 +234,7 @@ router.post("/CKEditorUpload", upload.single("upload"), async (req, res) => {
 
   /* ▽ ckeditor.jsに返却するデータを生成する ▽ */
   const CKEditorFuncNum = req.query.CKEditorFuncNum;
-  const imagePath = `/uploads/${saveImageName}`;
+  const imagePath = saveImageName ? getStoredImageUrl(saveImageName) : "";
   const sendText = `<script>window.parent.CKEDITOR.tools.callFunction(${CKEditorFuncNum}, '${imagePath}', 'アップロード成功')</script>`;
 
   /* ▽ HTMLを返す ▽ */

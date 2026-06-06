@@ -76,6 +76,7 @@ INSTANCE="dockerexpress-mysql"
 DATABASE="express_db"
 DB_USER="dockerexpress_user"
 BUCKET="${PROJECT_ID}-dockerexpress-uploads"
+UPLOADS_BASE_URL="https://storage.googleapis.com/${BUCKET}/uploads"
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:demo"
 CONNECTION_NAME="${PROJECT_ID}:${REGION}:${INSTANCE}"
 ```
@@ -85,7 +86,7 @@ CONNECTION_NAME="${PROJECT_ID}:${REGION}:${INSTANCE}"
 - Docker image の build 時に `npm run build` を実行し、Cloud Run の起動コマンド `npm start` が参照する `dist/bin/www.js` を image 内に生成します。
 - `DB_SOCKET_PATH=/cloudsql/<INSTANCE_CONNECTION_NAME>` を設定した場合、Sequelize が Cloud SQL の Unix socket で MySQL に接続します。
 - `GCS_BUCKET_NAME` を設定した場合、アップロード画像をローカルファイルシステムではなく Cloud Storage の `uploads/` prefix に保存します。
-- `/uploads/<fileName>` へのアクセス時、Cloud Storage 有効時はアプリが Cloud Storage から画像を取得して返します。bucket を public にしなくても、Cloud Run のサービスアカウントに権限があれば表示できます。
+- `UPLOADS_BASE_URL` を設定した場合、投稿画像・プロフィール画像・CKEditor 画像の URL に Cloud Storage の公開 URL を使います。未設定時は `/uploads/<fileName>` のアプリ経由 URL に fallback します。
 
 ## 1. Google Cloud の API を有効化
 
@@ -160,6 +161,14 @@ RUN_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
   --member="serviceAccount:${RUN_SERVICE_ACCOUNT}" \
   --role="roles/storage.objectAdmin"
+```
+
+このデモアプリではアップロード画像をブラウザから直接表示できるよう、`uploads/` 配下の object を public read にします。公開 Q&A サイトの投稿画像として見せる前提の設定です。
+
+```bash
+gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
+  --member="allUsers" \
+  --role="roles/storage.objectViewer"
 ```
 
 ## 5. Secret Manager に秘密情報を登録
@@ -331,10 +340,18 @@ gcloud run deploy "${SERVICE}" \
   --allow-unauthenticated \
   --port 3000 \
   --add-cloudsql-instances "${CONNECTION_NAME}" \
-  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --min-instances 0 \
   --max-instances 1
+```
+
+既存の Cloud Run service に環境変数だけ追加したい場合は、次のように更新できます。ただし、今回の `uploadUrl()` 対応コードを反映するには、正しい branch で image を build & push し直してから deploy してください。
+
+```bash
+gcloud run services update "${SERVICE}" \
+  --region "${REGION}" \
+  --update-env-vars "UPLOADS_BASE_URL=${UPLOADS_BASE_URL}"
 ```
 
 ## 8. DB 初期化: phpMyAdmin dump import または Cloud Run Jobs
@@ -378,7 +395,7 @@ gcloud run jobs create dockerexpress-migrate \
   --image "${IMAGE}" \
   --region "${REGION}" \
   --set-cloudsql-instances "${CONNECTION_NAME}" \
-  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --command npm \
   --args run,migrate
@@ -395,7 +412,7 @@ gcloud run jobs create dockerexpress-seed \
   --image "${IMAGE}" \
   --region "${REGION}" \
   --set-cloudsql-instances "${CONNECTION_NAME}" \
-  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOADS_BASE_URL=${UPLOADS_BASE_URL},UPLOAD_MAX_BYTES=5242880" \
   --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
   --command npm \
   --args run,seed

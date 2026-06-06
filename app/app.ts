@@ -24,7 +24,11 @@ import dashboardRouter from "./routes/dashboard";
 import indexRouter from "./routes/index";
 import likesRouter from "./routes/likes";
 import postsRouter from "./routes/posts";
-import { fetchStoredImage } from "./utils/imageStorage";
+import {
+  fetchStoredImage,
+  getStoredImageUrl,
+  shouldRedirectStoredImageRequests,
+} from "./utils/imageStorage";
 
 const User = db.User;
 const app = express();
@@ -52,9 +56,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
+app.use((req, res, next) => {
+  res.locals.uploadUrl = getStoredImageUrl;
+  next();
+});
 app.use(express.static(publicDir));
 app.get("/uploads/:fileName", async (req, res, next) => {
   try {
+    if (shouldRedirectStoredImageRequests()) {
+      return res.redirect(302, getStoredImageUrl(req.params.fileName));
+    }
+
     const image = await fetchStoredImage(req.params.fileName);
     if (image === undefined) {
       return next();

@@ -4,6 +4,8 @@ import * as path from "path";
 const localUploadDir = path.join(process.cwd(), "public", "uploads");
 const uploadPrefix = process.env.GCS_UPLOAD_PREFIX || "uploads";
 
+const getUploadsBaseUrl = () => (process.env.UPLOADS_BASE_URL || "/uploads").replace(/\/$/, "");
+
 const getBucketName = () => process.env.GCS_BUCKET_NAME || "";
 const isCloudStorageEnabled = () => Boolean(getBucketName());
 
@@ -47,6 +49,13 @@ export const createUploadMiddleware = (multer: {
     limits: { fileSize: Number(process.env.UPLOAD_MAX_BYTES || 5 * 1024 * 1024) },
   });
 };
+
+export const getStoredImageUrl = (fileName: string) => {
+  const baseUrl = getUploadsBaseUrl();
+  return `${baseUrl}/${encodeURIComponent(fileName)}`;
+};
+
+export const shouldRedirectStoredImageRequests = () => /^https?:\/\//.test(getUploadsBaseUrl());
 
 export const saveImageBuffer = async (fileName: string, buffer: Buffer) => {
   if (!isCloudStorageEnabled()) {

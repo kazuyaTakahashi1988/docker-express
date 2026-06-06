@@ -11,7 +11,7 @@
           <% if(user){ %>
             <%- user.image && `<li class="nav-item ml-2">
               <a class="nav-link nav-icon" aria-current="page" href="/dashboard/">
-                <img src="/uploads/${user.image}">
+                <img src="${uploadUrl(user.image)}">
               </a>
             </li>` %>
             <li class="nav-item ml-2">
