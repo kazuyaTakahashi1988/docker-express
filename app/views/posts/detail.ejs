@@ -58,7 +58,7 @@ let args = {
           <div></div>
           <%
           let date = new Date(post.createdAt);
-          const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",date.getHours(),":",date.getMinutes());
+          const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",String(date.getHours()).padStart(2, "0"),":",String(date.getMinutes()).padStart(2, "0"));
           %>
           <div>
             <%- post.User.image && `<a href="/posts/user/${post.User.id}" class="icon"><img src="/uploads/${post.User.image}"></a>` %><span class="text3"><small><%- TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
@@ -77,7 +77,7 @@ let args = {
               </a></div>
             <%
             let date = new Date(comment.createdAt);
-            const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",date.getHours(),":",date.getMinutes());
+            const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",String(date.getHours()).padStart(2, "0"),":",String(date.getMinutes()).padStart(2, "0"));
             %>
             <div><span class="text3"><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
           </div>
@@ -90,7 +90,7 @@ let args = {
                 <div><a href="/posts/user/<%= Reply.User.id %>"><small><span class="text-secondary">ユーザー：</span><span class=""><%= Reply.User.name %></span></small></a></div>
                 <%
                 let date = new Date(Reply.createdAt);
-                const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",date.getHours(),":",date.getMinutes());
+                const TIME = "".concat(date.getFullYear(),"年",date.getMonth() + 1,"月",date.getDate(),"日 ",String(date.getHours()).padStart(2, "0"),":",String(date.getMinutes()).padStart(2, "0"));
                 %>
                 <div><span><small><%= TIME %></small></span><span class="thumbup"><i class="fa fa-thumbs-o-up"></i></span></div>
               </div>
