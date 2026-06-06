@@ -4,19 +4,21 @@
 - Docker Compose v5.1.4 以降<br>
   <sub>※ コンテナ内：Node.js 24 LTS 系を使用（`node:24-alpine`）</sub><br>
   <sub>※ コンテナ内：MySQL 8.4 LTS 系を使用（`mysql:8.4`）</sub>
-<br>
+  <br>
 
 # 初回セットアップ
 
 compose.yaml ファイルがある場所でターミナルを開き、以下のコマンドを叩く　　
 
 <sub>※ ポート番号は　80　/　3000　をそれぞれ使用</sub>
+
 ```bash
 cp .env.example .env
 
 docker compose build
 docker compose up -d
 ```
+
 上記コマンド成功後、ローカルフォルダ `app` 内に `dist` & `node_modules` フォルダが自動生成される
 <br>
 <sub>（裏でコンパイルおよびシンクが走っているため2~3分、要待ち）</sub>
@@ -31,6 +33,7 @@ docker compose up -d
 docker compose exec dockerexpress npm run migrate
 docker compose exec dockerexpress npm run seed
 ```
+
 ↓↓↓↓↓
 <br>
 
@@ -39,7 +42,7 @@ docker compose exec dockerexpress npm run seed
 - アプリ： <http://localhost:3000>
 - phpMyAdmin： <http://localhost:8080><br>
   <sub>※ phpMyAdmin はアイパス『 root 』でログイン可</sub>
-  
+
 <br>
 
 ## アプリが開けない場合、追加で以下のコマンドを叩く
@@ -48,4 +51,204 @@ docker compose exec dockerexpress npm run seed
 docker compose exec dockerexpress npm run typecheck
 docker compose exec dockerexpress npm run build
 docker compose exec dockerexpress npm run dev
+```
+
+# Google Cloud / Cloud Run デプロイ手順
+
+このリポジトリは、以下の Google Cloud 構成で動かせるように調整しています。
+
+- Cloud Run: Express / Node.js コンテナ
+- Cloud SQL for MySQL: アプリ用 DB
+- Artifact Registry: Docker image の保存先
+- Secret Manager: DB パスワード、セッション secret、remember me 用キー
+- Cloud Storage: 投稿画像、プロフィール画像、CKEditor 画像の保存先
+
+## 前提値
+
+今回のデモでは以下の値を使います。
+
+```bash
+PROJECT_ID="project-fa900d56-8f52-4a54-867"
+REGION="asia-northeast1"
+REPOSITORY="dockerexpress"
+SERVICE="dockerexpress"
+INSTANCE="dockerexpress-mysql"
+DATABASE="express_db"
+DB_USER="dockerexpress_user"
+BUCKET="${PROJECT_ID}-dockerexpress-uploads"
+IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:demo"
+CONNECTION_NAME="${PROJECT_ID}:${REGION}:${INSTANCE}"
+```
+
+## このアプリ側で追加した Cloud Run 対応
+
+- Docker image の build 時に `npm run build` を実行し、Cloud Run の起動コマンド `npm start` が参照する `dist/bin/www.js` を image 内に生成します。
+- `DB_SOCKET_PATH=/cloudsql/<INSTANCE_CONNECTION_NAME>` を設定した場合、Sequelize が Cloud SQL の Unix socket で MySQL に接続します。
+- `GCS_BUCKET_NAME` を設定した場合、アップロード画像をローカルファイルシステムではなく Cloud Storage の `uploads/` prefix に保存します。
+- `/uploads/<fileName>` へのアクセス時、Cloud Storage 有効時はアプリが Cloud Storage から画像を取得して返します。bucket を public にしなくても、Cloud Run のサービスアカウントに権限があれば表示できます。
+
+## 1. Google Cloud の API を有効化
+
+```bash
+gcloud config set project "${PROJECT_ID}"
+
+gcloud services enable \
+  run.googleapis.com \
+  sqladmin.googleapis.com \
+  artifactregistry.googleapis.com \
+  cloudbuild.googleapis.com \
+  secretmanager.googleapis.com \
+  storage.googleapis.com
+```
+
+## 2. Artifact Registry を作成
+
+```bash
+gcloud artifacts repositories create "${REPOSITORY}" \
+  --repository-format=docker \
+  --location="${REGION}" \
+  --description="Docker Express demo images"
+```
+
+## 3. Cloud SQL for MySQL を作成
+
+勉強会デモ向けの最小構成例です。発表後は停止または削除してください。
+
+```bash
+gcloud sql instances create "${INSTANCE}" \
+  --database-version=MYSQL_8_4 \
+  --region="${REGION}" \
+  --tier=db-f1-micro \
+  --storage-size=10GB \
+  --availability-type=zonal \
+  --root-password="<ROOT_PASSWORD>"
+
+gcloud sql databases create "${DATABASE}" \
+  --instance="${INSTANCE}"
+
+gcloud sql users create "${DB_USER}" \
+  --instance="${INSTANCE}" \
+  --password="<DB_PASSWORD>"
+```
+
+## 4. Cloud Storage bucket を作成
+
+```bash
+gcloud storage buckets create "gs://${BUCKET}" \
+  --location="${REGION}" \
+  --uniform-bucket-level-access
+```
+
+Cloud Run から private bucket に読み書きするため、Cloud Run の実行サービスアカウントに bucket 権限を付与します。
+
+```bash
+PROJECT_NUMBER="$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')"
+RUN_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
+  --member="serviceAccount:${RUN_SERVICE_ACCOUNT}" \
+  --role="roles/storage.objectAdmin"
+```
+
+## 5. Secret Manager に秘密情報を登録
+
+```bash
+printf '<DB_PASSWORD>' | gcloud secrets create DB_PASSWORD --data-file=-
+openssl rand -base64 32 | gcloud secrets create SESSION_SECRET --data-file=-
+openssl rand -base64 32 | gcloud secrets create APP_KEY --data-file=-
+```
+
+作成済み secret の値を更新する場合は、次のように新しい version を追加します。
+
+```bash
+printf '<NEW_DB_PASSWORD>' | gcloud secrets versions add DB_PASSWORD --data-file=-
+```
+
+Cloud Run から secret と Cloud SQL を使えるように、実行サービスアカウントへ権限を付与します。
+
+```bash
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${RUN_SERVICE_ACCOUNT}" \
+  --role="roles/secretmanager.secretAccessor"
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${RUN_SERVICE_ACCOUNT}" \
+  --role="roles/cloudsql.client"
+```
+
+## 6. Docker image を build & push
+
+```bash
+gcloud builds submit app --tag "${IMAGE}"
+```
+
+## 7. Cloud Run にデプロイ
+
+```bash
+gcloud run deploy "${SERVICE}" \
+  --image "${IMAGE}" \
+  --region "${REGION}" \
+  --platform managed \
+  --allow-unauthenticated \
+  --port 3000 \
+  --add-cloudsql-instances "${CONNECTION_NAME}" \
+  --set-env-vars "NODE_ENV=production,PORT=3000,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
+  --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
+  --min-instances 0 \
+  --max-instances 1
+```
+
+## 8. migration / seed を Cloud Run Jobs で実行
+
+migration job を作成して実行します。
+
+```bash
+gcloud run jobs create dockerexpress-migrate \
+  --image "${IMAGE}" \
+  --region "${REGION}" \
+  --add-cloudsql-instances "${CONNECTION_NAME}" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
+  --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
+  --command npm \
+  --args run,migrate
+
+gcloud run jobs execute dockerexpress-migrate \
+  --region "${REGION}" \
+  --wait
+```
+
+seed job も同じ image で作成できます。
+
+```bash
+gcloud run jobs create dockerexpress-seed \
+  --image "${IMAGE}" \
+  --region "${REGION}" \
+  --add-cloudsql-instances "${CONNECTION_NAME}" \
+  --set-env-vars "NODE_ENV=production,DB_NAME=${DATABASE},DB_USER=${DB_USER},DB_DIALECT=mysql,TZ=Asia/Tokyo,DB_SOCKET_PATH=/cloudsql/${CONNECTION_NAME},GCS_BUCKET_NAME=${BUCKET},GCS_UPLOAD_PREFIX=uploads,UPLOAD_MAX_BYTES=5242880" \
+  --set-secrets "DB_PASSWORD=DB_PASSWORD:latest,SESSION_SECRET=SESSION_SECRET:latest,APP_KEY=APP_KEY:latest" \
+  --command npm \
+  --args run,seed
+
+gcloud run jobs execute dockerexpress-seed \
+  --region "${REGION}" \
+  --wait
+```
+
+## 9. 発表後の後片付け
+
+Cloud SQL は起動中に費用が発生しやすいので、勉強会後は削除または停止してください。完全に不要ならプロジェクトごと削除するのが簡単です。
+
+個別に削除する場合の例です。
+
+```bash
+gcloud run services delete "${SERVICE}" --region "${REGION}"
+gcloud run jobs delete dockerexpress-migrate --region "${REGION}"
+gcloud run jobs delete dockerexpress-seed --region "${REGION}"
+gcloud sql instances delete "${INSTANCE}"
+gcloud artifacts repositories delete "${REPOSITORY}" --location "${REGION}"
+gcloud storage rm --recursive "gs://${BUCKET}"
+gcloud storage buckets delete "gs://${BUCKET}"
+gcloud secrets delete DB_PASSWORD
+gcloud secrets delete SESSION_SECRET
+gcloud secrets delete APP_KEY
 ```

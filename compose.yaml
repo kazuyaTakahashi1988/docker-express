@@ -10,7 +10,11 @@ services:
     volumes:
       - ${MYSQL_DATA_DIR:-./.data/mysql8.4}:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -56,6 +60,10 @@ services:
       TZ: ${TZ:-Asia/Tokyo}
       SESSION_SECRET: ${SESSION_SECRET:-change-me-in-local-env}
       APP_KEY: ${APP_KEY:-change-me-in-local-env}
+      DB_SOCKET_PATH: ${DB_SOCKET_PATH:-}
+      GCS_BUCKET_NAME: ${GCS_BUCKET_NAME:-}
+      GCS_UPLOAD_PREFIX: ${GCS_UPLOAD_PREFIX:-uploads}
+      UPLOAD_MAX_BYTES: ${UPLOAD_MAX_BYTES:-5242880}
     ports:
       - "${APP_PORT:-3000}:3000"
     init: true

@@ -29,6 +29,7 @@ declare namespace Express {
 
   interface UploadedFile {
     originalname: string;
+    buffer: Buffer;
     [key: string]: unknown;
   }
 

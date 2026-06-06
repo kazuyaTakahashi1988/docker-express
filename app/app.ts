@@ -24,6 +24,7 @@ import dashboardRouter from "./routes/dashboard";
 import indexRouter from "./routes/index";
 import likesRouter from "./routes/likes";
 import postsRouter from "./routes/posts";
+import { fetchStoredImage } from "./utils/imageStorage";
 
 const User = db.User;
 const app = express();
@@ -51,6 +52,23 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
+app.use(express.static(publicDir));
+app.get("/uploads/:fileName", async (req, res, next) => {
+  try {
+    const image = await fetchStoredImage(req.params.fileName);
+    if (image === undefined) {
+      return next();
+    }
+    if (image === null) {
+      return next(createError(404));
+    }
+    res.type(image.contentType);
+    res.set("Cache-Control", "public, max-age=3600");
+    return res.send(image.body);
+  } catch (error) {
+    return next(error);
+  }
+});
 app.use(express.static(publicDir));
 
 /* ---------------------------

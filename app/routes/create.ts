@@ -5,8 +5,8 @@ const router = express.Router();
 
 import multer from "multer";
 import sharp from "sharp";
-import * as fs from "fs";
 import { check, validationResult } from "express-validator";
+import { createUploadMiddleware, saveImageBuffer } from "../utils/imageStorage";
 
 const User = db.User;
 const Post = db.Post;
@@ -19,15 +19,7 @@ const Like = db.Like;
     ▽ 画像UPロード ▽
 -------------------------------------- */
 
-const destDir = "public/uploads/";
-const storage = multer.diskStorage({
-  destination: destDir,
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-
-const upload = multer({ storage: storage });
+const upload = createUploadMiddleware(multer);
 
 /* --------------------------------------
     ▽ バリデーション・ルール ▽
@@ -81,13 +73,12 @@ router.post("/post", upload.single("image"), postValidRules, async (req, res) =>
 
   /* ▽ 画像圧縮処理 ▽  */
   if (req.file) {
-    await sharp(destDir + req.file.originalname)
+    const imageBuffer = await sharp(req.file.buffer)
       .resize(340)
       .toFormat("jpg")
       .jpeg({ quality: 20 }) // 圧縮率 0〜100
-      .toFile(destDir + saveImageName, () => {
-        fs.unlinkSync(destDir + req.file.originalname); // 元の画像を削除
-      });
+      .toBuffer();
+    await saveImageBuffer(saveImageName, imageBuffer);
   } else {
     saveImageName = "";
   }
@@ -232,12 +223,11 @@ router.post("/CKEditorUpload", upload.single("upload"), async (req, res) => {
 
   /* ▽ 画像圧縮処理 ▽  */
   if (req.file) {
-    await sharp(destDir + req.file.originalname)
+    const imageBuffer = await sharp(req.file.buffer)
       .toFormat("jpg")
       .jpeg({ quality: 20 }) // 圧縮率 0〜100
-      .toFile(destDir + saveImageName, () => {
-        fs.unlinkSync(destDir + req.file.originalname); // 元の画像を削除
-      });
+      .toBuffer();
+    await saveImageBuffer(saveImageName, imageBuffer);
   } else {
     saveImageName = "";
   }
