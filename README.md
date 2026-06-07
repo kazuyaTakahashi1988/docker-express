@@ -118,9 +118,9 @@ gcloud artifacts repositories create "${REPOSITORY}" \
 
 ## 3. Cloud SQL for MySQL を作成
 
-勉強会デモ向けの最小構成例です。発表後は停止または削除してください。
+デモ向けの最小構成例です。
 
-MySQL 8.4 は edition を省略すると Cloud SQL Enterprise Plus として作成されますが、`db-f1-micro` は Enterprise Plus では使えません。勉強会デモで安価な shared-core の `db-f1-micro` を使うため、ここでは `--edition=ENTERPRISE` を明示します。
+MySQL 8.4 は edition を省略すると Cloud SQL Enterprise Plus として作成されますが、`db-f1-micro` は Enterprise Plus では使えません。デモで安価な shared-core の `db-f1-micro` を使うため、ここでは `--edition=ENTERPRISE` を明示します。
 
 パスワードに `!` が含まれる場合、Bash では double quote (`"`) の中でも history expansion が働き、`bash: !xxx: event not found` になることがあります。Cloud Shell では次のように `read -rs` で変数へ入れてから実行すると、`!` を含むパスワードでも安全に扱えます。
 
@@ -364,7 +364,7 @@ gcloud run services update "${SERVICE}" \
 
 ## 8. DB 初期化: phpMyAdmin dump import または Cloud Run Jobs
 
-勉強会デモなら、ローカルの phpMyAdmin から export した SQL dump を Cloud SQL に import する方法でも妥当です。Cloud Run Jobs で migration / seed を実行するより手順の見通しがよい場合は、まずこの方法で進めてください。
+デモなら、ローカルの phpMyAdmin から export した SQL dump を Cloud SQL に import する方法でも妥当です。Cloud Run Jobs で migration / seed を実行するより手順の見通しがよい場合は、まずこの方法で進めてください。
 
 ### 方法 A: phpMyAdmin の SQL dump を Cloud SQL に import する
 
