@@ -1,57 +1,5 @@
-# 必要ローカル開発環境
+<img width="1536" height="1024" alt="ChatGPT Image 2026年6月7日 10_04_28" src="https://github.com/user-attachments/assets/9ff4c6a3-5d88-4b51-94bc-1ced3e7c896a" />
 
-- Docker v29.5.2 以降
-- Docker Compose v5.1.4 以降<br>
-  <sub>※ コンテナ内：Node.js 24 LTS 系を使用（`node:24-alpine`）</sub><br>
-  <sub>※ コンテナ内：MySQL 8.4 LTS 系を使用（`mysql:8.4`）</sub>
-  <br>
-
-# 初回セットアップ
-
-compose.yaml ファイルがある場所でターミナルを開き、以下のコマンドを叩く　　
-
-<sub>※ ポート番号は　80　/　3000　をそれぞれ使用</sub>
-
-```bash
-cp .env.example .env
-
-docker compose build
-docker compose up -d
-```
-
-上記コマンド成功後、ローカルフォルダ `app` 内に `dist` & `node_modules` フォルダが自動生成される
-<br>
-<sub>（裏でコンパイルおよびシンクが走っているため2~3分、要待ち）</sub>
-<br>
-<br>
-↓↓↓↓↓
-<br>
-<br>
-自動生成されたのを確認できた後、以下のコマンドを叩く　
-
-```bash
-docker compose exec dockerexpress npm run migrate
-docker compose exec dockerexpress npm run seed
-```
-
-↓↓↓↓↓
-<br>
-
-## Open in your browser
-
-- アプリ： <http://localhost:3000>
-- phpMyAdmin： <http://localhost:8080><br>
-  <sub>※ phpMyAdmin はアイパス『 root 』でログイン可</sub>
-
-<br>
-
-## アプリが開けない場合、追加で以下のコマンドを叩く
-
-```bash
-docker compose exec dockerexpress npm run typecheck
-docker compose exec dockerexpress npm run build
-docker compose exec dockerexpress npm run dev
-```
 
 # Google Cloud / Cloud Run デプロイ手順
 
