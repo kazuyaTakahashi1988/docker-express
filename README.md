@@ -437,7 +437,9 @@ gcloud run jobs execute dockerexpress-seed \
 # 先ほど控えた公開URLを SITE_HOST に入れる
 
 SITE_HOST="https://xxxx.run.app"
+```
 
+```bash
 # Google Cloud コンソール画面にて ${BUCKET} バケットの " /images/common/ogp.png " にデフォルトOGP画像を直接格納しておくこと
 
 DEFAULT_OGP_IMAGE_URL="https://storage.googleapis.com/${BUCKET}/images/common/ogp.png"
