@@ -52,3 +52,9 @@ docker compose exec dockerexpress npm run typecheck
 docker compose exec dockerexpress npm run build
 docker compose exec dockerexpress npm run dev
 ```
+
+<br>
+
+## Google Cloud 使用する場合
+
+- Google Cloud リソース用リポジトリ： <a href="https://github.com/kazuyaTakahashi1988/docker-express/tree/for-google-cloud" target="_blank">for-google-cloud</a>
