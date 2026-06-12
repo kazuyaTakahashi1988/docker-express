@@ -12,7 +12,7 @@
 # Google Cloud / Cloud Run デプロイ手順（1. ~ 10.）
 
 Cloud Shell 上、またはローカル環境（ Cloud SDK インストール済みのターミナル）で以下コマンド群を叩く
-<br>
+<br><br>
 
 ## 1. 使用する環境変数を設定する
 
