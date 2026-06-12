@@ -1,6 +1,6 @@
 <img width="1536" height="1024" alt="ChatGPT Image 2026年6月7日 10_04_28" src="https://github.com/user-attachments/assets/9ff4c6a3-5d88-4b51-94bc-1ced3e7c896a" />
 
-# Google Cloud / Cloud Run デプロイ手順（1. ~ 9.）
+# Google Cloud / Cloud Run デプロイ手順（1. ~ 10.）
 
 このリポジトリは、以下の Google Cloud 構成で動かせるように調整しています。
 
@@ -164,7 +164,7 @@ gcloud storage buckets create "gs://${BUCKET}" \
   --uniform-bucket-level-access
 ```
 
-<sub># Cloud Run の実行サービスアカウントに bucket 権限を付与するコマンド。<br>これにより、Cloud Run（アプリ側） から bucket への画像データの格納/読み書きが可能となる。</sub>
+<sub># Cloud Run の実行サービスアカウントに bucket 権限を付与するコマンド<br>これにより、Cloud Run（アプリ側） から bucket への画像データの格納/読み書きが可能となる。</sub>
 
 ```bash
 gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
@@ -172,7 +172,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
   --role="roles/storage.objectAdmin"
 ```
 
-<sub># bucket データの公開オブジェクト設定のコマンド。<br>これにより、一般ユーザーが bucket 内の画像を閲覧できるようになる。</sub>
+<sub># bucket データの公開オブジェクト設定のコマンド<br>これにより、一般ユーザーが bucket 内の画像を閲覧できるようになる。</sub>
 
 ```bash
 gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
@@ -186,7 +186,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
 
 以下コマンドを叩く
 
-<sub># Secret Manage に DBパスワードなど秘密情報を登録するコマンド。</sub>
+<sub># Secret Manage に DBパスワードなど秘密情報を登録するコマンド</sub>
 
 ```bash
 printf '%s' "${DB_PASSWORD}" | gcloud secrets create DB_PASSWORD --data-file=-
@@ -194,7 +194,7 @@ openssl rand -base64 32 | gcloud secrets create SESSION_SECRET --data-file=-
 openssl rand -base64 32 | gcloud secrets create APP_KEY --data-file=-
 ```
 
-<sub># Cloud Run（アプリ側）から secret を参照できるよう、実行サービスアカウントへ権限を付与するコマンド。</sub>
+<sub># Cloud Run（アプリ側）から secret を参照できるよう、実行サービスアカウントへ権限を付与するコマンド</sub>
 
 ```bash
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
@@ -202,7 +202,7 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/secretmanager.secretAccessor"
 ```
 
-<sub># Cloud Run（アプリ側）から Cloud SQL にアクセスできるよう、実行サービスアカウントへ権限を付与するコマンド。</sub>
+<sub># Cloud Run（アプリ側）から Cloud SQL にアクセスできるよう、実行サービスアカウントへ権限を付与するコマンド</sub>
 
 ```bash
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
@@ -214,10 +214,7 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 
 ## 7. Docker image を build & push
 
-もし Cloud Shell 前提なら以下にてソースコードを用意する必要あり。<br>
-<br>
-
-### 7-1. Cloud Shell にソースコードを用意する
+### 7-1. ソースコードを用意する
 
 以下コマンドを叩く
 
@@ -239,7 +236,7 @@ cd ~/docker-express
 git switch for-google-cloud
 ```
 
-<sub># このアプリ root にいることを確認するコマンド。</sub>
+<sub># このアプリ root にいることを確認するコマンド</sub>
 
 ```bash
 pwd
@@ -248,11 +245,11 @@ test -f app/Dockerfile && test -f app/package.json && echo "OK: app build contex
 
 <br>
 
-### 7-2. 変数と Artifact Registry repository を確認する
+### 7-2. 変数と Artifact Registry repository を確認する（これら、不要なら無視してOK）
 
 以下コマンドを叩く
 
-<sub># IMAGEの環境変数と Artifact Registry repository を確認するコマンド群。（これら、不要なら無視してOK）</sub>
+<sub># IMAGEの環境変数と Artifact Registry repository を確認するコマンド群</sub>
 
 ```bash
 gcloud config set project "${PROJECT_ID}"
@@ -279,7 +276,7 @@ gcloud artifacts repositories describe "${REPOSITORY}" \
 BUILD_PUSH_COUNT="1"
 ```
 
-<sub># Cloud Build の実行サービスアカウントに build 実行権限を付与するコマンド。</sub>
+<sub># Cloud Build の実行サービスアカウントに build 実行権限を付与するコマンド</sub>
 
 ```bash
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
@@ -287,7 +284,7 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/cloudbuild.builds.builder"
 ```
 
-<sub># Cloud Build の実行サービスアカウントに storage を読む権限を与えるコマンド。</sub>
+<sub># Cloud Build の実行サービスアカウントに storage を読む権限を与えるコマンド</sub>
 
 ```bash
 gcloud storage buckets add-iam-policy-binding "gs://${CLOUDBUILD_BUCKET}" \
@@ -295,7 +292,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${CLOUDBUILD_BUCKET}" \
   --role="roles/storage.objectViewer"
 ```
 
-<sub># ソースコード `app/Dockerfile` を Artifact Registry に build & push するコマンド。</sub>
+<sub># ソースコード `app/Dockerfile` を Artifact Registry に build & push するコマンド</sub>
 
 ```bash
 gcloud builds submit app --tag "${IMAGE}"
@@ -322,28 +319,29 @@ gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
 
 以下コマンドを叩く
 
-<sub># Artifact Registry に保存されている Docker イメージの一覧を表示するコマンド。</sub>
+<sub># Artifact Registry に保存されている Docker イメージの一覧を表示するコマンド</sub>
 
 ```bash
 gcloud artifacts docker images list \
   "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}"
 ```
 
-<sub># 特定の Docker イメージに付いているタグ一覧を表示するコマンド。</sub>
+<sub># 特定の Docker イメージに付いているタグ一覧を表示するコマンド</sub>
 
 ```bash
 gcloud artifacts docker tags list \
   "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}"
 ```
 
-<sub>`TAG: demo` が表示されれば、Cloud Run に渡す image の準備は完了です。</sub>
-<br><br>
+`TAG: demo` が表示されれば、Cloud Run に渡す image の準備は完了です。
+
+<br>
 
 ## 8. build & push されたものを Cloud Run にデプロイ
 
 以下コマンドを叩く
 
-<sub># build & push されたものを Cloud Run にデプロイするコマンド。</sub>
+<sub># build & push されたものを Cloud Run にデプロイするコマンド</sub>
 
 ```bash
 gcloud run deploy "${SERVICE}" \
@@ -370,7 +368,7 @@ gcloud run deploy "${SERVICE}" \
 
 以下コマンドを叩く
 
-<sub># migration job を作成するコマンド。</sub>
+<sub># migration job を作成するコマンド</sub>
 
 ```bash
 gcloud run jobs create dockerexpress-migrate \
@@ -383,7 +381,7 @@ gcloud run jobs create dockerexpress-migrate \
   --args run,migrate
 ```
 
-<sub># migration job を実行するコマンド。</sub>
+<sub># migration job を実行するコマンド</sub>
 
 ```bash
 gcloud run jobs execute dockerexpress-migrate \
@@ -397,7 +395,7 @@ gcloud run jobs execute dockerexpress-migrate \
 
 以下コマンドを叩く
 
-<sub># seed job を作成するコマンド。</sub>
+<sub># seed job を作成するコマンド</sub>
 
 ```bash
 gcloud run jobs create dockerexpress-seed \
@@ -411,7 +409,7 @@ gcloud run jobs create dockerexpress-seed \
 
 ```
 
-<sub># seed job を実行するコマンド。</sub>
+<sub># seed job を実行するコマンド</sub>
 
 ```bash
 gcloud run jobs execute dockerexpress-seed \
@@ -420,7 +418,7 @@ gcloud run jobs execute dockerexpress-seed \
 ```
 
 これにてリリース完了です。<br>
-先ほど控えた公開URLおよび " Service URL: https://xxxx.run.app " をブラウザで確認する。
+先ほど控えた公開URLおよび `" Service URL: https://xxxx.run.app "` をブラウザで確認する。
 <br>
 
 <br>
@@ -430,16 +428,16 @@ gcloud run jobs execute dockerexpress-seed \
 以下コマンドを叩く
 
 <sub># アプリ内（メタ情報など）のデフォルト値を指定<br>
-先ほど控えた公開URLを SITE_HOST に入れる</sub>
 
 ```bash
 # 先ほど控えた公開URLを SITE_HOST に入れる
+# Google Cloud コンソール画面にて `" ${BUCKET} "` バケットの `" /images/common/ogp.png "` に直接デフォルトのOGP画像を格納しておくこと
 
 SITE_HOST="https://xxxx.run.app"
 DEFAULT_OGP_IMAGE_URL="https://storage.googleapis.com/${BUCKET}/images/common/ogp.png"
 ```
 
-<sub># （手順8.と同様）build & push されたものを Cloud Run にデプロイするコマンド。</sub>
+<sub># （手順8.と同様）build & push されたものを Cloud Run にデプロイするコマンド</sub>
 
 ```bash
 gcloud run deploy "${SERVICE}" \
