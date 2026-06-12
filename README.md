@@ -218,19 +218,19 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 
 以下コマンドを叩く
 
-<sub># git clone でこのアプリのソースをダウンロードする。</sub>
+<sub># git clone でこのアプリのソースをダウンロードする</sub>
 
 ```bash
 git clone https://github.com/kazuyaTakahashi1988/docker-express.git
 ```
 
-<sub># このアプリのソースがある階層に移動する。</sub>
+<sub># このアプリのソースがある階層に移動する</sub>
 
 ```bash
 cd ~/docker-express
 ```
 
-<sub># git switch で、このアプリの Google Cloud リリース用ブランチに切り替える。</sub>
+<sub># git switch で、このアプリの Google Cloud リリース用ブランチに切り替える</sub>
 
 ```bash
 git switch for-google-cloud
@@ -300,7 +300,7 @@ gcloud builds submit app --tag "${IMAGE}"
 
 <br>
 
-### 7-4. もし Artifact Registry への push 権限エラーが出た場合、追加で以下の対応を
+### 7-4. もしも Artifact Registry への push 権限エラーが出た場合、追加で以下の対応を
 
 Source archive の読み取りは通ったが、Artifact Registry への push で `Permission denied` や `denied: Permission` のようなエラーになる場合は、同じ build 実行サービスアカウントに Artifact Registry writer を付与してから再実行してください。
 
@@ -418,7 +418,7 @@ gcloud run jobs execute dockerexpress-seed \
 ```
 
 これにてリリース完了です。<br>
-先ほど控えた公開URLおよび `" Service URL: https://xxxx.run.app "` をブラウザで確認する。
+先ほど控えた公開URL `" Service URL: https://xxxx.run.app "` をブラウザで確認する。
 <br>
 
 <br>
@@ -431,7 +431,7 @@ gcloud run jobs execute dockerexpress-seed \
 
 ```bash
 # 先ほど控えた公開URLを SITE_HOST に入れる
-# Google Cloud コンソール画面にて `" ${BUCKET} "` バケットの `" /images/common/ogp.png "` に直接デフォルトのOGP画像を格納しておくこと
+# Google Cloud コンソール画面にて ${BUCKET} バケットの " /images/common/ogp.png " にデフォルトOGP画像を直接格納しておくこと
 
 SITE_HOST="https://xxxx.run.app"
 DEFAULT_OGP_IMAGE_URL="https://storage.googleapis.com/${BUCKET}/images/common/ogp.png"
