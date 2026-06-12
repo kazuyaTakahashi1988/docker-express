@@ -302,7 +302,7 @@ gcloud builds submit app --tag "${IMAGE}"
 
 ### 7-4. もしも Artifact Registry への push 権限エラーが出た場合、追加で以下の対応を
 
-Source archive の読み取りは通ったが、Artifact Registry への push で `Permission denied` や `denied: Permission` のようなエラーになる場合は、同じ build 実行サービスアカウントに Artifact Registry writer を付与してから再実行してください。
+<sub># Cloud Build の実行サービスアカウントに Artifact Registry へ Docker イメージを書き込む権限を与えるコマンド</sub>
 
 ```bash
 gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
