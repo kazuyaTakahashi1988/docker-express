@@ -311,6 +311,12 @@ gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
   --role="roles/artifactregistry.writer"
 ```
 
+<sub># ソースコード `app/Dockerfile` を Artifact Registry に build & push するコマンド</sub>
+
+```bash
+gcloud builds submit app --tag "${IMAGE}"
+```
+
 <br>
 
 ### 7-5. 無事に push できたことを確認する
