@@ -1,5 +1,5 @@
 <img width="1536" height="1024" alt="ChatGPT Image 2026年6月7日 10_04_28" src="https://github.com/user-attachments/assets/9ff4c6a3-5d88-4b51-94bc-1ced3e7c896a" />
-<br>
+<br><br>
 このリポジトリは、以下の Google Cloud 構成で動かせるように調整しています。
 
 - Cloud Run: Express / Node.js コンテナ
