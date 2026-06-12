@@ -1,6 +1,6 @@
 <% let define = {
 SITE_NAME: "Q & A site - ナゼナゼ Express -",
-SITE_HOST: siteHost || "https://dockerexpress-720570741774.asia-northeast1.run.app",
+SITE_HOST: siteHost || "https://default-hostname.run.app",
 SITE_DES: " Q & A site - ナゼナゼ Express - は質問を投稿、及び回答することができるC to C サービスです。",
 SITE_KEY: "デフォルトキー",
 };
@@ -9,7 +9,7 @@ const ogImage = args.pageImg
 ? isAbsoluteUrl(args.pageImg)
 ? args.pageImg
 : `${define.SITE_HOST}${args.pageImg}`
-: defaultOgpImageUrl || "https://storage.googleapis.com/project-fa900d56-8f52-4a54-867-dockerexpress-uploads/images/common/ogp.png";
+: defaultOgpImageUrl || "https://storage.googleapis.com/default-uploads/images/common/ogp.png";
 %>
 
 <!-- ▽ head meta ▽ -->
