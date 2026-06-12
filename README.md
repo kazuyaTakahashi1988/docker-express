@@ -4,7 +4,7 @@
 - Docker Compose v5.1.4 以降推奨<br>
   <sub>※ コンテナ内：Node.js 24 LTS 系を使用（`node:24-alpine`）</sub><br>
   <sub>※ コンテナ内：MySQL 8.4 LTS 系を使用（`mysql:8.4`）</sub>
-  <br>
+  <br><br>
 
 # 初回セットアップ
 
@@ -55,6 +55,6 @@ docker compose exec dockerexpress npm run dev
 
 <br>
 
-## Google Cloud 使用する場合
+## Google Cloud を使用する場合
 
 - Google Cloud リソース用リポジトリ： <a href="https://github.com/kazuyaTakahashi1988/docker-express/tree/for-google-cloud" target="_blank">for-google-cloud</a>
