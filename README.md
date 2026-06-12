@@ -305,8 +305,6 @@ gcloud builds submit app --tag "${IMAGE}"
 Source archive の読み取りは通ったが、Artifact Registry への push で `Permission denied` や `denied: Permission` のようなエラーになる場合は、同じ build 実行サービスアカウントに Artifact Registry writer を付与してから再実行してください。
 
 ```bash
-BUILD_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-
 gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
   --location="${REGION}" \
   --member="serviceAccount:${BUILD_SERVICE_ACCOUNT}" \
