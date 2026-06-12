@@ -1,7 +1,5 @@
 <img width="1536" height="1024" alt="ChatGPT Image 2026年6月7日 10_04_28" src="https://github.com/user-attachments/assets/9ff4c6a3-5d88-4b51-94bc-1ced3e7c896a" />
-
-# Google Cloud / Cloud Run デプロイ手順（1. ~ 10.）
-
+<br>
 このリポジトリは、以下の Google Cloud 構成で動かせるように調整しています。
 
 - Cloud Run: Express / Node.js コンテナ
@@ -10,6 +8,8 @@
 - Secret Manager: DB パスワード、セッション secret、remember me 用キー
 - Cloud Storage: 投稿画像、プロフィール画像、CKEditor 画像の保存先
   <br><br>
+
+# Google Cloud / Cloud Run デプロイ手順（1. ~ 10.）
 
 Cloud Shell 上、またはローカル環境（ Cloud SDK インストール済みのターミナル）で以下コマンド群を叩く
 
