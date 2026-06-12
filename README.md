@@ -1,7 +1,5 @@
 <img width="1536" height="1024" alt="ChatGPT Image 2026年6月7日 10_04_28" src="https://github.com/user-attachments/assets/9ff4c6a3-5d88-4b51-94bc-1ced3e7c896a" />
-
-# Google Cloud / Cloud Run デプロイ手順（1. ~ 9.）
-
+<br><br>
 このリポジトリは、以下の Google Cloud 構成で動かせるように調整しています。
 
 - Cloud Run: Express / Node.js コンテナ
@@ -11,17 +9,27 @@
 - Cloud Storage: 投稿画像、プロフィール画像、CKEditor 画像の保存先
   <br><br>
 
-Cloud Shell 上、またはローカル環境（ Cloud SDK インストール済みのターミナル）で以下コマンド群を叩く
+# Google Cloud / Cloud Run デプロイ手順（1. ~ 10.）
+
+事前準備
+
+- Google Cloud コンソールで新規プロジェクトを立ち上げておく
+- 立ち上げたプロジェクトのプロジェクトIDを控えておく
+- Cloud Shell 操作環境（★初心者にオススメ）<br>またはローカル操作環境（ Cloud SDK インストール & auth login 済みのターミナル）
+  <br>
+
+操作環境で以下のコマンド群を叩いていく
+<br><br>
 
 ## 1. 使用する環境変数を設定する
 
 以下コマンドを叩く
 
-<sub># プロジェクトIDを "xxxx" 箇所に入れ、プロジェクトIDとリージョンの指定<br>
+<sub># プロジェクトIDとリージョンの指定<br>
 </sub>
 
 ```bash
-# プロジェクトIDを "xxxx" 箇所に入れること
+# プロジェクトIDを xxxx 箇所に入れること
 
 PROJECT_ID="xxxx"
 REGION="asia-northeast1"
@@ -35,13 +43,23 @@ SERVICE="dockerexpress"
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:demo"
 ```
 
-<sub># DB（Cloud SQL for MySQL）とテーブル/ユーザー名の指定</sub>
+<sub># DB（Cloud SQL for MySQL）の指定</sub>
 
 ```bash
 INSTANCE="dockerexpress-mysql"
 DATABASE="express_db"
 DB_USER="dockerexpress_user"
 CONNECTION_NAME="${PROJECT_ID}:${REGION}:${INSTANCE}"
+```
+
+<sub># MySQLのルートパスワードとDBパスワードの指定</sub>
+
+```bash
+# 任意の文字列を xxxx 箇所に入れること
+# 特殊文字・記号を用いると、エラーに繋がる恐れあり（解消方もあるが一旦、demo目的では半/全角英数字だけ用いること）
+
+MYSQL_ROOT_PASSWORD="xxxx"
+DB_PASSWORD="xxxx"
 ```
 
 <sub># Cloud Run 用の実行サービスアカウントの指定</sub>
@@ -63,6 +81,13 @@ CLOUDBUILD_BUCKET="${PROJECT_ID}_cloudbuild"
 ```bash
 BUCKET="${PROJECT_ID}-dockerexpress-uploads"
 UPLOADS_BASE_URL="https://storage.googleapis.com/${BUCKET}/uploads"
+```
+
+<sub># meta情報（twitter:cardなど）用の値。不要なら空文字のままでOK（のち手順10.で再設定可）</sub>
+
+```bash
+SITE_HOST=""
+DEFAULT_OGP_IMAGE_URL=""
 ```
 
 <br>
@@ -110,18 +135,6 @@ gcloud artifacts repositories create "${REPOSITORY}" \
 
 以下コマンドを叩く
 
-<sub># 任意の文字列を "xxxx" 箇所に入れ、MySQLのルートパスワードとDBパスワードを指定<br>
-特殊文字・記号を使用すると、`bash: !xxxx: event not found` エラーが出ることあり。<br>
-（解消の仕方はあるが、demo目的なら半/全角英数字だけ用いるとよい）
-</sub>
-
-```bash
-# 任意の文字列を "xxxx" 箇所に入れること
-
-MYSQL_ROOT_PASSWORD="xxxx"
-DB_PASSWORD="xxxx"
-```
-
 <sub># MySQLのインスタンスを作成、およびルートパスワードを設定するコマンド（※ 結構時間かかる）</sub>
 
 ```bash
@@ -164,7 +177,7 @@ gcloud storage buckets create "gs://${BUCKET}" \
   --uniform-bucket-level-access
 ```
 
-<sub># Cloud Run の実行サービスアカウントに bucket 権限を付与するコマンド。<br>これにより、Cloud Run（アプリ側） から bucket への画像データの格納/読み書きが可能となる。</sub>
+<sub># Cloud Run の実行サービスアカウントに bucket 権限を付与するコマンド<br>※ これにより、Cloud Run（アプリ側） から bucket への画像データの格納/読み書きが可能となる。</sub>
 
 ```bash
 gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
@@ -172,7 +185,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
   --role="roles/storage.objectAdmin"
 ```
 
-<sub># bucket データの公開オブジェクト設定のコマンド。<br>これにより、一般ユーザーが bucket 内の画像を閲覧できるようになる。</sub>
+<sub># bucket データの公開オブジェクト設定のコマンド<br>※ これにより、一般ユーザーが bucket 内の画像を閲覧できるようになる。</sub>
 
 ```bash
 gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
@@ -186,7 +199,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
 
 以下コマンドを叩く
 
-<sub># Secret Manage に DBパスワードなど秘密情報を登録するコマンド。</sub>
+<sub># Secret Manager に DBパスワードなど秘密情報を登録するコマンド</sub>
 
 ```bash
 printf '%s' "${DB_PASSWORD}" | gcloud secrets create DB_PASSWORD --data-file=-
@@ -194,7 +207,7 @@ openssl rand -base64 32 | gcloud secrets create SESSION_SECRET --data-file=-
 openssl rand -base64 32 | gcloud secrets create APP_KEY --data-file=-
 ```
 
-<sub># Cloud Run（アプリ側）から secret を参照できるよう、実行サービスアカウントへ権限を付与するコマンド。</sub>
+<sub># Cloud Run（アプリ側）から secret を参照できるよう、実行サービスアカウントへ権限を付与するコマンド</sub>
 
 ```bash
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
@@ -202,7 +215,7 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/secretmanager.secretAccessor"
 ```
 
-<sub># Cloud Run（アプリ側）から Cloud SQL にアクセスできるよう、実行サービスアカウントへ権限を付与するコマンド。</sub>
+<sub># Cloud Run（アプリ側）から Cloud SQL にアクセスできるよう、実行サービスアカウントへ権限を付与するコマンド</sub>
 
 ```bash
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
@@ -214,32 +227,29 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 
 ## 7. Docker image を build & push
 
-もし Cloud Shell 前提なら以下にてソースコードを用意する必要あり。<br>
-<br>
-
-### 7-1. Cloud Shell にソースコードを用意する
+### 7-1. ソースコードを用意する
 
 以下コマンドを叩く
 
-<sub># git clone でこのアプリのソースをダウンロードする。</sub>
+<sub># git clone でこのアプリのソースをダウンロードするコマンド</sub>
 
 ```bash
 git clone https://github.com/kazuyaTakahashi1988/docker-express.git
 ```
 
-<sub># このアプリのソースがある階層に移動する。</sub>
+<sub># このアプリのソースがある階層に移動するコマンド</sub>
 
 ```bash
-cd ~/docker-express
+cd docker-express
 ```
 
-<sub># git switch で、このアプリの Google Cloud リリース用ブランチに切り替える。</sub>
+<sub># git switch で、このアプリの Google Cloud リリース用ブランチに切り替えるコマンド</sub>
 
 ```bash
 git switch for-google-cloud
 ```
 
-<sub># このアプリ root にいることを確認するコマンド。</sub>
+<sub># このアプリ root にいることを確認するコマンド</sub>
 
 ```bash
 pwd
@@ -252,7 +262,7 @@ test -f app/Dockerfile && test -f app/package.json && echo "OK: app build contex
 
 以下コマンドを叩く
 
-<sub># IMAGEの環境変数と Artifact Registry repository を確認するコマンド群。（これら、不要なら無視してOK）</sub>
+<sub># IMAGEの環境変数と Artifact Registry repository を確認するコマンド群（これら、不要なら無視してOK）</sub>
 
 ```bash
 gcloud config set project "${PROJECT_ID}"
@@ -279,7 +289,7 @@ gcloud artifacts repositories describe "${REPOSITORY}" \
 BUILD_PUSH_COUNT="1"
 ```
 
-<sub># Cloud Build の実行サービスアカウントに build 実行権限を付与するコマンド。</sub>
+<sub># Cloud Build の実行サービスアカウントに build 実行権限を付与するコマンド</sub>
 
 ```bash
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
@@ -287,7 +297,7 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/cloudbuild.builds.builder"
 ```
 
-<sub># Cloud Build の実行サービスアカウントに storage を読む権限を与えるコマンド。</sub>
+<sub># Cloud Build の実行サービスアカウントに storage を読む権限を与えるコマンド</sub>
 
 ```bash
 gcloud storage buckets add-iam-policy-binding "gs://${CLOUDBUILD_BUCKET}" \
@@ -295,7 +305,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${CLOUDBUILD_BUCKET}" \
   --role="roles/storage.objectViewer"
 ```
 
-<sub># ソースコード `app/Dockerfile` を Artifact Registry に build & push するコマンド。</sub>
+<sub># ソースコード `app/Dockerfile` を Artifact Registry に build & push するコマンド</sub>
 
 ```bash
 gcloud builds submit app --tag "${IMAGE}"
@@ -303,17 +313,21 @@ gcloud builds submit app --tag "${IMAGE}"
 
 <br>
 
-### 7-4. もし Artifact Registry への push 権限エラーが出た場合、追加で以下の対応を
+### 7-4. もしも Artifact Registry への push 権限エラーが出た場合、追加で以下の対応を
 
-Source archive の読み取りは通ったが、Artifact Registry への push で `Permission denied` や `denied: Permission` のようなエラーになる場合は、同じ build 実行サービスアカウントに Artifact Registry writer を付与してから再実行してください。
+<sub># Cloud Build の実行サービスアカウントに Artifact Registry へ Docker イメージを書き込む権限を与えるコマンド</sub>
 
 ```bash
-BUILD_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-
 gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
   --location="${REGION}" \
   --member="serviceAccount:${BUILD_SERVICE_ACCOUNT}" \
   --role="roles/artifactregistry.writer"
+```
+
+<sub># ソースコード `app/Dockerfile` を Artifact Registry に build & push するコマンド</sub>
+
+```bash
+gcloud builds submit app --tag "${IMAGE}"
 ```
 
 <br>
@@ -322,28 +336,29 @@ gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
 
 以下コマンドを叩く
 
-<sub># Artifact Registry に保存されている Docker イメージの一覧を表示するコマンド。</sub>
+<sub># Artifact Registry に保存されている Docker イメージの一覧を表示するコマンド</sub>
 
 ```bash
 gcloud artifacts docker images list \
   "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}"
 ```
 
-<sub># 特定の Docker イメージに付いているタグ一覧を表示するコマンド。</sub>
+<sub># 特定の Docker イメージに付いているタグ一覧を表示するコマンド</sub>
 
 ```bash
 gcloud artifacts docker tags list \
   "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}"
 ```
 
-<sub>`TAG: demo` が表示されれば、Cloud Run に渡す image の準備は完了です。</sub>
-<br><br>
+`TAG: demo` が表示されれば、Cloud Run に渡す image の準備は完了です。
+
+<br>
 
 ## 8. build & push されたものを Cloud Run にデプロイ
 
 以下コマンドを叩く
 
-<sub># build & push されたものを Cloud Run にデプロイするコマンド。</sub>
+<sub># build & push されたものを Cloud Run にデプロイするコマンド</sub>
 
 ```bash
 gcloud run deploy "${SERVICE}" \
@@ -359,7 +374,7 @@ gcloud run deploy "${SERVICE}" \
   --max-instances 1
 ```
 
-コマンド成功後、以下のように公開URLが表示されるので控えておくこと<br>
+コマンド成功後、以下のようにアプリ公開URLが表示されるので控えておくこと<br>
 `" Service URL: https://xxxx.run.app "`
 
 <br>
@@ -370,7 +385,7 @@ gcloud run deploy "${SERVICE}" \
 
 以下コマンドを叩く
 
-<sub># migration job を作成するコマンド。</sub>
+<sub># migration job を作成するコマンド</sub>
 
 ```bash
 gcloud run jobs create dockerexpress-migrate \
@@ -383,7 +398,7 @@ gcloud run jobs create dockerexpress-migrate \
   --args run,migrate
 ```
 
-<sub># migration job を実行するコマンド。</sub>
+<sub># migration job を実行するコマンド</sub>
 
 ```bash
 gcloud run jobs execute dockerexpress-migrate \
@@ -397,7 +412,7 @@ gcloud run jobs execute dockerexpress-migrate \
 
 以下コマンドを叩く
 
-<sub># seed job を作成するコマンド。</sub>
+<sub># seed job を作成するコマンド</sub>
 
 ```bash
 gcloud run jobs create dockerexpress-seed \
@@ -411,7 +426,7 @@ gcloud run jobs create dockerexpress-seed \
 
 ```
 
-<sub># seed job を実行するコマンド。</sub>
+<sub># seed job を実行するコマンド</sub>
 
 ```bash
 gcloud run jobs execute dockerexpress-seed \
@@ -420,26 +435,30 @@ gcloud run jobs execute dockerexpress-seed \
 ```
 
 これにてリリース完了です。<br>
-先ほど控えた公開URLおよび " Service URL: https://xxxx.run.app " をブラウザで確認する。
+先ほど控えたアプリ公開URL `" Service URL: https://xxxx.run.app "` をブラウザで確認する。
 <br>
 
 <br>
 
-## 10. SNSシェアに対応したい場合（twitter:cardなど）、追加で以下の対応を
+## 10. もしも meta情報（twitter:cardなど）を指定したい場合、追加で以下の対応を
 
 以下コマンドを叩く
 
-<sub># アプリ内（メタ情報など）のデフォルト値を指定<br>
-先ほど控えた公開URLを SITE_HOST に入れる</sub>
+<sub># アプリ内（メタ情報など）のデフォルト値を指定</sub>
 
 ```bash
-# 先ほど控えた公開URLを SITE_HOST に入れる
+# 先ほど控えたアプリ公開URLを SITE_HOST に入れる
 
 SITE_HOST="https://xxxx.run.app"
+```
+
+```bash
+# Google Cloud コンソール画面にて ${BUCKET} バケットの " /images/common/ogp.png " にデフォルトOGP画像を直接格納しておくこと
+
 DEFAULT_OGP_IMAGE_URL="https://storage.googleapis.com/${BUCKET}/images/common/ogp.png"
 ```
 
-<sub># （手順8.と同様）build & push されたものを Cloud Run にデプロイするコマンド。</sub>
+<sub># （手順8.と同様）build & push されたものを Cloud Run にデプロイするコマンド</sub>
 
 ```bash
 gcloud run deploy "${SERVICE}" \
@@ -455,7 +474,7 @@ gcloud run deploy "${SERVICE}" \
   --max-instances 1
 ```
 
-公開URLをブラウザで確認する。
+アプリ公開URLをブラウザで確認する。
 <br><br>
 
 ## 11. 他、リソース削除方法
