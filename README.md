@@ -245,11 +245,11 @@ test -f app/Dockerfile && test -f app/package.json && echo "OK: app build contex
 
 <br>
 
-### 7-2. 変数と Artifact Registry repository を確認する（これら、不要なら無視してOK）
+### 7-2. 変数と Artifact Registry repository を確認する
 
 以下コマンドを叩く
 
-<sub># IMAGEの環境変数と Artifact Registry repository を確認するコマンド群</sub>
+<sub># IMAGEの環境変数と Artifact Registry repository を確認するコマンド群（これら、不要なら無視してOK）</sub>
 
 ```bash
 gcloud config set project "${PROJECT_ID}"
@@ -435,9 +435,11 @@ gcloud run jobs execute dockerexpress-seed \
 
 ```bash
 # 先ほど控えた公開URLを SITE_HOST に入れる
-# Google Cloud コンソール画面にて ${BUCKET} バケットの " /images/common/ogp.png " にデフォルトOGP画像を直接格納しておくこと
 
 SITE_HOST="https://xxxx.run.app"
+
+# Google Cloud コンソール画面にて ${BUCKET} バケットの " /images/common/ogp.png " にデフォルトOGP画像を直接格納しておくこと
+
 DEFAULT_OGP_IMAGE_URL="https://storage.googleapis.com/${BUCKET}/images/common/ogp.png"
 ```
 
