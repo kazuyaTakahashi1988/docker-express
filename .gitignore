@@ -7,3 +7,13 @@ app/public/uploads/*
 
 # TypeScript build output
 app/dist/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!.tfvars.example
+crash.log
+crash.*.log
+*.tfplan
