@@ -1,0 +1,9 @@
+project_id = "your-gcp-project-id"
+region     = "asia-northeast1"
+
+# Optional: set after the first apply if you want metadata to use the final Run URL.
+# site_host = "https://dockerexpress-xxxxx-an.a.run.app"
+
+# Optional: provide your own passwords. If omitted, Terraform generates them.
+# database_password = "change-this"
+# root_password     = "change-this"
