@@ -230,19 +230,19 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 
 以下コマンドを叩く
 
-<sub># git clone でこのアプリのソースをダウンロードする</sub>
+<sub># git clone でこのアプリのソースをダウンロードするコマンド</sub>
 
 ```bash
 git clone https://github.com/kazuyaTakahashi1988/docker-express.git
 ```
 
-<sub># このアプリのソースがある階層に移動する</sub>
+<sub># このアプリのソースがある階層に移動するコマンド</sub>
 
 ```bash
 cd ~/docker-express
 ```
 
-<sub># git switch で、このアプリの Google Cloud リリース用ブランチに切り替える</sub>
+<sub># git switch で、このアプリの Google Cloud リリース用ブランチに切り替えるコマンド</sub>
 
 ```bash
 git switch for-google-cloud
@@ -439,7 +439,7 @@ gcloud run jobs execute dockerexpress-seed \
 
 <br>
 
-## 10. meta情報（twitter:cardなど）を指定したい場合、追加で以下の対応を
+## 10. もしも meta情報（twitter:cardなど）を指定したい場合、追加で以下の対応を
 
 以下コマンドを叩く
 
