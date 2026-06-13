@@ -9,7 +9,7 @@
 - Cloud Storage: 投稿画像、プロフィール画像、CKEditor 画像の保存先
   <br><br>
 
-# Google Cloud / Cloud Run デプロイ手順（1. ~ 10.）
+# Google Cloud / Cloud Run デプロイ手順（1. ~ 9.）
 
 事前準備
 
@@ -83,7 +83,7 @@ BUCKET="${PROJECT_ID}-dockerexpress-uploads"
 UPLOADS_BASE_URL="https://storage.googleapis.com/${BUCKET}/uploads"
 ```
 
-<sub># meta情報（twitter:cardなど）用の値。不要なら空文字のままでOK（のち手順10.で再設定可）</sub>
+<sub># meta情報（twitter:cardなど）用の値。不要なら空文字のままでOK（のち再設定可）</sub>
 
 ```bash
 SITE_HOST=""
@@ -440,7 +440,7 @@ gcloud run jobs execute dockerexpress-seed \
 
 <br>
 
-## 10. もしも meta情報（twitter:cardなど）を指定したい場合、追加で以下の対応を
+## meta情報（twitter:cardなど）を指定したい場合、追加で以下の対応を
 
 以下コマンドを叩く
 
@@ -477,7 +477,7 @@ gcloud run deploy "${SERVICE}" \
 アプリ公開URLをブラウザで確認する。
 <br><br>
 
-## 11. 他、リソース削除方法
+## リソース削除方法
 
 個別に削除する場合の例です。
 
