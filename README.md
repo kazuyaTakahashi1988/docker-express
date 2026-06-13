@@ -1,3 +1,4 @@
+<img width="1200" height="630" alt="ogp" src="https://github.com/user-attachments/assets/52dfc032-efe6-4089-a231-07713c2adfbf" />
 # ローカル開発環境
 
 - Docker v29.5.2 以降推奨
