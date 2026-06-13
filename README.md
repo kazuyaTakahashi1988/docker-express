@@ -237,7 +237,7 @@ git clone https://github.com/kazuyaTakahashi1988/docker-express.git
 <sub># このアプリのソースがある階層に移動するコマンド</sub>
 
 ```bash
-cd ~/docker-express
+cd docker-express
 ```
 
 <sub># git switch で、このアプリの Google Cloud リリース用ブランチに切り替えるコマンド</sub>
