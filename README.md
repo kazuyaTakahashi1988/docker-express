@@ -66,6 +66,13 @@ BUCKET="${PROJECT_ID}-dockerexpress-uploads"
 UPLOADS_BASE_URL="https://storage.googleapis.com/${BUCKET}/uploads"
 ```
 
+<sub># meta情報（twitter:cardなど）用の値。不要なら空文字のままでOK（のち手順10.で再設定）</sub>
+
+```bash
+SITE_HOST=""
+DEFAULT_OGP_IMAGE_URL=""
+```
+
 <br>
 
 ## 2. Google Cloud の API を有効化する
@@ -187,7 +194,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
 
 以下コマンドを叩く
 
-<sub># Secret Manage に DBパスワードなど秘密情報を登録するコマンド</sub>
+<sub># Secret Manager に DBパスワードなど秘密情報を登録するコマンド</sub>
 
 ```bash
 printf '%s' "${DB_PASSWORD}" | gcloud secrets create DB_PASSWORD --data-file=-
@@ -428,11 +435,11 @@ gcloud run jobs execute dockerexpress-seed \
 
 <br>
 
-## 10. SNSシェアに対応したい場合（twitter:cardなど）、追加で以下の対応を
+## 10. meta情報に対応したい場合（twitter:cardなど）、追加で以下の対応を
 
 以下コマンドを叩く
 
-<sub># アプリ内（メタ情報など）のデフォルト値を指定<br>
+<sub># アプリ内（メタ情報など）のデフォルト値を指定</sub>
 
 ```bash
 # 先ほど控えた公開URLを SITE_HOST に入れる
