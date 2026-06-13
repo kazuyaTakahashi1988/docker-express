@@ -26,7 +26,7 @@
 </sub>
 
 ```bash
-# プロジェクトIDを "xxxx" 箇所に入れること
+# プロジェクトIDを xxxx 箇所に入れること
 
 PROJECT_ID="xxxx"
 REGION="asia-northeast1"
@@ -40,13 +40,23 @@ SERVICE="dockerexpress"
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:demo"
 ```
 
-<sub># DB（Cloud SQL for MySQL）とテーブル/ユーザー名の指定</sub>
+<sub># DB（Cloud SQL for MySQL）の指定</sub>
 
 ```bash
 INSTANCE="dockerexpress-mysql"
 DATABASE="express_db"
 DB_USER="dockerexpress_user"
 CONNECTION_NAME="${PROJECT_ID}:${REGION}:${INSTANCE}"
+```
+
+<sub># MySQLのルートパスワードとDBパスワードを指定</sub>
+
+```bash
+# 任意の文字列を xxxx 箇所に入れること
+# 特殊文字・記号を用いると、エラーに繋がる恐れあり（解消方もあるが一旦、demo目的では半/全角英数字だけ用いること）
+
+MYSQL_ROOT_PASSWORD="xxxx"
+DB_PASSWORD="xxxx"
 ```
 
 <sub># Cloud Run 用の実行サービスアカウントの指定</sub>
@@ -122,18 +132,6 @@ gcloud artifacts repositories create "${REPOSITORY}" \
 
 以下コマンドを叩く
 
-<sub># 任意の文字列を "xxxx" 箇所に入れ、MySQLのルートパスワードとDBパスワードを指定<br>
-特殊文字・記号を使用すると、`bash: !xxxx: event not found` エラーが出ることあり<br>
-（解消方もあるが、demo目的なら半/全角英数字だけ用いるとよい）
-</sub>
-
-```bash
-# 任意の文字列を "xxxx" 箇所に入れること
-
-MYSQL_ROOT_PASSWORD="xxxx"
-DB_PASSWORD="xxxx"
-```
-
 <sub># MySQLのインスタンスを作成、およびルートパスワードを設定するコマンド（※ 結構時間かかる）</sub>
 
 ```bash
@@ -176,7 +174,7 @@ gcloud storage buckets create "gs://${BUCKET}" \
   --uniform-bucket-level-access
 ```
 
-<sub># Cloud Run の実行サービスアカウントに bucket 権限を付与するコマンド<br>これにより、Cloud Run（アプリ側） から bucket への画像データの格納/読み書きが可能となる。</sub>
+<sub># Cloud Run の実行サービスアカウントに bucket 権限を付与するコマンド<br>※ これにより、Cloud Run（アプリ側） から bucket への画像データの格納/読み書きが可能となる。</sub>
 
 ```bash
 gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
@@ -184,7 +182,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
   --role="roles/storage.objectAdmin"
 ```
 
-<sub># bucket データの公開オブジェクト設定のコマンド<br>これにより、一般ユーザーが bucket 内の画像を閲覧できるようになる。</sub>
+<sub># bucket データの公開オブジェクト設定のコマンド<br>※ これにより、一般ユーザーが bucket 内の画像を閲覧できるようになる。</sub>
 
 ```bash
 gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
@@ -373,7 +371,7 @@ gcloud run deploy "${SERVICE}" \
   --max-instances 1
 ```
 
-コマンド成功後、以下のように公開URLが表示されるので控えておくこと<br>
+コマンド成功後、以下のようにアプリ公開URLが表示されるので控えておくこと<br>
 `" Service URL: https://xxxx.run.app "`
 
 <br>
@@ -434,7 +432,7 @@ gcloud run jobs execute dockerexpress-seed \
 ```
 
 これにてリリース完了です。<br>
-先ほど控えた公開URL `" Service URL: https://xxxx.run.app "` をブラウザで確認する。
+先ほど控えたアプリ公開URL `" Service URL: https://xxxx.run.app "` をブラウザで確認する。
 <br>
 
 <br>
@@ -446,7 +444,7 @@ gcloud run jobs execute dockerexpress-seed \
 <sub># アプリ内（メタ情報など）のデフォルト値を指定</sub>
 
 ```bash
-# 先ほど控えた公開URLを SITE_HOST に入れる
+# 先ほど控えたアプリ公開URLを SITE_HOST に入れる
 
 SITE_HOST="https://xxxx.run.app"
 ```
@@ -473,7 +471,7 @@ gcloud run deploy "${SERVICE}" \
   --max-instances 1
 ```
 
-公開URLをブラウザで確認する。
+アプリ公開URLをブラウザで確認する。
 <br><br>
 
 ## 11. 他、リソース削除方法
