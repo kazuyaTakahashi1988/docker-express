@@ -435,7 +435,7 @@ gcloud run jobs execute dockerexpress-seed \
 
 <br>
 
-## 10. meta情報に対応したい場合（twitter:cardなど）、追加で以下の対応を
+## 10. meta情報（twitter:cardなど）を指定したい場合、追加で以下の対応を
 
 以下コマンドを叩く
 
