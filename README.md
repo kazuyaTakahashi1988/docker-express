@@ -11,14 +11,18 @@
 
 # Google Cloud / Cloud Run デプロイ手順（1. ~ 10.）
 
-Cloud Shell 上、またはローカル環境（ Cloud SDK インストール済みのターミナル）で以下コマンド群を順に叩いていく
-<br><br>
+事前準備
+
+- Google Cloud コンソールで新規プロジェクトを立ち上げておく
+- 立ち上げたプロジェクトのプロジェクトIDを控えておく
+- Cloud Shell 操作環境（簡単でオススメ）or ローカル環境（ Cloud SDK インストール済みのターミナル）
+  <br><br>
 
 ## 1. 使用する環境変数を設定する
 
 以下コマンドを叩く
 
-<sub># プロジェクトIDを "xxxx" 箇所に入れ、プロジェクトIDとリージョンの指定<br>
+<sub># プロジェクトIDとリージョンの指定<br>
 </sub>
 
 ```bash
@@ -66,7 +70,7 @@ BUCKET="${PROJECT_ID}-dockerexpress-uploads"
 UPLOADS_BASE_URL="https://storage.googleapis.com/${BUCKET}/uploads"
 ```
 
-<sub># meta情報（twitter:cardなど）用の値。不要なら空文字のままでOK（のち手順10.で再設定）</sub>
+<sub># meta情報（twitter:cardなど）用の値。不要なら空文字のままでOK（のち手順10.で再設定可）</sub>
 
 ```bash
 SITE_HOST=""
@@ -119,8 +123,8 @@ gcloud artifacts repositories create "${REPOSITORY}" \
 以下コマンドを叩く
 
 <sub># 任意の文字列を "xxxx" 箇所に入れ、MySQLのルートパスワードとDBパスワードを指定<br>
-特殊文字・記号を使用すると、`bash: !xxxx: event not found` エラーが出ることあり。<br>
-（解消の仕方はあるが、demo目的なら半/全角英数字だけ用いるとよい）
+特殊文字・記号を使用すると、`bash: !xxxx: event not found` エラーが出ることあり<br>
+（解消方もあるが、demo目的なら半/全角英数字だけ用いるとよい）
 </sub>
 
 ```bash
