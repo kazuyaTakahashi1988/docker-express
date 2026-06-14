@@ -18,6 +18,7 @@ This directory manages the Google Cloud resources used by the app:
    ```bash
    gcloud auth application-default login
    gcloud config set project YOUR_PROJECT_ID
+   gcloud services enable cloudresourcemanager.googleapis.com
    ```
 
 3. Copy the sample variables file:
