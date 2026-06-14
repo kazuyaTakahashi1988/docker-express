@@ -97,7 +97,7 @@ resource "google_sql_database_instance" "mysql" {
     disk_type         = "PD_SSD"
   }
 
-  deletion_protection = true
+  deletion_protection = false
 
   depends_on = [google_project_service.required]
 }
