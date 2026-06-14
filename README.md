@@ -9,6 +9,30 @@
 - Cloud Storage: 投稿画像、プロフィール画像、CKEditor 画像の保存先
   <br><br>
 
+
+## Terraform で管理したい場合
+
+この Google Cloud 構成は Terraform でも管理できます。Terraform 定義は `terraform/` に配置しています。
+
+```bash
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# terraform.tfvars の project_id を編集
+gcloud services enable serviceusage.googleapis.com cloudresourcemanager.googleapis.com
+terraform init
+terraform apply -var="deploy_cloud_run=false"
+gcloud builds submit ../app \
+  --gcs-source-staging-dir "$(terraform output -raw cloud_build_source_staging_dir)" \
+  --tag "$(terraform output -raw image)"
+terraform apply
+```
+
+注意: `gcloud builds submit ../app --tag "$(terraform output -raw image)"` のように `--gcs-source-staging-dir` なしで実行すると、暗黙の `${PROJECT_ID}_cloudbuild` bucket が使われ、`storage.objects.get` 権限エラーが再発することがあります。
+
+詳しい手順、migration / seed 用 Cloud Run Jobs の実行方法、注意点は [`terraform/README.md`](terraform/README.md) を参照してください。
+
+<br>
+
 # Google Cloud / Cloud Run デプロイ手順（1. ~ 10.）
 
 事前準備
@@ -107,7 +131,9 @@ gcloud services enable \
   sqladmin.googleapis.com \
   artifactregistry.googleapis.com \
   cloudbuild.googleapis.com \
+  cloudresourcemanager.googleapis.com \
   secretmanager.googleapis.com \
+  serviceusage.googleapis.com \
   storage.googleapis.com
 ```
 
@@ -305,7 +331,9 @@ gcloud storage buckets add-iam-policy-binding "gs://${CLOUDBUILD_BUCKET}" \
 <sub># ソースコード `app/Dockerfile` を Artifact Registry に build & push するコマンド</sub>
 
 ```bash
-gcloud builds submit app --tag "${IMAGE}"
+gcloud builds submit app \
+  --gcs-source-staging-dir "gs://${CLOUDBUILD_BUCKET}/source" \
+  --tag "${IMAGE}"
 ```
 
 <br>
@@ -324,7 +352,9 @@ gcloud artifacts repositories add-iam-policy-binding "${REPOSITORY}" \
 <sub># ソースコード `app/Dockerfile` を Artifact Registry に build & push するコマンド</sub>
 
 ```bash
-gcloud builds submit app --tag "${IMAGE}"
+gcloud builds submit app \
+  --gcs-source-staging-dir "gs://${CLOUDBUILD_BUCKET}/source" \
+  --tag "${IMAGE}"
 ```
 
 <br>
