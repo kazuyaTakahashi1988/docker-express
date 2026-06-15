@@ -19,7 +19,7 @@
   <br>
 
 操作環境で以下のコマンド群を叩いていく<br>
-<sub>（terraform でデプロイしたい人は<a href="https://github.com/kazuyaTakahashi1988/docker-express/tree/for-google-cloud/terraform" target="_blank">こちら</a>へ）</sub>
+<sub>※ terraform でデプロイしたい人は<a href="https://github.com/kazuyaTakahashi1988/docker-express/tree/for-google-cloud/terraform" target="_blank">こちら</a>へ</sub>
 <br><br>
 
 ## 1. 使用する環境変数を設定する
