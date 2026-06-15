@@ -1,0 +1,9 @@
+variable "name" { type = string }
+variable "region" { type = string }
+variable "image" { type = string }
+variable "service_account" { type = string }
+variable "command" { type = list(string) }
+variable "args" { type = list(string) }
+variable "env" { type = map(string) }
+variable "secret_env" { type = map(string) }
+variable "cloud_sql_instances" { type = list(string) }
