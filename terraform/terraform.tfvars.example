@@ -1,4 +1,4 @@
-project_id = "your-gcp-project-id"
+project_id = "xxxx"
 region     = "asia-northeast1"
 
 # Optional: set after the first apply if you want metadata to use the final Run URL.

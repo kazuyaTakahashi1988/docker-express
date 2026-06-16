@@ -1,93 +1,122 @@
-# Terraform for Docker Express on Google Cloud
+# Terraform によるデプロイ手順
 
-This directory manages the Google Cloud resources used by the app:
+事前準備
 
-- Cloud Run service for the Express container
-- Cloud Run Jobs for migration and seed execution
-- Cloud SQL for MySQL 8.4
-- Artifact Registry Docker repository
-- Secret Manager secrets
-- Cloud Storage bucket for uploads
-- IAM bindings and required Google Cloud APIs, including Cloud Resource Manager and Service Usage
+- Google Cloud コンソールで新規プロジェクトを立ち上げておく
+- 立ち上げたプロジェクトのプロジェクトIDを控えておく
+- Cloud Shell 操作環境（★初心者にオススメ）<br>またはローカル操作環境（ Cloud SDK インストール & auth login 済みのターミナル）
+- Terraform v1.6 以上の環境
+  <br><br>
 
-## Prerequisites
+## デプロイ環境の準備（1. ~ 4.）
 
-1. Install Terraform `>= 1.6` and the Google Cloud CLI.
-2. Authenticate with Google Cloud. Terraform runs the bootstrap API enablement for Cloud Resource Manager and Service Usage with `gcloud services enable`, so you do not need to run that command manually:
+1. Terraform v1.6 以上の環境であることを確認する<br><sub>※ v1.6 未満だとデプロイまで進めない</sub>
 
    ```bash
-   gcloud auth application-default login
+   terraform -v
    ```
 
-   If you use `gcloud` commands outside Terraform, set the active project as usual:
+2. 操作対象となるデフォルトのプロジェクトを指定する
 
    ```bash
-   gcloud config set project YOUR_PROJECT_ID
+   # プロジェクトIDを xxxx 箇所に入れること
+   gcloud config set project "xxxx"
    ```
 
-3. Copy the sample variables file:
+3. ソースコードを用意する
+
+   <sub># git clone でこのアプリのソースをダウンロードする</sub>
+
+   ```bash
+   git clone https://github.com/kazuyaTakahashi1988/docker-express.git
+   ```
+
+   <sub># このアプリのソースがある階層に移動する</sub>
+
+   ```bash
+   cd docker-express
+   ```
+
+   <sub># git switch で、このアプリの Google Cloud リリース用ブランチに切り替える</sub>
+
+   ```bash
+   git switch for-google-cloud
+   ```
+
+   <sub># terraform のソース群がある階層に移動する</sub>
+
+   ```bash
+   cd terraform
+   ```
+
+   <sub># 環境変数ファイル（サンプル用）をコピーする</sub>
 
    ```bash
    cp terraform.tfvars.example terraform.tfvars
    ```
 
-4. Edit `terraform.tfvars` and set `project_id`. If the principal running `gcloud builds submit` is not a project owner/editor, also set `build_submitter_members` so it can upload the source archive to the Terraform-managed staging bucket.
+4. コピーした環境変数ファイル `terraform.tfvars` を編集し、<br>(2.)と同様のプロジェクトIDを指定する
 
-## Deploy
+   ```bash
+   vim terraform.tfvars
+   # ファイル内 `project_id = "xxxx"` の
+   #  xxxx 個所に、(2.)と同様のプロジェクトIDを指定する
+   ```
 
-Initialize Terraform:
+<br>
 
-```bash
-terraform init
-```
+## Terraform コマンドによるデプロイ手順（1. ~ 6.）
 
-Create the infrastructure except Cloud Run first, because Cloud Run cannot deploy until the image exists:
+1. Terraform 初期化コマンド
 
-```bash
-terraform apply -var="deploy_cloud_run=false"
-```
+   ```bash
+   terraform init
+   ```
 
-Build and push the application image shown by the `image` output. Do not use `gcloud builds submit ../app --tag "$(terraform output -raw image)"` here, because that falls back to the implicit `${PROJECT_ID}_cloudbuild` bucket and can reproduce `storage.objects.get` errors on the uploaded source archive:
+2. Cloud Runを除いて、インフラストラクチャを作成するコマンド<br><sub>※ アプリケーションイメージが build & push されるまで Cloud Run はデプロイできないため</sub>
 
-```bash
-gcloud builds submit ../app \
-  --gcs-source-staging-dir "$(terraform output -raw cloud_build_source_staging_dir)" \
-  --tag "$(terraform output -raw image)"
-```
+   ```bash
+   terraform apply -var="deploy_cloud_run=false"
+   ```
 
-Apply again with the default `deploy_cloud_run=true` so Cloud Run and the jobs deploy the newly pushed image:
+3. アプリケーションイメージを build & push するコマンド
 
-```bash
-terraform apply
-```
+   ```bash
+   gcloud builds submit ../app \
+      --gcs-source-staging-dir "$(terraform output -raw cloud_build_source_staging_dir)" \
+      --tag "$(terraform output -raw image)"
+   ```
 
-Run migrations and seed data when needed:
+4. Cloud Runを含めて、全てのインフラストラクチャを作成するコマンド
 
-```bash
-gcloud run jobs execute dockerexpress-migrate --region "$(terraform output -raw region 2>/dev/null || echo asia-northeast1)" --wait
-gcloud run jobs execute dockerexpress-seed --region "$(terraform output -raw region 2>/dev/null || echo asia-northeast1)" --wait
-```
+   ```bash
+   terraform apply
+   ```
 
-You can also print the recommended build command with:
+5. migration / seed を実行するコマンド
 
-```bash
-terraform output -raw gcloud_builds_submit_command
-```
+   ```bash
+   gcloud run jobs execute dockerexpress-migrate --region "$(terraform output -raw region 2>/dev/null || echo asia-northeast1)" --wait
+   gcloud run jobs execute dockerexpress-seed --region "$(terraform output -raw region 2>/dev/null || echo asia-northeast1)" --wait
+   ```
 
-The public application URL is available with:
+6. これにてリリース完了です。<br>以下のコマンドで公開URLを入手しブラウザで確認する
 
-```bash
-terraform output cloud_run_url
-```
+   ```bash
+   terraform output cloud_run_url
+   ```
+
+   <br>
 
 ## Notes
 
-- Cloud SQL has `deletion_protection = true` to prevent accidental database deletion. Set it to `false` in `main.tf` only when intentionally destroying the environment.
-- If `database_password`, `root_password`, `SESSION_SECRET`, or `APP_KEY` are not provided, Terraform generates values and stores application secrets in Secret Manager.
-- Uploaded application objects are publicly readable to match the current application behavior for image URLs.
-- `gcloud builds submit` uses the Terraform-managed `cloud_build_source_staging_dir` bucket so the Cloud Build service account receives read access explicitly instead of relying on the implicit default Cloud Build bucket.
+- デプロイ成功後、再ビルドするための推奨ビルドコマンドを取得するコマンド
 
+  ```bash
+  terraform output -raw gcloud_builds_submit_command
+  ```
 
-## Troubleshooting Cloud Build source bucket permissions
-
-If you see an error like `does not have storage.objects.get access` for `gs://<PROJECT_ID>_cloudbuild/source/...`, you are still using Cloud Build's implicit default source bucket. Re-run the build with the documented `--gcs-source-staging-dir "$(terraform output -raw cloud_build_source_staging_dir)"` option so Cloud Build reads from the Terraform-managed bucket that has explicit IAM bindings.
+- Cloud SQL では、誤ってデータベースが削除されるのを防ぐために deletion_protection = true が設定されています。環境を意図的に破棄する場合のみ、main.tf でこの値を false に設定してください。
+- database_password、root_password、SESSION_SECRET、または APP_KEY が指定されていない場合、Terraform は値を自動生成し、アプリケーション シークレットを Secret Manager に保存します。
+- アップロードされたアプリケーション オブジェクトは、イメージ URL の現在のアプリケーションの動作に合わせて、公開読み取り可能になります。
+- gcloud builds submit は Terraform が管理する cloud_build_source_staging_dir バケットを使用するため、Cloud Build サービス アカウントは暗黙的なデフォルトの Cloud Build バケットに依存するのではなく、明示的に読み取りアクセス権を取得します。
