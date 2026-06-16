@@ -13,12 +13,16 @@ This directory manages the Google Cloud resources used by the app:
 ## Prerequisites
 
 1. Install Terraform `>= 1.6` and the Google Cloud CLI.
-2. Authenticate with Google Cloud and enable the bootstrap APIs required before Terraform can manage project services/IAM:
+2. Authenticate with Google Cloud. Terraform runs the bootstrap API enablement for Cloud Resource Manager and Service Usage with `gcloud services enable`, so you do not need to run that command manually:
 
    ```bash
    gcloud auth application-default login
+   ```
+
+   If you use `gcloud` commands outside Terraform, set the active project as usual:
+
+   ```bash
    gcloud config set project YOUR_PROJECT_ID
-   gcloud services enable serviceusage.googleapis.com cloudresourcemanager.googleapis.com
    ```
 
 3. Copy the sample variables file:
