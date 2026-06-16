@@ -1,5 +1,18 @@
+resource "null_resource" "bootstrap_project_apis" {
+  triggers = {
+    project_id = var.project_id
+    services   = "cloudresourcemanager.googleapis.com,serviceusage.googleapis.com"
+  }
+
+  provisioner "local-exec" {
+    command = "gcloud services enable ${replace(self.triggers.services, ",", " ")} --project=${self.triggers.project_id}"
+  }
+}
+
 data "google_project" "current" {
   project_id = var.project_id
+
+  depends_on = [null_resource.bootstrap_project_apis]
 }
 
 locals {
