@@ -23,6 +23,7 @@
 
    ```bash
    # プロジェクトIDを xxxx 箇所に入れること
+
    gcloud config set project "xxxx"
    ```
 
@@ -58,12 +59,13 @@
    cp terraform.tfvars.example terraform.tfvars
    ```
 
-4. コピーした環境変数ファイル `terraform.tfvars` を編集し、<br>(2.)と同様のプロジェクトIDを指定する
+4. コピーした環境変数ファイル `terraform.tfvars` を編集し、<br>(2.) と同様のプロジェクトIDを指定する
 
    ```bash
+   # ファイル内 project_id = "xxxx" の
+   # xxxx 個所に (2.) と同様のプロジェクトIDを指定する
+
    vim terraform.tfvars
-   # ファイル内 `project_id = "xxxx"` の
-   #  xxxx 個所に、(2.)と同様のプロジェクトIDを指定する
    ```
 
 <br>

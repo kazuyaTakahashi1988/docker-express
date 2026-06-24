@@ -314,7 +314,7 @@ gcloud builds submit app --tag "${IMAGE}"
 
 <br>
 
-### 7-4. もしも Artifact Registry への push 権限エラーが出た場合、追加で以下の対応を
+#### ※ もしもエラー（ Artifact Registry への push 権限エラー）が出た場合、追加で以下の対応を
 
 <sub># Cloud Build の実行サービスアカウントに Artifact Registry へ Docker イメージを書き込む権限を与えるコマンド</sub>
 
@@ -333,7 +333,7 @@ gcloud builds submit app --tag "${IMAGE}"
 
 <br>
 
-### 7-5. 無事に push できたことを確認する
+### 7-4. 無事に push できたことを確認する
 
 以下コマンドを叩く
 
