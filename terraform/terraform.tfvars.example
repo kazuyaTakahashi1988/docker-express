@@ -1,12 +1,58 @@
+# Required: Google Cloud project ID and deployment region.
+# README.md: PROJECT_ID / REGION
 project_id = "xxxx"
 region     = "asia-northeast1"
 
-# Optional: set after the first apply if you want metadata to use the final Run URL.
-# site_host = "https://dockerexpress-xxxxx-an.a.run.app"
+# Artifact Registry / Cloud Run image settings.
+# README.md: REPOSITORY / SERVICE / IMAGE
+repository_id = "dockerexpress"
+service_name  = "dockerexpress"
+image_tag     = "demo"
 
-# Optional: provide your own passwords. If omitted, Terraform generates them.
-# database_password = "change-this"
+# Cloud SQL for MySQL settings.
+# README.md: INSTANCE / DATABASE / DB_USER / CONNECTION_NAME
+# CONNECTION_NAME is derived as <project_id>:<region>:<cloud_sql_instance_name>.
+cloud_sql_instance_name = "dockerexpress-mysql"
+database_name           = "express_db"
+database_user           = "dockerexpress_user"
+
+# MySQL passwords.
+# README.md: MYSQL_ROOT_PASSWORD / DB_PASSWORD
+# If omitted, Terraform generates them and stores DB_PASSWORD in Secret Manager.
 # root_password     = "change-this"
+# database_password = "change-this"
 
-# Optional: if the principal running `gcloud builds submit` is not a project owner/editor, grant upload access to the Terraform-managed staging bucket.
+# Cloud Run / Cloud Build service accounts.
+# README.md: PROJECT_NUMBER / RUN_SERVICE_ACCOUNT / BUILD_SERVICE_ACCOUNT
+# Terraform derives the project number automatically, creates a dedicated Cloud Run
+# runtime service account, and grants Cloud Build permissions to the project service
+# accounts. No manual value is required here.
+
+# Cloud Build source staging bucket.
+# README.md: CLOUDBUILD_BUCKET
+cloud_build_source_bucket_name = "xxxx_cloudbuild"
+
+# Optional: if the principal running `gcloud builds submit` is not a project
+# owner/editor, grant upload access to the Terraform-managed staging bucket.
 # build_submitter_members = ["user:you@example.com"]
+
+# Cloud Storage bucket and public upload URL.
+# README.md: BUCKET / UPLOADS_BASE_URL
+# Leave bucket_name null to use <project_id>-dockerexpress-uploads.
+# Leave uploads_base_url empty to use https://storage.googleapis.com/<bucket_name>/uploads.
+# bucket_name      = "xxxx-dockerexpress-uploads"
+# uploads_base_url = "https://storage.googleapis.com/xxxx-dockerexpress-uploads/uploads"
+
+# Metadata values. Leave empty if unnecessary; you can set them later.
+# README.md: SITE_HOST / DEFAULT_OGP_IMAGE_URL
+site_host             = ""
+default_ogp_image_url = ""
+
+# Application / Cloud Run tuning.
+build_push_count = "terraform"
+upload_max_bytes = 5242880
+min_instances    = 0
+max_instances    = 1
+
+# Set false for the first apply before the container image is built and pushed.
+deploy_cloud_run = true
