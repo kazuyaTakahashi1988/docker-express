@@ -83,6 +83,12 @@ variable "site_host" {
   default     = ""
 }
 
+variable "uploads_base_url" {
+  description = "Base URL for uploaded files. Leave empty to derive https://storage.googleapis.com/<bucket_name>/uploads."
+  type        = string
+  default     = ""
+}
+
 variable "default_ogp_image_url" {
   description = "Default OGP image URL. Leave empty to derive a Cloud Storage URL."
   type        = string

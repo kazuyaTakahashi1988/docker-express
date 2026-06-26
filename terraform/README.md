@@ -62,7 +62,8 @@
 4. コピーした環境変数ファイル `terraform.tfvars` を編集し、<br>(2.) と同様のプロジェクトIDを指定する
 
    ```bash
-   # ファイル内 project_id = "xxxx" の
+   # project_id = "xxxx" と
+   # cloud_build_source_bucket_name = "xxxx_cloudbuild" の
    # xxxx 個所に (2.) と同様のプロジェクトIDを指定する
 
    vim terraform.tfvars

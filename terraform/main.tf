@@ -21,7 +21,7 @@ locals {
   cloud_build_source_staging_dir   = "gs://${local.cloud_build_source_bucket_name}/source"
   image                            = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repository_id}/${var.service_name}:${var.image_tag}"
   db_connection_name               = "${var.project_id}:${var.region}:${var.cloud_sql_instance_name}"
-  uploads_base_url                 = "https://storage.googleapis.com/${local.bucket_name}/uploads"
+  uploads_base_url                 = var.uploads_base_url != "" ? var.uploads_base_url : "https://storage.googleapis.com/${local.bucket_name}/uploads"
   default_ogp_image_url            = var.default_ogp_image_url != "" ? var.default_ogp_image_url : "https://storage.googleapis.com/${local.bucket_name}/images/common/ogp.png"
 
   app_env = {
